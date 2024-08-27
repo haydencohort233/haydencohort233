@@ -1,0 +1,40 @@
+.vendor-card {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin: 10px 0;
+    max-width: 600px;
+    background-color: #f9f9f9;
+  }
+  
+  .vendor-avatar {
+    width: 64px;
+    height: 64px;
+    margin-right: 15px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  
+  .vendor-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .vendor-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 0 0 5px;
+  }
+  
+  .vendor-description {
+    font-size: 1em;
+    margin: 0 0 5px;
+  }
+  
+  .vendor-location {
+    font-size: 0.9em;
+    color: #666;
+  }
+  
