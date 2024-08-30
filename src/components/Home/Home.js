@@ -9,15 +9,13 @@ const Home = () => {
   return (
     <>
       <Header />
+      <FeaturedVendors />
       <div className="home">
         <div className="main-content">
-          <h1>Welcome to Our Thrift Store</h1>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla convallis malesuada suscipit.</p>
           <div className="content-sections">
             <UpcomingEvents />
-            <FeaturedVendors />
+            <FeaturedBlogs />
           </div>
-          <FeaturedBlogs />
         </div>
       </div>
     </>

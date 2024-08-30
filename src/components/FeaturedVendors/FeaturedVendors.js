@@ -1,25 +1,45 @@
+// FeaturedVendors.js
 import React, { useState, useEffect } from 'react';
 import VendorCard from '../VendorCard/VendorCard';
 import './FeaturedVendors.css';
 
 const FeaturedVendors = () => {
   const [featured, setFeatured] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:5000/api/featured')
-      .then(response => response.json())
-      .then(data => setFeatured(data))
-      .catch(error => console.error('Error fetching featured vendors:', error));
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch featured vendors');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setFeatured([...data, ...data]); // Duplicate the data for smooth looping
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setError('Failed to load featured vendors');
+        setIsLoading(false);
+        console.error('Error fetching featured vendors:', error);
+      });
   }, []);
 
   return (
     <div className="featured-vendors">
-      <h2>Featured Vendors</h2>
-      <div className="vendor-scroll">
-        {featured.map((vendor) => (
-          <VendorCard key={vendor.id} vendor={vendor} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="loading-message">Loading featured vendors...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : (
+        <div className="vendor-scroll">
+          {featured.map((vendor, index) => (
+            <VendorCard key={index} vendor={vendor} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

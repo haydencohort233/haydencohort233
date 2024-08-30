@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import VendorCard from '../VendorCard/VendorCard';
 import AddVendor from '../AddVendor/AddVendor';
 import './VendorList.css';
+import Header from '../Header/Header';
 
 const VendorList = () => {
   const [vendors, setVendors] = useState([]);
@@ -34,7 +35,7 @@ const VendorList = () => {
 
   return (
     <div className="vendor-list">
-      <h1>Our Vendors</h1>
+      <Header />
       <div className="sort-options">
         <label htmlFor="sort">Sort by Name:</label>
         <select id="sort" value={sortOrder} onChange={handleSortChange}>
