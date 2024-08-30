@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import AddEvent from '../AddEvent/AddEvent'; // Adjust the path based on your folder structure
+import AddEvent from '../AddEvent/AddEvent';
 import './Events.css';
+import Header from '../Header/Header';
 
 const Events = () => {
   const [events, setEvents] = useState([]);
-  const [isAddEventOpen, setIsAddEventOpen] = useState(false); // Track modal state
+  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/events/upcoming?range=3') // Fetch events within the next 3 months
@@ -23,7 +24,7 @@ const Events = () => {
 
   return (
     <div className="events">
-      <h1>Expanded Events</h1>
+      <Header />
       <button className="add-event-button" onClick={handleOpenAddEvent}>
         Add Event
       </button>

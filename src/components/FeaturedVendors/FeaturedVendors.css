@@ -1,21 +1,61 @@
 /* FeaturedVendors.css */
 .featured-vendors {
-    max-width: 350px;
-    margin: 0;
-    padding: 10px;
-  }
-  
-  .vendor-scroll {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .vendor-card {
-    border: 1px solid #ccc;
+  min-width: 80%;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 0 auto;
+  background-color: #f0f0f0;
+  position: relative;
+}
 
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    width: 95%;
+.vendor-scroll {
+  display: inline-flex;
+  animation: scroll-left 10s linear infinite;
+}
+
+.featured-vendors:hover .vendor-scroll {
+  animation-play-state: paused;
+}
+
+.vendor-card {
+  display: inline-block;
+  width: 250px;
+  max-height: 170px;
+  margin-right: 50px;
+  padding: 15px;
+  background-color: #fff;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Error and Loading Message Styling */
+.error-message,
+.loading-message {
+  color: #d9534f;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 25px !important;
+  border-radius: 4px;
+  background-color: #f8d7da;
+  margin-top: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Keyframe for scrolling effect */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
   }
-  
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 668px) {
+  .featured-vendors {
+    display: none;
+  }
+}
