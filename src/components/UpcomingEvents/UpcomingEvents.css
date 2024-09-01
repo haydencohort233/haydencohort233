@@ -14,6 +14,7 @@
 }
 
 .event-item {
+  display: flex; /* Allows image and text to be side-by-side */
   padding: 10px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
@@ -21,7 +22,14 @@
   border-radius: 5px;
 }
 
-/* Custom classes for each event */
+.event-photo {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+/* Customization for each event */
 .event-1 {
   color: green;
 }
@@ -32,6 +40,12 @@
 
 .event-3 {
   color: red;
+}
+
+.event-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .event-item h3 {

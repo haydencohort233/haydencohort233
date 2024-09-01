@@ -1,15 +1,33 @@
 .header {
-  background-color: #333;
+  background: linear-gradient(to top right, purple 0%, green 100%);
   color: #fff;
   padding: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
-.header h1 {
+.header-logo-title {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  height: 50px;
+  max-height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-link {
+  display: inline-flex;
   margin: 0;
-  font-size: 24px;
+  padding: 0;
+}
+
+.header nav {
+  display: flex;
 }
 
 .header nav ul {
@@ -32,4 +50,60 @@
 
 .header nav ul li a:hover {
   text-decoration: underline;
+}
+
+/* Mobile Menu Icon */
+.menu-icon {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.menu-bar {
+  width: 25px;
+  height: 3px;
+  background-color: #fff;
+}
+
+/* Mobile Design */
+@media (max-width: 768px) {
+  .header nav {
+    display: none;
+  }
+
+  .menu-icon {
+    display: flex;
+  }
+
+  .nav.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 60px; /* Same as header height */
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 10px 20px;
+    width: 40%;
+    z-index: 1002;
+  }
+
+  .nav.open ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav.open ul li {
+    margin: 0;
+    width: 100%;
+  }
+
+  .nav.open ul li a {
+    color: #fff;
+    padding: 10px 0;
+    text-align: left;
+    display: block;
+    width: 100%;
+  }
 }

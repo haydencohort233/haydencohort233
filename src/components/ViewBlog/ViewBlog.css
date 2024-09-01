@@ -16,7 +16,6 @@
     padding: 20px;
     max-width: 600px;
     width: 100%;
-    border-radius: 8px;
     position: relative;
   }
   
@@ -45,5 +44,37 @@
   .view-blog-content-text {
     font-size: 1.1em;
     line-height: 1.6;
+  }
+  
+  .view-blog-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .view-blog-content {
+    background-color: white;
+    padding: 20px;
+    max-width: 60%;
+    max-height: 80%;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .close-modal-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+  }
+  
+  .view-blog-content-text {
+    line-height: 1.6;
+    margin-top: 20px;
   }
   

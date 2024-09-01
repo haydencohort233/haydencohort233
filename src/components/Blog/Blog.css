@@ -12,7 +12,6 @@
     margin-bottom: 40px;
     padding: 20px;
     border: 1px solid #ddd;
-    border-radius: 8px;
     background-color: #f9f9f9;
 }
 
@@ -27,7 +26,6 @@
     max-height: 300px;
     object-fit: cover;
     margin-bottom: 20px;
-    border-radius: 8px;
 }
 
 .blog-content {
@@ -81,6 +79,9 @@
     color: #007bff;
     text-decoration: none;
     font-weight: bold;
+    text-align: center; /* Center the text horizontally */
+    width: 100%; /* Ensures the text takes full width for centering */
+    cursor: pointer;
 }
 
 .read-more-link:hover {
