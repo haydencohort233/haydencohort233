@@ -1,4 +1,3 @@
-/* FeaturedBlogs.css */
 .featured-blogs {
     display: flex;
     max-width: 450px;
@@ -35,7 +34,7 @@
     text-decoration: underline;
   }
   
-/* Error message styling */
+/* Error message */
 .error-message {
     color: #d9534f;
     font-size: 16px;

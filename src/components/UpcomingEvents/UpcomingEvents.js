@@ -43,7 +43,7 @@ const UpcomingEvents = () => {
                   className="event-photo"
                   onError={(e) => {
                     console.error('Failed to load event image:', e.target.src);
-                    e.target.style.display = 'none'; // Hide image if it fails to load
+                    e.target.style.display = 'none'; // Hide image if loading fails
                   }}
                 />
               )}
