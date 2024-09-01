@@ -79,8 +79,8 @@
     color: #007bff;
     text-decoration: none;
     font-weight: bold;
-    text-align: center; /* Center the text horizontally */
-    width: 100%; /* Ensures the text takes full width for centering */
+    text-align: center;
+    width: 100%;
     cursor: pointer;
 }
 

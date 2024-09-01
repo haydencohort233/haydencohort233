@@ -9,15 +9,15 @@ body {
 }
 
 .vendor-list {
-  background-color: rgba(255, 255, 255, 0.8); /* Matches overall theme */
+  background-color: rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 1200px; /* Limits the maximum width to prevent excessive expansion */
-  margin: 0 auto; /* Centers the list on the page */
+  max-width: 1200px;
+  margin: 0 auto;
   box-sizing: border-box;
-  overflow: hidden; /* Prevents overflow issues */
+  overflow: hidden;
 }
 
 .sort-options {
@@ -29,10 +29,10 @@ body {
 
 .vendor-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Keeps cards evenly spaced */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   width: 100%;
-  max-width: 90%; /* Adds padding to prevent edges */
+  max-width: 90%;
   margin: 0 auto;
   box-sizing: border-box;
   justify-items: center;

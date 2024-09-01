@@ -17,7 +17,7 @@ const VendorCard = ({ vendor }) => {
           className="vendor-avatar"
           onError={(e) => {
             console.error('Failed to load avatar:', e.target.src);
-            e.target.src = '/images/avatar.png'; // Fallback to default image if custom avatar fails to load
+            e.target.src = '/images/avatar.png'; // Fallback to default image if avatar fails to load
           }}
         />
         <div className="vendor-info">

@@ -20,7 +20,7 @@ const ViewBlog = ({ blog, onClose }) => {
     ));
   };
 
-  // Close modal on clicking outside of it or pressing Escape key
+  // Close modal when clicking outside or pressing Esc key
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
