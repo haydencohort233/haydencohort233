@@ -1,4 +1,3 @@
-// UpcomingEvents.js
 import React, { useEffect, useState } from 'react';
 import './UpcomingEvents.css';
 
@@ -37,10 +36,23 @@ const UpcomingEvents = () => {
         <ul>
           {events.map((event, index) => (
             <li key={event.id} className={`event-item event-${index + 1}`}>
-              <h3>{event.title}</h3>
-              <p>
-                {new Date(event.date).toLocaleDateString()} at {event.time}
-              </p>
+              {event.photo_url && (
+                <img
+                  src={`http://localhost:5000${event.photo_url}`}
+                  alt={event.title}
+                  className="event-photo"
+                  onError={(e) => {
+                    console.error('Failed to load event image:', e.target.src);
+                    e.target.style.display = 'none'; // Hide image if it fails to load
+                  }}
+                />
+              )}
+              <div className="event-details">
+                <h3>{event.title}</h3>
+                <p>
+                  {new Date(event.date).toLocaleDateString()} at {event.time}
+                </p>
+              </div>
             </li>
           ))}
         </ul>

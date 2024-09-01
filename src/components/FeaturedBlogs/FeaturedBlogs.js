@@ -37,7 +37,7 @@ const FeaturedBlogs = () => {
   };
 
   if (isLoading) return <p className="loading-message">Loading featured blogs...</p>;
-  if (error) return <p className="error-message">{error}</p>; // Applying .error-message class
+  if (error) return <p className="error-message">{error}</p>;
 
   return (
     <div className="featured-blogs">

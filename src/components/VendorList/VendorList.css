@@ -1,14 +1,63 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-image: url('background.jpg');
+  background-size:cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.vendor-list {
+  background-color: rgba(255, 255, 255, 0.8); /* Matches overall theme */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px; /* Limits the maximum width to prevent excessive expansion */
+  margin: 0 auto; /* Centers the list on the page */
+  box-sizing: border-box;
+  overflow: hidden; /* Prevents overflow issues */
+}
+
 .sort-options {
-    margin-bottom: 1em;
-    display: flex;
-    align-items: center;
+  margin-bottom: 1em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vendor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Keeps cards evenly spaced */
+  gap: 20px;
+  width: 100%;
+  max-width: 90%; /* Adds padding to prevent edges */
+  margin: 0 auto;
+  box-sizing: border-box;
+  justify-items: center;
+}
+
+@media (max-width: 600px) {
+  .vendor-grid {
+    grid-template-columns: repeat(1, 1fr);
   }
-  
-  .sort-options label {
-    margin-right: 0.5em;
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .vendor-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .sort-options select {
-    padding: 0.5em;
+}
+
+@media (min-width: 901px) and (max-width: 1200px) {
+  .vendor-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
-  
+}
+
+@media (min-width: 1351px) and (max-width: 1600px) {
+  .vendor-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
