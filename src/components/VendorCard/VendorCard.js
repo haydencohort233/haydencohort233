@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './VendorCard.css';
 import ViewVendor from '../ViewVendor/ViewVendor'; // Ensure correct import path
 
-const VendorCard = ({ vendor }) => {
+const VendorCard = ({ vendor, onClick }) => {
   const [showModal, setShowModal] = useState(false);
 
   // Prepend '/uploads/' if the avatar exists
@@ -10,7 +10,7 @@ const VendorCard = ({ vendor }) => {
 
   return (
     <>
-      <div className="vendor-card" onClick={() => setShowModal(true)}>
+      <div className="vendor-card" onClick={onClick}>
         <img
           src={avatarUrl}
           alt={`${vendor.name} avatar`}

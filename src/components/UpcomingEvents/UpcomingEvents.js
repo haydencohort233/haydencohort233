@@ -1,61 +1,93 @@
 import React, { useEffect, useState } from 'react';
 import './UpcomingEvents.css';
+import ViewEvent from '../ViewEvent/ViewEvent';
 
 const UpcomingEvents = () => {
   const [events, setEvents] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(':');
+    const hours12 = ((+hours % 12) || 12).toString();
+    const suffix = +hours < 12 ? 'AM' : 'PM';
+    return `${hours12}:${minutes}${suffix}`;
+  };
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/events/upcoming?limit=2')
-      .then(response => {
+    fetch('http://localhost:5000/api/events/upcoming?limit=3')
+      .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch upcoming events');
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
+        console.log('Fetched events:', data);
         setEvents(data);
         setIsLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setError('Failed to load upcoming events');
         setIsLoading(false);
         console.error('Error fetching events:', error);
       });
   }, []);
 
+  const handleImageError = (e) => {
+    e.target.src = '/images/placeholder.png';
+  };
+
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedEvent(null);
+  };
+
   return (
     <div className="upcoming-events">
-      <h2>Upcoming Events</h2>
       {isLoading ? (
         <div className="loading-message">Loading upcoming events...</div>
       ) : error ? (
         <div className="error-message">{error}</div>
       ) : (
         <ul>
-          {events.map((event, index) => (
-            <li key={event.id} className={`event-item event-${index + 1}`}>
-              {event.photo_url && (
-                <img
-                  src={`http://localhost:5000${event.photo_url}`}
-                  alt={event.title}
-                  className="event-photo"
-                  onError={(e) => {
-                    console.error('Failed to load event image:', e.target.src);
-                    e.target.style.display = 'none'; // Hide image if loading fails
-                  }}
-                />
-              )}
-              <div className="event-details">
-                <h3>{event.title}</h3>
-                <p>
-                  {new Date(event.date).toLocaleDateString()} at {event.time}
-                </p>
-              </div>
-            </li>
-          ))}
+          {events.map((event) => {
+            const titlePhoto = event.title_photo
+              ? `http://localhost:5000${event.title_photo}` + (event.title_photo.endsWith('.png') || event.title_photo.endsWith('.jpg') ? '' : '.png')
+              : '/images/placeholder.png';
+
+            return (
+              <li
+                key={event.id}
+                className="event-item"
+                onClick={() => handleEventClick(event)}
+              >
+                <div className="event-photo">
+                  <img
+                    src={titlePhoto}
+                    alt={event.title}
+                    onError={handleImageError}
+                  />
+                </div>
+                <div className="event-details">
+                  <h3>{event.title}</h3>
+                  <p className="event-datetime">
+                    {new Date(event.date).toLocaleDateString()} at{' '}
+                    {formatTime(event.time)}
+                  </p>
+                  <p className="preview-text">{event.preview_text}</p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
+      )}
+      {selectedEvent && (
+        <ViewEvent event={selectedEvent} onClose={handleCloseModal} />
       )}
     </div>
   );
