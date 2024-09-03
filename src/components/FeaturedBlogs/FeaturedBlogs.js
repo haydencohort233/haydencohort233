@@ -52,6 +52,7 @@ const FeaturedBlogs = () => {
             <p className="featured-blog-preview">
               {blog.preview_text || `${blog.content.substring(0, 150)}...`}
             </p>
+            <p className="read-more-link">Click to read more</p>
           </div>
         ))
       ) : (

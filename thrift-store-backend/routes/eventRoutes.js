@@ -31,13 +31,13 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 2 * 1024 * 1024 } // Set file size limit (2MB)
+  limits: { fileSize: 2 * 1024 * 1024 } // File size limit (2MB)
 });
 
 // Get the next 3 upcoming events
 router.get('/events/upcoming', (req, res) => {
   const query = `
-    SELECT id, title, date, time, description, photo_url 
+    SELECT id, title, date, time, description, preview_text, photo_url, title_photo 
     FROM chasingevents 
     WHERE date >= CURDATE() 
     ORDER BY date ASC, time ASC 
@@ -54,13 +54,14 @@ router.get('/events/upcoming', (req, res) => {
 
 // Add a new event
 router.post('/events', upload.single('photo'), (req, res) => {
-  const { title, date, time, description } = req.body;
+  const { title, date, time, description, preview_text } = req.body;
   const photoUrl = req.file ? `/uploads/${req.file.filename}` : null;
+  const titlePhoto = req.file ? `/uploads/${req.file.filename}` : null;
 
   const query = `
-    INSERT INTO chasingevents (title, date, time, description, photo_url) 
-    VALUES (?, ?, ?, ?, ?)`;
-  const values = [title, date, time, description, photoUrl];
+    INSERT INTO chasingevents (title, date, time, description, preview_text, photo_url, title_photo) 
+    VALUES (?, ?, ?, ?, ?, ?, ?)`;
+  const values = [title, date, time, description, preview_text, photoUrl, titlePhoto];
 
   db.query(query, values, (err, results) => {
     if (err) {
