@@ -32,12 +32,12 @@ exports.getSingleBlog = (req, res) => {
 
 exports.createBlog = (req, res) => {
     try {
-      console.log('Create blog endpoint hit'); // Log when the endpoint is accessed
+      console.log('Create blog endpoint accessed'); // Log when the endpoint is accessed
       console.log('Request body:', req.body); // Log request body content
       console.log('Request file:', req.file); // Log file details if any
   
       const { title, content, date, preview_text } = req.body;
-      const photo_url = req.file ? `/uploads/${req.file.filename}` : null;
+      const photo_url = req.file ? `/uploads/blogs/${req.file.filename}` : null;
   
       if (!title || !content || !date) {
         return res.status(400).json({ error: 'Title, content, and date are required' });
@@ -71,7 +71,7 @@ exports.createBlog = (req, res) => {
 // Update a blog
 exports.updateBlog = (req, res) => {
   const { title, content, date, preview_text } = req.body;
-  const photo_url = req.file ? `/uploads/${req.file.filename}` : null;
+  const photo_url = req.file ? `/uploads/blogs/${req.file.filename}` : null;
 
   const query = `
     UPDATE chasingblogs SET

@@ -14,8 +14,8 @@ exports.getUpcomingEvents = (req, res) => {
 
 exports.addEvent = (req, res) => {
   const { title, date, time, description, preview_text } = req.body;
-  const photoUrl = req.file ? `/uploads/${req.file.filename}` : null;
-  const titlePhoto = req.file ? `/uploads/${req.file.filename}` : null;
+  const photoUrl = req.file ? `/uploads/events/${req.file.filename}` : null;
+  const titlePhoto = req.file ? `/uploads/events/${req.file.filename}` : null;
 
   const query = 'INSERT INTO chasingevents (title, date, time, description, preview_text, photo_url, title_photo) VALUES (?, ?, ?, ?, ?, ?, ?)';
   const values = [title, date, time, description, preview_text, photoUrl, titlePhoto];
