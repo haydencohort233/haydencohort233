@@ -7,7 +7,7 @@ const path = require('path');
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Save files to 'uploads/' directory
+    cb(null, 'uploads/events/'); // Save files to 'uploads/' directory
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Generate a unique filename with a timestamp
@@ -55,8 +55,8 @@ router.get('/events/upcoming', (req, res) => {
 // Add a new event
 router.post('/events', upload.single('photo'), (req, res) => {
   const { title, date, time, description, preview_text } = req.body;
-  const photoUrl = req.file ? `/uploads/${req.file.filename}` : null;
-  const titlePhoto = req.file ? `/uploads/${req.file.filename}` : null;
+  const photoUrl = req.file ? `/uploads/events/${req.file.filename}` : null;
+  const titlePhoto = req.file ? `/uploads/events/${req.file.filename}` : null;
 
   const query = `
     INSERT INTO chasingevents (title, date, time, description, preview_text, photo_url, title_photo) 

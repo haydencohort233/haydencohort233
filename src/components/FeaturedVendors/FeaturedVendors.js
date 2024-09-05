@@ -1,7 +1,7 @@
 // FeaturedVendors.js
 import React, { useState, useEffect, useCallback } from 'react';
 import VendorCard from '../VendorCard/VendorCard';
-import ViewVendor from '../ViewVendor/ViewVendor'; // Assuming ViewVendor is the modal component
+import ViewVendor from '../ViewVendor/ViewVendor';
 import './FeaturedVendors.css';
 
 // Utility function to shuffle vendors and manage repeats

@@ -24,7 +24,6 @@ const UpcomingEvents = () => {
         return response.json();
       })
       .then((data) => {
-        console.log('Fetched events:', data);
         setEvents(data);
         setIsLoading(false);
       })

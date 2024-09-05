@@ -15,7 +15,7 @@ const AddBlog = ({ onClose, onSubmit }) => {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [date, setDate] = useState(getCurrentDate()); // Set current date as default
+  const [date, setDate] = useState(getCurrentDate());
   const [photo, setPhoto] = useState(null);
   const [previewText, setPreviewText] = useState('');
   const [error, setError] = useState(null);

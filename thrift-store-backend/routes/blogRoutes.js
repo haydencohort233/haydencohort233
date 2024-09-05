@@ -12,7 +12,7 @@ const {
 } = require('../controllers/blogController');
 
 // Ensure the uploads directory exists
-const uploadDir = path.join(__dirname, '../uploads');
+const uploadDir = path.join(__dirname, '../uploads/blogs');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -20,7 +20,7 @@ if (!fs.existsSync(uploadDir)) {
 // Configure multer storage for blog photo uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Ensure this directory exists
+    cb(null, 'uploads/blogs/'); // Ensure this directory exists
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);

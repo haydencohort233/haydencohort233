@@ -2,7 +2,30 @@ const db = require('../config/db');
 const path = require('path');
 
 exports.getAllVendors = (req, res) => {
-  const query = 'SELECT id, name, description, location, category, avatar FROM vendorshops';
+  // Get the sort parameter from the query string; default to 'asc' if not provided
+  const sort = req.query.sort || 'asc';
+  let orderByClause = 'name ASC'; // Default sorting order
+
+  // Determine the sorting order based on the sort parameter
+  switch (sort) {
+    case 'asc':
+      orderByClause = 'name ASC';
+      break;
+    case 'desc':
+      orderByClause = 'name DESC';
+      break;
+    case 'new':
+      orderByClause = 'datecreated DESC'; // Newest vendors first
+      break;
+    case 'old':
+      orderByClause = 'datecreated ASC'; // Oldest vendors first
+      break;
+    default:
+      orderByClause = 'name ASC'; // Fallback to default sorting
+  }
+
+  // Update the SQL query to include the ORDER BY clause
+  const query = `SELECT id, name, description, location, category, avatar FROM vendorshops ORDER BY ${orderByClause}`;
   
   db.query(query, (err, results) => {
     if (err) {
@@ -42,7 +65,7 @@ exports.getFeaturedVendors = (req, res) => {
 
 exports.addVendor = (req, res) => {
   const { name, description, location, category } = req.body;
-  const avatarPath = req.file ? `/uploads/${req.file.filename}` : '/public/images/avatar.png';
+  const avatarPath = req.file ? `/uploads/vendors/${req.file.filename}` : '/public/images/avatar.png';
 
   const query = 'INSERT INTO vendorshops (name, description, location, category, avatar) VALUES (?, ?, ?, ?, ?)';
   const values = [name, description, location, category, avatarPath];
