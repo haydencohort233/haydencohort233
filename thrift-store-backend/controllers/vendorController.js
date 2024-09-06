@@ -24,8 +24,8 @@ exports.getAllVendors = (req, res) => {
       orderByClause = 'name ASC'; // Fallback to default sorting
   }
 
-  // Update the SQL query to include the ORDER BY clause
-  const query = `SELECT id, name, description, location, category, avatar FROM vendorshops ORDER BY ${orderByClause}`;
+  // Update the SQL query to include the ORDER BY clause and datecreated field
+  const query = `SELECT id, name, description, location, category, avatar, datecreated FROM vendorshops ORDER BY ${orderByClause}`;
   
   db.query(query, (err, results) => {
     if (err) {
@@ -67,8 +67,11 @@ exports.addVendor = (req, res) => {
   const { name, description, location, category } = req.body;
   const avatarPath = req.file ? `/uploads/vendors/${req.file.filename}` : '/public/images/avatar.png';
 
-  const query = 'INSERT INTO vendorshops (name, description, location, category, avatar) VALUES (?, ?, ?, ?, ?)';
-  const values = [name, description, location, category, avatarPath];
+  // Set current date for datecreated
+  const dateCreated = new Date();
+
+  const query = 'INSERT INTO vendorshops (name, description, location, category, avatar, datecreated) VALUES (?, ?, ?, ?, ?, ?)';
+  const values = [name, description, location, category, avatarPath, dateCreated];
 
   // Execute SQL query
   db.query(query, values, (err, results) => {
