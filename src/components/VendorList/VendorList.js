@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import VendorCard from '../VendorCard/VendorCard';
 import AddVendor from '../AddVendor/AddVendor';
-import VendorMap from '../VendorMap/VendorMap'; // Import the VendorMap component
+import VendorMap from '../VendorMap/VendorMap';
 import './VendorList.css';
 import Header from '../Header/Header';
 
@@ -9,17 +9,16 @@ const VendorList = () => {
   const [vendors, setVendors] = useState([]);
   const [sortOrder, setSortOrder] = useState('location'); // 'asc', 'desc', 'new', 'old', 'location'
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMapOpen, setIsMapOpen] = useState(false); // State for controlling the Vendor Map
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  const openMap = () => setIsMapOpen(true); // Function to open the Vendor Map
-  const closeMap = () => setIsMapOpen(false); // Function to close the Vendor Map
+  const openMap = () => setIsMapOpen(true);
+  const closeMap = () => setIsMapOpen(false);
 
   useEffect(() => {
-    // Fetch vendor data from the backend with the sort parameter
     fetch(`http://localhost:5000/api/vendors?sort=${sortOrder}`)
       .then((response) => {
         if (!response.ok) {
@@ -36,20 +35,20 @@ const VendorList = () => {
         setIsLoading(false);
         console.error('Error fetching vendor data:', error);
       });
-  }, [sortOrder]); // Add sortOrder as a dependency to refetch on change
+  }, [sortOrder]);
 
   // Function to handle sorting
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
   };
 
-  // Helper function to parse location strings like "1A", "11B" for proper sorting
+  // Helper to parse location strings like "1A", "11B"
   const parseLocation = (location) => {
     const match = location.match(/(\d+)([A-Z]?)/i);
     return match ? [parseInt(match[1]), match[2] || ''] : [0, ''];
   };
 
-  // Sort vendors based on the selected order
+  // Sorting vendors
   const sortedVendors = [...vendors].sort((a, b) => {
     if (sortOrder === 'asc') {
       return a.name.localeCompare(b.name);
@@ -61,7 +60,6 @@ const VendorList = () => {
       if (numA === numB) return letterA.localeCompare(letterB);
       return numA - numB;
     } else {
-      // "new" and "old" will be sorted by the backend, no need to handle here
       return 0;
     }
   });
@@ -76,7 +74,7 @@ const VendorList = () => {
           <option value="desc">Name: Descending</option>
           <option value="new">New Vendors</option>
           <option value="old">Old Vendors</option>
-          <option value="location">Location</option> {/* Added Sort by Location */}
+          <option value="location">Location</option>
         </select>
       </div>
       {isLoading ? (
@@ -94,6 +92,7 @@ const VendorList = () => {
                 location: vendor.location,
                 category: vendor.category,
                 avatar: vendor.avatar,
+                datecreated: vendor.datecreated,
               }}
             />
           ))}
@@ -105,7 +104,7 @@ const VendorList = () => {
         <button onClick={openMap}>View Vendor Map</button>
       </div>
       <AddVendor isOpen={isModalOpen} onClose={closeModal} />
-      {isMapOpen && <VendorMap onClose={closeMap} />} {/* Render VendorMap if isMapOpen is true */}
+      {isMapOpen && <VendorMap onClose={closeMap} />}
     </div>
   );
 };

@@ -65,7 +65,7 @@
     border: 1px solid black;
     font-size: 12px;
     pointer-events: none; /* Clicking through Vendor name */
-    display: none; /* Only shows on hover or flashing */
+    display: none;
   }
   
   .vendor-location:hover .vendor-name {

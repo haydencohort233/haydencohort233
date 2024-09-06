@@ -1,4 +1,5 @@
 .vendor-card {
+  position: relative; /* Position relative to place the badge correctly */
   display: flex;
   align-items: flex-start;
   padding: 10px;
@@ -9,7 +10,21 @@
   max-width: 300px;
   box-sizing: border-box;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-  min-height: 200px; /* Adjust this value as needed */
+  min-height: 200px;
+  overflow: visible; /* Ensure badge is not clipped */
+}
+
+.new-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: red;
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 3px;
+  z-index: 10;
 }
 
 .vendor-avatar {
@@ -39,9 +54,9 @@
   text-overflow: ellipsis;
   max-width: 100%;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Limit to two lines before truncating */
+  -webkit-line-clamp: 3; /* Limit description to three lines before ... */
   -webkit-box-orient: vertical;
-  white-space: normal; /* Allow text to wrap */
+  white-space: normal;
 }
 
 .vendor-card-location {
