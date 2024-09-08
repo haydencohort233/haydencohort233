@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, forwardRef } from 'react';
 import './VendorMap.css';
 
-const VendorMap = ({ location, onClose }) => {
+const VendorMap = forwardRef(({ location, onClose }, ref) => {
   const mapRef = useRef(null);
 
   // Mapping locations to specific coordinates
@@ -48,7 +48,7 @@ const VendorMap = ({ location, onClose }) => {
   }, [location]);
 
   return (
-    <div className="vendor-map-modal">
+    <div className="vendor-map-modal" ref={ref}>
       <div className="vendor-map-overlay" onClick={onClose} />
       <div className="vendor-map-content" ref={mapRef}>
         <button className="close-map-button" onClick={onClose}>
@@ -75,5 +75,6 @@ const VendorMap = ({ location, onClose }) => {
       </div>
     </div>
   );
-};
+});
+
 export default VendorMap;

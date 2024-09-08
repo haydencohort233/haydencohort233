@@ -1,20 +1,109 @@
+.admin-tools {
+  display: flex;
+  justify-content: flex-end;
+  color: #000;
+  background: rgba(255, 255, 255, 0.8);
+  border: 3px solid #ddd;
+  margin-right: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  width: 200px;
+}
+
+h2 {
+  align-items: center;
+  margin-right: 23px;
+}
+
 .tools {
-    padding: 20px;
-  }
-  
-  .tool-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #2196F3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    margin: 5px;
-    transition: background-color 0.3s;
-  }
-  
-  .tool-button:hover {
-    background-color: #1E88E5;
-  }
-  
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.tools-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  border: 3px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.tool-button,
+.add-event-button,
+.add-guest-button,
+.add-vendor-button,
+.view-map-button,
+.add-survey-button,
+.add-blog-button {
+  width: 200px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin: 5px 0;
+  transition: background-color 0.3s;
+}
+
+/* Button specific styles */
+.tool-button {
+  background-color: #2196F3;
+}
+
+.tool-button:hover {
+  background-color: #1E88E5;
+}
+
+.add-event-button {
+  background-color: #4CAF50;
+}
+
+.add-event-button:hover {
+  background-color: #218526;
+}
+
+.add-guest-button {
+  background-color: #FF9800;
+}
+
+.add-guest-button:hover {
+  background-color: #c26b02;
+}
+
+.add-vendor-button {
+  background-color: #b00fd8;
+}
+
+.add-vendor-button:hover {
+  background-color: #59076d;
+}
+
+.view-map-button {
+  background-color: #fbff00;
+  color: black;
+}
+
+.view-map-button:hover {
+  background-color: #af9e01;
+}
+
+.add-survey-button {
+  background-color: #ee5ac2;
+}
+
+.add-survey-button:hover {
+  background-color: #cf2b9e;
+}
+
+.add-blog-button {
+  background-color: #007bff;
+}
+
+.add-blog-button:hover {
+  background-color: #0056b3;
+}

@@ -43,20 +43,6 @@ body {
   margin-top: 20px;
 }
 
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  background-color: green;
-  color: white;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: purple;
-}
-
 /* Pagination styles */
 .pagination {
   display: flex;
@@ -104,7 +90,6 @@ button:hover {
   }
 }
 
-/* Error message styling */
 .error-message {
   color: #d9534f;
   font-size: 16px;
@@ -118,7 +103,6 @@ button:hover {
   margin-bottom: 25px;
 }
 
-/* Loading message styling */
 .loading-message {
   font-size: 16px;
   padding: 10px;

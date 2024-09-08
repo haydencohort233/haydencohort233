@@ -1,24 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import VendorCard from '../VendorCard/VendorCard';
-import AddVendor from '../AddVendor/AddVendor';
-import VendorMap from '../VendorMap/VendorMap';
-import './VendorList.css';
 import Header from '../Header/Header';
+import './VendorList.css';
 
 const VendorList = () => {
   const [vendors, setVendors] = useState([]);
   const [sortOrder, setSortOrder] = useState('location');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMapOpen, setIsMapOpen] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [vendorsPerPage, setVendorsPerPage] = useState(20);
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-  const openMap = () => setIsMapOpen(true);
-  const closeMap = () => setIsMapOpen(false);
 
   // Detect viewport size and set vendorsPerPage
   useEffect(() => {
@@ -145,13 +136,6 @@ const VendorList = () => {
           {renderPaginationButtons()}
         </>
       )}
-
-      <div className="vendor-actions">
-        <button onClick={openModal}>Add Vendor</button>
-        <button onClick={openMap}>View Vendor Map</button>
-      </div>
-      <AddVendor isOpen={isModalOpen} onClose={closeModal} />
-      {isMapOpen && <VendorMap onClose={closeMap} />}
     </div>
   );
 };

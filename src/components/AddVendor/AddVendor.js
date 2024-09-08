@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import './AddVendor.css';
 
-const AddVendor = ({ isOpen, onClose }) => {
+const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
   const [vendor, setVendor] = useState({
     name: '',
     description: '',
@@ -12,13 +12,11 @@ const AddVendor = ({ isOpen, onClose }) => {
   });
   const [error, setError] = useState(null);
 
-  // Handle input changes for text fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setVendor({ ...vendor, [name]: value });
   };
 
-  // Handle file input changes for avatar and vendor photo
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
@@ -29,21 +27,17 @@ const AddVendor = ({ isOpen, onClose }) => {
         return;
       }
       setVendor({ ...vendor, [name]: file });
-      setError(null); // Clear any previous error
+      setError(null);
     }
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const formData = new FormData();
     formData.append('name', vendor.name);
     formData.append('description', vendor.description);
     formData.append('location', vendor.location);
     formData.append('category', vendor.category);
-
-    // Append files if they exist
     if (vendor.avatar) {
       formData.append('avatar', vendor.avatar);
     }
@@ -66,11 +60,10 @@ const AddVendor = ({ isOpen, onClose }) => {
       });
   };
 
-  // If modal is not open, do not render
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" ref={ref}>
       <div className="modal-content">
         <h2>Add New Vendor</h2>
         <form onSubmit={handleSubmit}>
@@ -141,6 +134,6 @@ const AddVendor = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
-};
+});
 
 export default AddVendor;

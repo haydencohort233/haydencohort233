@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import AddEvent from '../AddEvent/AddEvent';
-import AddGuest from '../AddGuest/AddGuest'; // Import AddGuest component
 import './Events.css';
 import Header from '../Header/Header';
 import GuestCard from '../GuestCard/GuestCard';
-import '../AddGuest/AddGuest.css'; // Import AddGuest.css for Add Guest button styles
 
 const Events = () => {
   const [events, setEvents] = useState([]);
-  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
-  const [isAddGuestOpen, setIsAddGuestOpen] = useState(false); // State for AddGuest modal
   const [guestVendors, setGuestVendors] = useState([]);
   const [eventError, setEventError] = useState('');
   const [guestVendorError, setGuestVendorError] = useState('');
@@ -44,22 +39,6 @@ const Events = () => {
       });
   }, []);
 
-  const handleOpenAddEvent = () => {
-    setIsAddEventOpen(true);
-  };
-
-  const handleCloseAddEvent = () => {
-    setIsAddEventOpen(false);
-  };
-
-  const handleOpenAddGuest = () => {
-    setIsAddGuestOpen(true);
-  };
-
-  const handleCloseAddGuest = () => {
-    setIsAddGuestOpen(false);
-  };
-
   const handleImageError = (e) => {
     e.target.src = '/images/placeholder.png';
   };
@@ -79,14 +58,6 @@ const Events = () => {
         )}
       </div>
       <div className="events-content">
-        <div className="button-group">
-          <button className="add-event-button" onClick={handleOpenAddEvent}>
-            Add Event
-          </button>
-          <button className="add-guest-button" onClick={handleOpenAddGuest}>
-            Add Guest
-          </button>
-        </div>
         <ul className="event-list">
           {events.length === 0 && !eventError ? (
             <div className="loading-message">Loading upcoming events...</div>
@@ -115,9 +86,6 @@ const Events = () => {
           )}
         </ul>
       </div>
-
-      <AddEvent isOpen={isAddEventOpen} onClose={handleCloseAddEvent} />
-      <AddGuest isOpen={isAddGuestOpen} onClose={handleCloseAddGuest} />
     </div>
   );
 };

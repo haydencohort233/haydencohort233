@@ -39,12 +39,21 @@ const AdminPage = () => {
     setIsAuthenticated(false);
   };
 
+  const handleBackToHome = () => {
+    window.location.href = '/'; // Redirect to home page
+  };
+
   if (isAuthenticated) {
     return (
       <div className="admin-page">
-        <button className="logout-button" onClick={handleLogout}>
-          Logout
-        </button>
+        <div className="admin-actions">
+          <button className="back-to-home-button" onClick={handleBackToHome}>
+            <span className="arrow">&larr;</span> Back to Home
+          </button>
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
         <Tools /> {/* Display the Tools component */}
       </div>
     );
