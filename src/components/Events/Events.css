@@ -26,21 +26,6 @@
   max-width: 600px;
 }
 
-.add-event-button {
-  padding: 10px 20px;
-  margin: 0 auto;
-  background-color: purple;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  align-items: center;
-  transition: background-color 0.5s ease;
-}
-
-.add-event-button:hover {
-  background-color: darkorchid;
-}
-
 .event-list {
   list-style: none;
   padding: 0;
@@ -79,6 +64,28 @@
 .event-photo {
   max-width: 100%;
   margin-top: 10px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Spacing between buttons */
+  margin: 20px 0; /* Adjust as needed for spacing */
+}
+
+.add-event-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4CAF50; /* Customize as needed */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.add-event-button:hover {
+  background-color: #45a049; /* Customize hover effect */
 }
 
 /* Error message and loading message styles */

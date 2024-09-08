@@ -52,6 +52,13 @@
   text-decoration: underline;
 }
 
+/* Add styles for GuestStatus to ensure it fits snugly */
+.guest-status {
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+}
+
 /* Mobile Menu Icon */
 .menu-icon {
   display: none;

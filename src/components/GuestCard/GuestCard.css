@@ -1,5 +1,3 @@
-/* GuestCard.css */
-
 .guest-card {
     display: flex;
     align-items: center;
@@ -46,7 +44,6 @@
   
   .guest-status {
     padding: 4px 8px;
-    border-radius: 4px;
     font-size: 0.85rem;
     font-weight: bold;
     text-align: center;
