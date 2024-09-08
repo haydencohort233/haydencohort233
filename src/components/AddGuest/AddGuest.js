@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import './AddGuest.css';
 
-const AddGuest = ({ isOpen, onClose }) => {
+const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
   const [guest, setGuest] = useState({
     name: '',
     guestavatar: null,
@@ -66,7 +66,7 @@ const AddGuest = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" ref={ref}>
       <div className="modal-content">
         <h2>Add New Guest Vendor</h2>
         <form onSubmit={handleSubmit}>
@@ -129,6 +129,6 @@ const AddGuest = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
-};
+});
 
 export default AddGuest;

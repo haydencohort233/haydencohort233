@@ -33,21 +33,6 @@
     line-height: 1.6;
 }
 
-/* Buttons */
-.add-blog-button {
-    margin-bottom: 20px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.add-blog-button:hover {
-    background-color: #0056b3;
-}
-
 /* FeaturedBlogs.css */
 .featured-blogs {
     margin-top: 20px;

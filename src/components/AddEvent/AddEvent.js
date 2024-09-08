@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import './AddEvent.css';
 
-const AddEvent = ({ isOpen, onClose }) => {
+const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
   const [event, setEvent] = useState({
     title: '',
     date: '',
@@ -24,7 +24,6 @@ const AddEvent = ({ isOpen, onClose }) => {
         setError('Please upload a .jpg or .png file.');
         return;
       }
-
       setEvent({ ...event, photo: file });
       setError(null); // Clear any previous error
     }
@@ -32,7 +31,6 @@ const AddEvent = ({ isOpen, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const formData = new FormData();
     formData.append('title', event.title);
     formData.append('date', event.date);
@@ -46,12 +44,12 @@ const AddEvent = ({ isOpen, onClose }) => {
       method: 'POST',
       body: formData,
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log('Event added:', data);
         onClose();
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error adding event:', error);
         setError('An error occurred while adding the event.');
       });
@@ -60,7 +58,7 @@ const AddEvent = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" ref={ref}>
       <div className="modal-content">
         <h2>Add New Event</h2>
         <form onSubmit={handleSubmit}>
@@ -111,15 +109,19 @@ const AddEvent = ({ isOpen, onClose }) => {
               accept=".jpg,.jpeg,.png"
               onChange={handleFileChange}
             />
-            <p className="file-info">Size limit: 2MB. Accepted formats: .jpg, .jpeg, .png</p>
+            <p className="file-info">
+              Size limit: 2MB. Accepted formats: .jpg, .jpeg, .png
+            </p>
           </label>
           {error && <p className="error">{error}</p>}
           <button type="submit">Add Event</button>
-          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
         </form>
       </div>
     </div>
   );
-};
+});
 
 export default AddEvent;
