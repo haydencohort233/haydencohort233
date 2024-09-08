@@ -1,16 +1,30 @@
+// guestController.js
 const db = require('../config/db');
 const path = require('path');
 
 // Get all guest vendors
 exports.getAllGuestVendors = (req, res) => {
   const query = `SELECT id, name, guestavatar, guestphoto, description, schedule, break FROM guestvendors ORDER BY name ASC`;
-  
+
   db.query(query, (err, results) => {
     if (err) {
       console.error('Error fetching guest vendor data:', err);
       return res.status(500).json({ error: 'Database query failed' });
     }
     res.json(results);
+  });
+};
+
+// Get the latest guest vendor
+exports.getLatestGuestVendor = (req, res) => {
+  const query = `SELECT id, name, guestavatar, guestphoto, description, schedule, break FROM guestvendors ORDER BY id DESC LIMIT 1`;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching latest guest vendor:', err);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+    res.json(results[0]); // Send the latest guest vendor
   });
 };
 
