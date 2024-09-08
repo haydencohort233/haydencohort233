@@ -5,6 +5,7 @@ require('dotenv').config();
 const vendorRoutes = require('./routes/vendorRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const guestRoutes = require('./routes/guestRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,6 +18,7 @@ app.use('/uploads', express.static('uploads')); // Serves static files from the 
 app.use('/api', vendorRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', blogRoutes);
+app.use('/api', guestRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

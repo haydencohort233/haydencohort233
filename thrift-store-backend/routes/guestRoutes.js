@@ -2,12 +2,12 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = express.Router();
-const { getAllVendors, getFeaturedVendors, addVendor } = require('../controllers/vendorController');
+const { getAllGuestVendors, addGuestVendor } = require('../controllers/guestController');
 
-// Configure multer storage
+// Configure multer storage for guest vendor images
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/vendors/'); // Save files to 'uploads/' directory
+    cb(null, 'uploads/vendors/guests/');
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Generate a unique filename with a timestamp
@@ -31,20 +31,16 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 2 * 1024 * 1024 }, // Set file size limit (2MB)
+  limits: { fileSize: 2 * 1024 * 1024 }, // File size limit (2MB)
 }).fields([
-  { name: 'avatar', maxCount: 1 },
-  { name: 'vendorphoto', maxCount: 1 },
+  { name: 'guestavatar', maxCount: 1 },
+  { name: 'guestphoto', maxCount: 1 },
 ]);
 
+// GET all guest vendors
+router.get('/guests', getAllGuestVendors);
 
-// GET all vendors
-router.get('/vendors', getAllVendors);
-
-// GET featured vendors
-router.get('/featured', getFeaturedVendors);
-
-// POST to add a vendor
-router.post('/vendors', upload, addVendor);
+// POST to add a guest vendor
+router.post('/guests', upload, addGuestVendor);
 
 module.exports = router;
