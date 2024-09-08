@@ -30,7 +30,7 @@ const FeaturedVendors = () => {
   const [featured, setFeatured] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedVendor, setSelectedVendor] = useState(null); // State to manage modal visibility
+  const [selectedVendor, setSelectedVendor] = useState(null);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/featured')
@@ -41,7 +41,7 @@ const FeaturedVendors = () => {
         return response.json();
       })
       .then((data) => {
-        const vendors = getRandomVendors(data, 15); // Fetch up to 15 random vendors
+        const vendors = getRandomVendors(data, 10); // Fetch up to X random vendors
         setFeatured(vendors);
         setIsLoading(false);
       })
@@ -74,7 +74,7 @@ const FeaturedVendors = () => {
 
     window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('resize', handleResize); // Cleanup event listener for performance
+      window.removeEventListener('resize', handleResize);
     };
   }, [selectedVendor, closeViewVendorModal]);
 
@@ -87,7 +87,11 @@ const FeaturedVendors = () => {
       ) : (
         <div className="vendor-scroll">
           {featured.map((vendor, index) => (
-            <VendorCard key={index} vendor={vendor} onClick={() => handleVendorClick(vendor)} />
+            <VendorCard 
+              key={index} 
+              vendor={vendor} 
+              onClick={() => handleVendorClick(vendor)} 
+            />
           ))}
         </div>
       )}

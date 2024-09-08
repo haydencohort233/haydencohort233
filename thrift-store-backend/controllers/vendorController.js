@@ -15,17 +15,17 @@ exports.getAllVendors = (req, res) => {
       orderByClause = 'name DESC';
       break;
     case 'new':
-      orderByClause = 'datecreated DESC'; // Newest vendors first
+      orderByClause = 'datecreated DESC';
       break;
     case 'old':
-      orderByClause = 'datecreated ASC'; // Oldest vendors first
+      orderByClause = 'datecreated ASC';
       break;
     default:
       orderByClause = 'name ASC'; // Fallback to default sorting
   }
 
   // Update the SQL query to include the ORDER BY clause and datecreated field
-  const query = `SELECT id, name, description, location, category, avatar, datecreated FROM vendorshops ORDER BY ${orderByClause}`;
+  const query = `SELECT id, name, description, location, category, avatar, vendorphoto, datecreated FROM vendorshops ORDER BY ${orderByClause}`;
   
   db.query(query, (err, results) => {
     if (err) {
@@ -37,9 +37,9 @@ exports.getAllVendors = (req, res) => {
 };
 
 exports.getFeaturedVendors = (req, res) => {
-  const { ids } = req.query; // Optional: Use specific vendor IDs for manual selection
+  const { ids } = req.query;
 
-  let query = 'SELECT id, name, description, location, category, avatar FROM vendorshops';
+  let query = 'SELECT id, name, description, location, category, avatar, vendorphoto, datecreated FROM vendorshops';
   
   if (ids) {
     const idArray = ids.split(',').map(id => parseInt(id, 10)); // Convert IDs to integers
@@ -52,7 +52,7 @@ exports.getFeaturedVendors = (req, res) => {
       res.json(results);
     });
   } else {
-    query += ' ORDER BY RAND() LIMIT 3'; // Randomly selects 3 vendors to display
+    query += ' ORDER BY RAND() LIMIT 10';
     db.query(query, (err, results) => {
       if (err) {
         console.error('Error fetching featured vendors:', err);
@@ -65,13 +65,14 @@ exports.getFeaturedVendors = (req, res) => {
 
 exports.addVendor = (req, res) => {
   const { name, description, location, category } = req.body;
-  const avatarPath = req.file ? `/uploads/vendors/${req.file.filename}` : '/public/images/avatar.png';
+  const avatarPath = req.file.avatar ? `/uploads/vendors/${req.file.filename}` : '/public/images/avatar.png';
+  const vendorPhoto = req.file.vendorphoto ? `/uploads/vendors/${req.file.filename}` : '/public/images/avatar.png';
 
   // Set current date for datecreated
   const dateCreated = new Date();
 
-  const query = 'INSERT INTO vendorshops (name, description, location, category, avatar, datecreated) VALUES (?, ?, ?, ?, ?, ?)';
-  const values = [name, description, location, category, avatarPath, dateCreated];
+  const query = 'INSERT INTO vendorshops (name, description, location, category, avatar, vendorphoto, datecreated) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  const values = [name, description, location, category, avatarPath, vendorPhoto, dateCreated];
 
   // Execute SQL query
   db.query(query, values, (err, results) => {

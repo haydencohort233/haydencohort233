@@ -5,8 +5,8 @@ import VendorMap from '../VendorMap/VendorMap'; // Import the VendorMap componen
 import './ViewVendor.css';
 
 const ViewVendor = ({ vendor, onClose }) => {
-  const { name, description, category, location, avatar } = vendor;
-  const avatarUrl = avatar ? `http://localhost:5000${avatar}` : '/images/avatar.png';
+  const { name, description, category, location, vendorphoto } = vendor;
+  const vendorPhoto = vendorphoto ? `http://localhost:5000${vendorphoto}` : '/images/avatar.png';
 
   const modalRef = useRef(null);
   const [showVendorMap, setShowVendorMap] = useState(false); // State to manage VendorMap visibility
@@ -21,9 +21,7 @@ const ViewVendor = ({ vendor, onClose }) => {
     ));
   };
 
-  // Close modal on clicking outside of it or pressing the Escape key
   useEffect(() => {
-    // Pause the animation of .vendor-scroll if it exists
     const vendorScrollElement = document.querySelector('.vendor-scroll');
     if (vendorScrollElement) {
       vendorScrollElement.style.animationPlayState = 'paused';
@@ -45,7 +43,6 @@ const ViewVendor = ({ vendor, onClose }) => {
     document.addEventListener('keydown', handleEscKey);
 
     return () => {
-      // Resume the animation of .vendor-scroll if it exists
       if (vendorScrollElement) {
         vendorScrollElement.style.animationPlayState = 'running';
       }
@@ -61,19 +58,14 @@ const ViewVendor = ({ vendor, onClose }) => {
           X
         </button>
         <h2>{name}</h2>
-        {avatarUrl && (
           <img
-            src={avatarUrl}
-            alt={`${name} avatar`}
-            className="view-vendor-avatar"
+          src={vendor.vendorphoto ? `http://localhost:5000${vendor.vendorphoto}` : '/images/placeholder.png'}
+            alt={vendor.name}
+            className="view-vendorphoto"
           />
-        )}
         <p className="vendor-category">
           Category: {category} |{' '}
-          <span
-            className="location-link"
-            onClick={() => setShowVendorMap(true)} // Open the VendorMap
-          >
+          <span className="location-link" onClick={() => setShowVendorMap(true)}>
             Location: {location}
           </span>
         </p>

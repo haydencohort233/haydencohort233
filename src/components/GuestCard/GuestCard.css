@@ -1,0 +1,67 @@
+/* GuestCard.css */
+
+.guest-card {
+    display: flex;
+    align-items: center;
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    padding: 16px;
+    margin: 12px 0;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .guest-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .guest-thumbnail img {
+    width: 200px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 16px;
+  }
+  
+  .guest-info {
+    flex: 1;
+  }
+  
+  .guest-name {
+    font-size: 1.2rem;
+    margin: 0 0 8px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .guest-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0 0 8px;
+  }
+  
+  .guest-schedule {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0 0 8px;
+  }
+  
+  .guest-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-align: center;
+    width: fit-content;
+  }
+  
+  .status-open {
+    color: #28a745;
+    background-color: #e6f4ea;
+    border: 1px solid #28a745;
+  }
+  
+  .status-closed {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #dc3545;
+  }
+  

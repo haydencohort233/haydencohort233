@@ -7,16 +7,32 @@ import Header from '../Header/Header';
 
 const VendorList = () => {
   const [vendors, setVendors] = useState([]);
-  const [sortOrder, setSortOrder] = useState('location'); // 'asc', 'desc', 'new', 'old', 'location'
+  const [sortOrder, setSortOrder] = useState('location');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [vendorsPerPage, setVendorsPerPage] = useState(20);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const openMap = () => setIsMapOpen(true);
   const closeMap = () => setIsMapOpen(false);
+
+  // Detect viewport size and set vendorsPerPage
+  useEffect(() => {
+    const handleResize = () => {
+      setVendorsPerPage(window.innerWidth <= 768 ? 10 : 20);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Set initial value
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/vendors?sort=${sortOrder}`)
@@ -37,18 +53,15 @@ const VendorList = () => {
       });
   }, [sortOrder]);
 
-  // Function to handle sorting
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
   };
 
-  // Helper to parse location strings like "1A", "11B"
   const parseLocation = (location) => {
     const match = location.match(/(\d+)([A-Z]?)/i);
     return match ? [parseInt(match[1]), match[2] || ''] : [0, ''];
   };
 
-  // Sorting vendors
   const sortedVendors = [...vendors].sort((a, b) => {
     if (sortOrder === 'asc') {
       return a.name.localeCompare(b.name);
@@ -64,9 +77,39 @@ const VendorList = () => {
     }
   });
 
+  // Pagination calculations
+  const indexOfLastVendor = currentPage * vendorsPerPage;
+  const indexOfFirstVendor = indexOfLastVendor - vendorsPerPage;
+  const currentVendors = sortedVendors.slice(indexOfFirstVendor, indexOfLastVendor);
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Total number of pages
+  const totalPages = Math.ceil(sortedVendors.length / vendorsPerPage);
+
+  // Render pagination buttons
+  const renderPaginationButtons = () => {
+    return (
+      <div className="pagination">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            onClick={() => paginate(i + 1)}
+            className={`pagination-button ${currentPage === i + 1 ? 'active' : ''}`}
+            disabled={totalPages === 1 || currentPage === i + 1}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="vendor-list">
       <Header />
+      {renderPaginationButtons()}
       <div className="sort-options">
         <label htmlFor="sort">Sort by:</label>
         <select id="sort" value={sortOrder} onChange={handleSortChange}>
@@ -82,21 +125,25 @@ const VendorList = () => {
       ) : error ? (
         <div className="error-message">{error}</div>
       ) : (
-        <div className="vendor-grid">
-          {sortedVendors.map((vendor) => (
-            <VendorCard
-              key={vendor.id}
-              vendor={{
-                name: vendor.name,
-                description: vendor.description,
-                location: vendor.location,
-                category: vendor.category,
-                avatar: vendor.avatar,
-                datecreated: vendor.datecreated,
-              }}
-            />
-          ))}
-        </div>
+        <>
+          <div className="vendor-grid">
+            {currentVendors.map((vendor) => (
+              <VendorCard
+                key={vendor.id}
+                vendor={{
+                  name: vendor.name,
+                  description: vendor.description,
+                  location: vendor.location,
+                  category: vendor.category,
+                  avatar: vendor.avatar,
+                  vendorphoto: vendor.vendorphoto,
+                  datecreated: vendor.datecreated,
+                }}
+              />
+            ))}
+          </div>
+          {renderPaginationButtons()}
+        </>
       )}
 
       <div className="vendor-actions">

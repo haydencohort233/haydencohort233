@@ -7,29 +7,33 @@ const AddVendor = ({ isOpen, onClose }) => {
     description: '',
     location: '',
     category: '',
-    avatar: null
+    avatar: null,
+    vendorphoto: null,
   });
   const [error, setError] = useState(null);
 
+  // Handle input changes for text fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setVendor({ ...vendor, [name]: value });
   };
 
+  // Handle file input changes for avatar and vendor photo
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const { name, files } = e.target;
+    const file = files[0];
     if (file) {
       const validTypes = ['image/jpeg', 'image/png'];
       if (!validTypes.includes(file.type)) {
         setError('Please upload a .jpg or .png file.');
         return;
       }
-
-      setVendor({ ...vendor, avatar: file });
+      setVendor({ ...vendor, [name]: file });
       setError(null); // Clear any previous error
     }
   };
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -38,25 +42,31 @@ const AddVendor = ({ isOpen, onClose }) => {
     formData.append('description', vendor.description);
     formData.append('location', vendor.location);
     formData.append('category', vendor.category);
+
+    // Append files if they exist
     if (vendor.avatar) {
       formData.append('avatar', vendor.avatar);
+    }
+    if (vendor.vendorphoto) {
+      formData.append('vendorphoto', vendor.vendorphoto);
     }
 
     fetch('http://localhost:5000/api/vendors', {
       method: 'POST',
       body: formData,
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log('Vendor added:', data);
         onClose();
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error adding vendor:', error);
         setError('An error occurred while adding the vendor.');
       });
   };
 
+  // If modal is not open, do not render
   if (!isOpen) return null;
 
   return (
@@ -112,9 +122,21 @@ const AddVendor = ({ isOpen, onClose }) => {
             />
             <p className="file-info">Size limit: 2MB. Accepted formats: .jpg, .jpeg, .png</p>
           </label>
+          <label>
+            Vendor Photo:
+            <input
+              type="file"
+              name="vendorphoto"
+              accept=".jpg,.jpeg,.png"
+              onChange={handleFileChange}
+            />
+            <p className="file-info">Size limit: 2MB. Accepted formats: .jpg, .jpeg, .png</p>
+          </label>
           {error && <p className="error">{error}</p>}
           <button type="submit">Add Vendor</button>
-          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
         </form>
       </div>
     </div>
