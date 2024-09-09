@@ -5,11 +5,13 @@
     border: 1px solid #ccc;
     padding: 16px;
     margin: 12px 0;
-    transition: box-shadow 0.3s ease;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
   
   .guest-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
   
   .guest-thumbnail img {

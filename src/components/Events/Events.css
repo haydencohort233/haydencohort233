@@ -1,5 +1,4 @@
 /* Events.css */
-
 .events {
   background-color: rgba(255, 255, 255, 0.8);
   display: flex;
@@ -40,7 +39,8 @@
 }
 
 .event-item:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .event-title {
