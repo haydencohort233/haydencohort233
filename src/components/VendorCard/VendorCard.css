@@ -26,13 +26,13 @@
   z-index: 10;
 }
 
-.vendor-avatar {
+.vendor-card-avatar {
   width: 214px;
   height: 64px;
   object-fit: cover;
 }
 
-.vendor-info {
+.vendor-card-info {
   display: flex;
   flex-direction: column;
   flex-grow: 1;

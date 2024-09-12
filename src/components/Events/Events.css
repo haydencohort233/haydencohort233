@@ -98,3 +98,16 @@
   margin-top: 10px;
   text-align: center;
 }
+
+/* Style for no guest vendors message */
+.no-guests-message {
+  color: #5a6268;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #e2e3e5;
+  border: 1px solid #d6d8db;
+  margin-top: 10px;
+  text-align: center;
+}

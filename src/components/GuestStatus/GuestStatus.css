@@ -1,62 +1,57 @@
 .guest-status {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ddd;
-    padding: 5px;
-    background-color: #f7f7f7;
-    max-width: 250px; /* Adjust width as needed */
-    margin: 5px;
-  }
-  
-  .guest-status-thumbnail {
-    margin-right: 10px;
-    flex-shrink: 0;
-  }
-  
-  .guest-status-thumbnail img {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-  }
-  
-  .guest-status-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  .guest-status-name {
-    font-size: 14px;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  .guest-status-description {
-    font-size: 12px;
-    color: #555;
-    margin: 2px 0;
-  }
-  
-  .guest-status-schedule {
-    font-size: 12px;
-    margin-top: 3px;
-  }
-  
-  .guest-status-indicator {
-    font-size: 12px;
-    padding: 2px 6px;
-    font-weight: bold;
-  }
-  
-  .status-open {
-    color: #28a745;
-    border: 1px solid #28a745;
-    background-color: #e7f9ec;
-  }
-  
-  .status-closed {
-    color: #d9534f;
-    border: 1px solid #d9534f;
-    background-color: #f8d7da;
-  }
-  
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 5px;
+  background-color: #f7f7f7;
+  max-width: 250px; /* Adjust width as needed */
+  margin: 5px;
+}
+
+.guest-status-thumbnail {
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.guest-status-thumbnail img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.guest-status-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.guest-status-name {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0;
+  color: #fff;
+}
+
+.guest-status-description {
+  font-size: 12px;
+  color: #555;
+  margin: 2px 0;
+}
+
+.guest-status-schedule {
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+/* Added minimalistic status colors */
+.status-open {
+  color: #28a745; /* Green for open */
+  border: 1px solid #28a745;
+  background-color: #e7f9ec;
+}
+
+.status-closed {
+  color: #d9534f; /* Red for closed */
+  border: 1px solid #d9534f;
+  background-color: #f8d7da;
+}

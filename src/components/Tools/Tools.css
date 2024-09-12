@@ -1,35 +1,30 @@
+/* Tools.css */
+.tools {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  gap: 20px;
+}
+
+.edit-section {
+  max-width: 600px;
+}
+
 .admin-tools {
   display: flex;
-  justify-content: flex-end;
-  color: #000;
-  background: rgba(255, 255, 255, 0.8);
-  border: 3px solid #ddd;
-  margin-right: 10px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  width: 200px;
-}
-
-h2 {
-  align-items: center;
-  margin-right: 23px;
-}
-
-.tools {
-  padding: 20px;
-  display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid #000;
+  padding: 10px;
+  max-width: 300px;
 }
 
 .tools-buttons {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  border: 3px solid #ddd;
-  padding: 10px;
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.8);
+  gap: 10px;
 }
 
 .tool-button,
@@ -38,15 +33,15 @@ h2 {
 .add-vendor-button,
 .view-map-button,
 .add-survey-button,
-.add-blog-button {
+.add-blog-button,
+.edit-vendor-button,
+.edit-guest-button,
+.edit-event-button {
   width: 200px;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
-  color: #fff;
   border: none;
-  border-radius: 4px;
-  margin: 5px 0;
   transition: background-color 0.3s;
 }
 
@@ -106,4 +101,28 @@ h2 {
 
 .add-blog-button:hover {
   background-color: #0056b3;
+}
+
+.edit-vendor-button {
+  background-color: #4d4d4d;
+}
+
+.edit-vendor-button:hover {
+  background-color: #2b2b2b;
+}
+
+.edit-guest-button {
+  background-color: #32ce24;
+}
+
+.edit-guest-button:hover {
+  background-color: #077503;
+}
+
+.edit-event-button {
+  background-color: #5bd0ff;
+}
+
+.edit-event-button:hover {
+  background-color: #248596;
 }

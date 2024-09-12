@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/db');
 const multer = require('multer');
 const path = require('path');
+const eventController = require('../controllers/eventController');
 
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/events/'); // Save files to 'uploads/' directory
+    cb(null, 'uploads/events/');
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Generate a unique filename with a timestamp
@@ -34,42 +34,11 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 } // File size limit (2MB)
 });
 
-// Get the next 3 upcoming events
-router.get('/events/upcoming', (req, res) => {
-  const query = `
-    SELECT id, title, date, time, description, preview_text, photo_url, title_photo 
-    FROM chasingevents 
-    WHERE date >= CURDATE() 
-    ORDER BY date ASC, time ASC 
-    LIMIT 3`;
+router.get('/events/upcoming', eventController.getUpcomingEvents);
+router.get('/events', eventController.getAllEvents);
+router.post('/events', upload.single('photo'), eventController.addEvent);
+router.patch('/events/:id', eventController.updateEvent);
+router.get('/events/:id', eventController.getEventById);
 
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error('Error fetching events:', err);
-      return res.status(500).json({ error: 'Database query failed' });
-    }
-    res.json(results);
-  });
-});
-
-// Add a new event
-router.post('/events', upload.single('photo'), (req, res) => {
-  const { title, date, time, description, preview_text } = req.body;
-  const photoUrl = req.file ? `/uploads/events/${req.file.filename}` : null;
-  const titlePhoto = req.file ? `/uploads/events/${req.file.filename}` : null;
-
-  const query = `
-    INSERT INTO chasingevents (title, date, time, description, preview_text, photo_url, title_photo) 
-    VALUES (?, ?, ?, ?, ?, ?, ?)`;
-  const values = [title, date, time, description, preview_text, photoUrl, titlePhoto];
-
-  db.query(query, values, (err, results) => {
-    if (err) {
-      console.error('Error adding event:', err);
-      return res.status(500).json({ error: 'Database query failed' });
-    }
-    res.status(201).json({ message: 'Event added successfully', id: results.insertId });
-  });
-});
 
 module.exports = router;

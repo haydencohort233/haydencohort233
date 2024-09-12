@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../Header/Header';
-import AddBlog from '../AddBlog/AddBlog';
 import ViewBlog from '../ViewBlog/ViewBlog';
 import './Blog.css';
 
@@ -73,9 +72,6 @@ const Blog = () => {
           </div>
         ))}
       </div>
-      {isAddBlogModalOpen && (
-        <AddBlog onClose={closeAddBlogModal} onSubmit={handleAddBlog} />
-      )}
       {selectedBlog && (
         <ViewBlog blog={selectedBlog} onClose={closeViewBlogModal} />
       )}
