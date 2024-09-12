@@ -101,7 +101,7 @@ const VendorList = () => {
     <div className="vendor-list">
       <Header />
       {renderPaginationButtons()}
-      <div className="sort-options">
+      <div className="vendor-sort-options">
         <label htmlFor="sort">Sort by:</label>
         <select id="sort" value={sortOrder} onChange={handleSortChange}>
           <option value="asc">Name: Ascending</option>
@@ -117,7 +117,7 @@ const VendorList = () => {
         <div className="error-message">{error}</div>
       ) : (
         <>
-          <div className="vendor-grid">
+          <div className="vendor-list-grid">
             {currentVendors.map((vendor) => (
               <VendorCard
                 key={vendor.id}

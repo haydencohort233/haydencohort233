@@ -1,0 +1,86 @@
+.add-vendor-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.add-vendor-modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.add-vendor-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.add-vendor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.add-vendor-label {
+  font-weight: bold;
+}
+
+.add-vendor-input,
+.add-vendor-textarea {
+  width: 96%;
+  height: 40px;
+  padding: 6px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-vendor-textarea {
+  height: 80px;
+  overflow-y: auto;
+}
+
+.add-vendor-file-info {
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 5px;
+}
+
+.add-vendor-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.add-vendor-save-button,
+.add-vendor-cancel-button {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.add-vendor-save-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.add-vendor-cancel-button {
+  background-color: #dc3545;
+  color: white;
+}

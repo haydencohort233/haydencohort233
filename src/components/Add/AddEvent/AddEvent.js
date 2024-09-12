@@ -54,7 +54,7 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
         setError('An error occurred while adding the event.');
       });
   };
-
+  
   if (!isOpen) return null;
 
   return (

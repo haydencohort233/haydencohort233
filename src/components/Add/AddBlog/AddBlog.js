@@ -3,8 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import './AddBlog.css';
 
-const AddBlog = ({ onClose, onSubmit }) => {
-  // Set the default date to today
+const AddBlog = ({ isOpen, onClose, onSubmit }) => {
   const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -53,10 +52,15 @@ const AddBlog = ({ onClose, onSubmit }) => {
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="modal-overlay">
-      <div className="add-blog-modal">
-        <h2>Add New Blog</h2>
+    <div className="add-blog-modal-overlay">
+      <div className="add-blog-modal-content">
+        <h2 className="add-blog-modal-title">
+          Add New Blog
+          <span className="add-blog-close-modal" onClick={onClose}>×</span>
+        </h2>
         {error && <p className="error-message">{error}</p>}
         <form onSubmit={handleSubmit}>
           <label>Title:</label>
@@ -75,7 +79,7 @@ const AddBlog = ({ onClose, onSubmit }) => {
             required
           />
 
-<label>Preview Text:</label>
+          <label>Preview Text:</label>
           <input
             type="text"
             value={previewText}

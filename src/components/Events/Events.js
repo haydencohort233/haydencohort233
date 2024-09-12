@@ -43,18 +43,24 @@ const Events = () => {
     e.target.src = '/images/placeholder.png';
   };
 
+  // Filter out guest vendors that are on break
+  const filteredGuestVendors = guestVendors.filter((guest) => !guest.break);
+
   return (
+    <>
+    <Header />
     <div className="events">
-      <Header />
       <div className="error-messages">
         {eventError && <div className="event-error-message">{eventError}</div>}
         {guestVendorError && <div className="guest-vendor-error">{guestVendorError}</div>}
       </div>
       <div className="guest-vendors-section">
-        {guestVendors.length === 0 && !guestVendorError ? (
-          <div className="loading-message">Loading guest vendors...</div>
+        {guestVendorError ? (
+          <div className="error-message">{guestVendorError}</div>
+        ) : filteredGuestVendors.length === 0 ? (
+          <div className="no-guests-message">Currently no guest vendor</div>
         ) : (
-          guestVendors.map((guest) => <GuestCard key={guest.id} guest={guest} />)
+          filteredGuestVendors.map((guest) => <GuestCard key={guest.id} guest={guest} />)
         )}
       </div>
       <div className="events-content">
@@ -87,6 +93,7 @@ const Events = () => {
         </ul>
       </div>
     </div>
+    </>
   );
 };
 

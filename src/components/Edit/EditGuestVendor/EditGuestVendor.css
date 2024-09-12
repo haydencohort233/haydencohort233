@@ -1,0 +1,151 @@
+/* Black Overlay to Darken Background */
+.edit-guest-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.edit-guest-modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.edit-guest-title {
+  display: flex;
+  color: #000;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.edit-guest-close-modal {
+  cursor: pointer;
+  font-size: 40px;
+  font-weight: bold;
+  color: #dc3545;
+}
+
+.edit-guest-list {
+  max-height: 600px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.edit-guest-list ul {
+  list-style-type: none;
+  padding: 0;
+  color: #000;
+}
+
+.edit-guest-list li {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+
+.edit-guest-list li:hover {
+  background-color: #eee;
+}
+
+.edit-guest-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.edit-guest-label {
+  font-weight: bold;
+}
+
+.edit-guest-input,
+.edit-guest-textarea {
+  width: 96%;
+  height: 20px;
+  padding: 6px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.edit-guest-textarea {
+  height: 100px;
+  overflow-y: auto;
+}
+
+.edit-guest-image-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-top: 10px;
+}
+
+.edit-guest-error-message {
+  color: red;
+}
+
+.edit-guest-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  color: #000;
+}
+
+.edit-guest-buttons-left {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-guest-save-button,
+.edit-guest-cancel-button,
+.edit-guest-back-button {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.edit-guest-save-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.edit-guest-cancel-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.edit-guest-back-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.edit-guest-break-button {
+  background-color: #ff9800;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.edit-guest-break-button:hover {
+  background-color: #e68900;
+}

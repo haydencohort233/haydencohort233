@@ -52,13 +52,13 @@ const VendorCard = ({ vendor }) => {
         <img
           src={avatarUrl}
           alt={`${vendor.name} avatar`}
-          className="vendor-avatar"
+          className="vendor-card-avatar"
           onError={(e) => {
             console.error('Failed to load avatar:', e.target.src);
             e.target.src = '/images/avatar.png'; // Fallback to default image if avatar fails to load
           }}
         />
-        <div className="vendor-info">
+        <div className="vendor-card-info">
           <h2 className="vendor-card-name">{vendor.name}</h2>
           <p className="vendor-card-description">
             {vendor.description.length > 150
