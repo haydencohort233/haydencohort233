@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/haydencohort233/static/css/main.18749610.css",
-    "main.js": "/haydencohort233/static/js/main.c37d6296.js",
-    "static/media/background.jpg": "/haydencohort233/static/media/background.657288c5e53924504072.jpg",
-    "index.html": "/haydencohort233/index.html",
-    "main.18749610.css.map": "/haydencohort233/static/css/main.18749610.css.map",
-    "main.c37d6296.js.map": "/haydencohort233/static/js/main.c37d6296.js.map"
+    "main.css": "/static/css/main.6e9e325d.css",
+    "main.js": "/static/js/main.c37d6296.js",
+    "static/media/background.jpg": "/static/media/background.657288c5e53924504072.jpg",
+    "index.html": "/index.html",
+    "main.6e9e325d.css.map": "/static/css/main.6e9e325d.css.map",
+    "main.c37d6296.js.map": "/static/js/main.c37d6296.js.map"
   },
   "entrypoints": [
-    "static/css/main.18749610.css",
+    "static/css/main.6e9e325d.css",
     "static/js/main.c37d6296.js"
   ]
 }
