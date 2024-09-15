@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/haydencohort233/static/css/main.18749610.css",
+    "main.js": "/haydencohort233/static/js/main.c37d6296.js",
+    "static/media/background.jpg": "/haydencohort233/static/media/background.657288c5e53924504072.jpg",
+    "index.html": "/haydencohort233/index.html",
+    "main.18749610.css.map": "/haydencohort233/static/css/main.18749610.css.map",
+    "main.c37d6296.js.map": "/haydencohort233/static/js/main.c37d6296.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.18749610.css",
+    "static/js/main.c37d6296.js"
+  ]
+}
