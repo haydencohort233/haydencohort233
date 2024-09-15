@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, forwardRef } from 'react';
 import './AddVendor.css';
 
 const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
@@ -65,6 +65,10 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
   return (
     <div className="add-vendor-modal-overlay" ref={ref}>
       <div className="add-vendor-modal-content">
+        {/* Close button */}
+        <button className="add-vendor-close-button" onClick={onClose}>
+          ×
+        </button>
         <h2 className="add-vendor-title">Add New Vendor</h2>
         <form onSubmit={handleSubmit} className="add-vendor-form">
           <label className="add-vendor-label">
@@ -76,6 +80,7 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
               value={vendor.name}
               onChange={handleChange}
               required
+              placeholder="Vendor Name"
             />
           </label>
           <label className="add-vendor-label">
@@ -86,6 +91,7 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
               value={vendor.description}
               onChange={handleChange}
               required
+              placeholder="Vendor Description"
             />
           </label>
           <label className="add-vendor-label">
@@ -97,6 +103,7 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
               value={vendor.location}
               onChange={handleChange}
               required
+              placeholder="12A"
             />
           </label>
           <label className="add-vendor-label">
@@ -133,8 +140,12 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
           </label>
           {error && <p className="add-vendor-error">{error}</p>}
           <div className="add-vendor-buttons">
-            <button type="button" className="add-vendor-cancel-button" onClick={onClose}>Cancel</button>
-            <button type="submit" className="add-vendor-save-button">Add Vendor</button>
+            <button type="button" className="add-vendor-cancel-button" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="add-vendor-save-button">
+              Add Vendor
+            </button>
           </div>
         </form>
       </div>

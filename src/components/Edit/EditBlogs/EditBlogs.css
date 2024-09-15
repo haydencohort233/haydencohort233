@@ -1,0 +1,121 @@
+.edit-blog-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.edit-blog-modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.edit-blog-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.edit-blog-close-modal {
+    cursor: pointer;
+    font-size: 36px;
+    color: #dc3545;
+}
+
+.edit-blog-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.edit-blog-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.edit-blog-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.edit-blog-list li:hover {
+    background-color: #eee;
+}
+
+.edit-blog-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.edit-blog-label {
+    font-weight: bold;
+}
+
+.edit-blog-input,
+.edit-blog-textarea {
+    width: 96%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.edit-blog-textarea {
+    height: 100px;
+}
+
+.edit-blog-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.edit-blog-buttons-left {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-blog-save-button,
+.edit-blog-cancel-button,
+.edit-blog-back-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.edit-blog-save-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.edit-blog-cancel-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.edit-blog-back-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.edit-blog-error-message {
+    color: red;
+}

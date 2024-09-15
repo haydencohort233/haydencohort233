@@ -12,13 +12,15 @@
 }
 
 .add-vendor-modal-content {
-  background: #fff;
+  background: linear-gradient(to top left, purple 0%, green 100%);
   padding: 20px;
   border-radius: 8px;
   width: 600px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  color: #fff;
+  border: 3px solid white;
 }
 
 .add-vendor-title {
@@ -32,7 +34,7 @@
 .add-vendor-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 5px;
 }
 
 .add-vendor-label {
@@ -42,7 +44,7 @@
 .add-vendor-input,
 .add-vendor-textarea {
   width: 96%;
-  height: 40px;
+  height: 20px;
   padding: 6px;
   margin-top: 5px;
   border: 1px solid #ccc;
@@ -56,8 +58,10 @@
 
 .add-vendor-file-info {
   font-size: 0.85em;
-  color: #666;
+  color: #ccc;
   margin-top: 5px;
+  text-align: center;
+  font-style: italic;
 }
 
 .add-vendor-buttons {
@@ -83,4 +87,20 @@
 .add-vendor-cancel-button {
   background-color: #dc3545;
   color: white;
+}
+
+.add-vendor-close-button {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 48px;
+  font-weight: bold;
+  color: #dc3545;
+  cursor: pointer;
+}
+
+.add-vendor-close-button:hover {
+  color: #bb2130;
 }

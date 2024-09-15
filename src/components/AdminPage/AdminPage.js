@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import Tools from '../Tools/Tools';
+import Status from '../Status/Status'; // Import the Status component
 import './AdminPage.css';
 
 const AdminPage = () => {
@@ -54,7 +55,10 @@ const AdminPage = () => {
             Logout
           </button>
         </div>
-        <Tools /> {/* Display the Tools component */}
+        <div className="admin-content">
+          <Tools /> {/* Display the Tools component */}
+          <Status /> {/* Display the Status component */}
+        </div>
       </div>
     );
   }
@@ -82,7 +86,12 @@ const AdminPage = () => {
           />
         </label>
         {error && <p className="error-message">{error}</p>}
-        <button type="submit">Login</button>
+        <div className="login-actions">
+          <button type="button" className="back-to-home-button" onClick={handleBackToHome}>
+            <span className="arrow">&larr;</span> Back to Home
+          </button>
+          <button type="submit" className="login-button">Login</button>
+        </div>
       </form>
     </div>
   );

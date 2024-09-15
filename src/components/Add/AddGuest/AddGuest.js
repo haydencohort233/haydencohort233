@@ -66,65 +66,75 @@ const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" ref={ref}>
-      <div className="modal-content">
-        <h2>Add New Guest Vendor</h2>
-        <form onSubmit={handleSubmit}>
-          <label>
+    <div className="add-guest-modal-overlay" ref={ref}>
+      <div className="add-guest-modal-content">
+        <h2 className="add-guest-title">Add New Guest</h2>
+        <span className="add-guest-close-button" onClick={onClose}>×</span>
+        <form onSubmit={handleSubmit} className="add-guest-form">
+          <label className="add-guest-label">
             Name:
             <input
               type="text"
               name="name"
+              className="add-guest-input"
               value={guest.name}
               onChange={handleChange}
+              placeholder="Guest Vendor Name"
               required
             />
           </label>
-          <label>
+          <label className="add-guest-label">
             Description:
             <textarea
               name="description"
+              className="add-guest-textarea"
               value={guest.description}
               onChange={handleChange}
+              placeholder="Guest Vendor Description (e.g. Tattoo Apprentice, Local DJ)"
               required
             />
           </label>
-          <label>
+          <label className="add-guest-label">
             Schedule:
             <input
               type="text"
               name="schedule"
+              className="add-guest-input"
               value={guest.schedule}
               onChange={handleChange}
               placeholder="e.g., Open 10am - 6pm"
               required
             />
           </label>
-          <label>
+          <label className="add-guest-label">
             Guest Avatar:
             <input
               type="file"
               name="guestavatar"
+              className="add-guest-input"
               accept=".jpg,.jpeg,.png"
               onChange={handleFileChange}
               required
             />
-            <p className="file-info">Size limit: 2MB. Accepted formats: .jpg, .jpeg, .png</p>
+            <p className="add-guest-file-info">Size limit: 2MB. Accepted formats: .jpg, .jpeg, .png</p>
           </label>
-          <label>
+          <label className="add-guest-label">
             Guest Photo (optional):
             <input
               type="file"
               name="guestphoto"
+              className="add-guest-input"
               accept=".jpg,.jpeg,.png"
               onChange={handleFileChange}
             />
           </label>
-          {error && <p className="error">{error}</p>}
-          <button type="submit">Add Guest</button>
-          <button type="button" onClick={onClose}>
-            Cancel
-          </button>
+          {error && <p className="add-guest-error">{error}</p>}
+          <div className="add-guest-buttons">
+            <button type="submit" className="add-guest-save-button">Add Guest</button>
+            <button type="button" className="add-guest-cancel-button" onClick={onClose}>
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>

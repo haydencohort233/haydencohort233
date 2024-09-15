@@ -1,0 +1,107 @@
+.add-event-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.add-event-modal-content {
+  background: linear-gradient(to top left, purple 0%, green 100%);
+  padding: 20px;
+  border-radius: 8px;
+  width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  color: #fff;
+  border: 3px solid white;
+}
+
+.add-event-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.add-event-close-button {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 48px;
+  font-weight: bold;
+  color: #dc3545;
+  cursor: pointer;
+}
+
+.add-event-close-button:hover {
+  color: #bb2130;
+}
+
+.add-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.add-event-label {
+  font-weight: bold;
+}
+
+.add-event-input,
+.add-event-textarea {
+  width: 96%;
+  padding: 6px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-event-textarea {
+  height: 80px;
+  overflow-y: auto;
+}
+
+.add-event-file-info {
+  font-size: 0.85em;
+  color: #ccc;
+  text-align: center;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.add-event-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.add-event-save-button,
+.add-event-cancel-button {
+  padding: 10px 20px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.add-event-save-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.add-event-cancel-button {
+  background-color: #dc3545;
+  color: white;
+}

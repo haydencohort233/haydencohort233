@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './EditGuestVendor.css'; // Ensure this is properly styled
+import './EditGuestVendor.css';
 
 const EditGuestVendor = ({ isOpen, onClose }) => {
   const [guests, setGuests] = useState([]);
@@ -16,20 +16,38 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
   const [guestPhotoPreview, setGuestPhotoPreview] = useState(null);
   const [error, setError] = useState('');
 
+  // Reset state when the modal is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedGuestId(null);
+      setGuestData({
+        name: '',
+        description: '',
+        schedule: '',
+        guestavatar: '',
+        guestphoto: '',
+        break: false,
+      });
+      setAvatarPreview(null);
+      setGuestPhotoPreview(null);
+      setError('');
+    }
+  }, [isOpen]);
+
   // Fetch all guest vendors when the modal opens
   useEffect(() => {
     if (isOpen) {
       fetch('http://localhost:5000/api/guests')
-        .then(response => {
+        .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           return response.json();
         })
-        .then(data => {
+        .then((data) => {
           setGuests(data.sort((a, b) => a.name.localeCompare(b.name))); // Sort guests A-Z
         })
-        .catch(err => {
+        .catch((err) => {
           console.error('Error fetching guests:', err.message);
           setError('Failed to load guests. Please try again.');
         });
@@ -40,13 +58,13 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (selectedGuestId) {
       fetch(`http://localhost:5000/api/guests/${selectedGuestId}`)
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
           setGuestData(data);
           setAvatarPreview(data.guestavatar); // Update avatar preview
           setGuestPhotoPreview(data.guestphoto);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error('Error fetching guest data:', err);
         });
     }
@@ -133,7 +151,7 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
       <div className="edit-guest-modal-content">
         <h2 className="edit-guest-title">
           Edit Guests
-          <span className="edit-guest-close-modal" onClick={onClose}>×</span> {/* X to close modal */}
+          <span className="edit-guest-close-button" onClick={onClose}>×</span> {/* X to close modal */}
         </h2>
         {error && <p className="edit-guest-error-message">{error}</p>}
 
@@ -141,12 +159,15 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
           <div className="edit-guest-list">
             <h3>Select a Guest</h3>
             <ul>
-              {guests.map(guest => (
+              {guests.map((guest) => (
                 <li key={guest.id} onClick={() => setSelectedGuestId(guest.id)}>
                   {guest.name}
                 </li>
               ))}
             </ul>
+            <button type="button" className="edit-guest-cancel-button-wide" onClick={onClose}>
+              Cancel
+            </button>
           </div>
         ) : (
           <form className="edit-guest-form" onSubmit={handleSubmit}>

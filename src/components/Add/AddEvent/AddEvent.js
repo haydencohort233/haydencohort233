@@ -25,7 +25,7 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
         return;
       }
       setEvent({ ...event, photo: file });
-      setError(null); // Clear any previous error
+      setError(null);
     }
   };
 
@@ -58,66 +58,78 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" ref={ref}>
-      <div className="modal-content">
-        <h2>Add New Event</h2>
-        <form onSubmit={handleSubmit}>
-          <label>
+    <div className="add-event-modal-overlay" ref={ref}>
+      <div className="add-event-modal-content">
+        <h2 className="add-event-title">
+          Add New Event
+          <span className="add-event-close-button" onClick={onClose}>×</span>
+        </h2>
+        <form onSubmit={handleSubmit} className="add-event-form">
+          <label className="add-event-label">
             Title:
             <input
               type="text"
               name="title"
+              className="add-event-input"
               value={event.title}
               onChange={handleChange}
+              placeholder="Event Title"
               required
             />
           </label>
-          <label>
+          <label className="add-event-label">
             Date:
             <input
               type="date"
               name="date"
+              className="add-event-input"
               value={event.date}
               onChange={handleChange}
               required
             />
           </label>
-          <label>
+          <label className="add-event-label">
             Time:
             <input
               type="time"
               name="time"
+              className="add-event-input"
               value={event.time}
               onChange={handleChange}
               required
             />
           </label>
-          <label>
+          <label className="add-event-label">
             Description:
             <textarea
               name="description"
+              className="add-event-textarea"
               value={event.description}
               onChange={handleChange}
+              placeholder="Event Description (Displays up to 1,000 words)"
               required
             />
           </label>
-          <label>
+          <label className="add-event-label">
             Event Photo:
             <input
               type="file"
               name="photo"
+              className="add-event-input"
               accept=".jpg,.jpeg,.png"
               onChange={handleFileChange}
             />
-            <p className="file-info">
+            <p className="add-event-file-info">
               Size limit: 2MB. Accepted formats: .jpg, .jpeg, .png
             </p>
           </label>
-          {error && <p className="error">{error}</p>}
-          <button type="submit">Add Event</button>
-          <button type="button" onClick={onClose}>
-            Cancel
-          </button>
+          {error && <p className="add-event-error">{error}</p>}
+          <div className="add-event-buttons">
+            <button type="submit" className="add-event-save-button">Add Event</button>
+            <button type="button" className="add-event-cancel-button" onClick={onClose}>
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>

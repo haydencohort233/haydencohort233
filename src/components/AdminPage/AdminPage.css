@@ -1,26 +1,20 @@
-/* Page background styling */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background-image: url('background.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  color: #fff;
-}
-
+/* AdminPage.css */
 .admin-page {
   padding: 20px;
 }
 
 .admin-actions {
   display: flex;
-  gap: 10px; /* Space between buttons */
+  gap: 10px;
   margin-bottom: 20px;
 }
 
+.admin-content {
+  display: flex;
+  gap: 20px;
+}
+
+/* Style for buttons */
 .back-to-home-button {
   padding: 10px 20px;
   background-color: #007bff;
@@ -54,18 +48,19 @@ body {
   background-color: #d32f2f;
 }
 
+/* Login page */
 .login-page {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f0f0;
+  background: linear-gradient(to top left, purple 0%, green 100%);
 }
 
 .login-form {
   background: white;
+  color: #000;
   padding: 20px;
-  border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -82,4 +77,9 @@ body {
 
 .error-message {
   color: red;
+}
+
+.login-actions {
+  display: flex;
+  justify-content: space-between;
 }

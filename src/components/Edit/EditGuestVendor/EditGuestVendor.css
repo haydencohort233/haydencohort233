@@ -1,4 +1,3 @@
-/* Black Overlay to Darken Background */
 .edit-guest-modal-overlay {
   position: fixed;
   top: 0;
@@ -13,70 +12,56 @@
 }
 
 .edit-guest-modal-content {
-  background: #fff;
+  background: linear-gradient(to top left, purple 0%, green 100%);
   padding: 20px;
   border-radius: 8px;
   width: 600px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  color: #fff;
+  border: 3px solid white;
 }
 
 .edit-guest-title {
-  display: flex;
-  color: #000;
-  justify-content: space-between;
-  align-items: center;
   font-size: 24px;
   margin-bottom: 20px;
+  color: #fff;
 }
 
-.edit-guest-close-modal {
-  cursor: pointer;
-  font-size: 40px;
+.edit-guest-close-button {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 48px;
   font-weight: bold;
   color: #dc3545;
-}
-
-.edit-guest-list {
-  max-height: 600px;
-  overflow-y: auto;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  background-color: #f9f9f9;
-}
-
-.edit-guest-list ul {
-  list-style-type: none;
-  padding: 0;
-  color: #000;
-}
-
-.edit-guest-list li {
-  padding: 10px;
   cursor: pointer;
-  border-bottom: 1px solid #ddd;
 }
 
-.edit-guest-list li:hover {
-  background-color: #eee;
+.edit-guest-close-button:hover {
+  color: #bb2130;
 }
 
 .edit-guest-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 5px;
 }
 
 .edit-guest-label {
   font-weight: bold;
 }
 
+.edit-guest-modal-content h3 {
+  color: #000;
+}
+
 .edit-guest-input,
 .edit-guest-textarea {
   width: 96%;
-  height: 20px;
   padding: 6px;
   margin-top: 5px;
   border: 1px solid #ccc;
@@ -84,26 +69,14 @@
 }
 
 .edit-guest-textarea {
-  height: 100px;
+  height: 80px;
   overflow-y: auto;
-}
-
-.edit-guest-image-preview {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  margin-top: 10px;
-}
-
-.edit-guest-error-message {
-  color: red;
 }
 
 .edit-guest-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
-  color: #000;
 }
 
 .edit-guest-buttons-left {
@@ -113,8 +86,9 @@
 
 .edit-guest-save-button,
 .edit-guest-cancel-button,
-.edit-guest-back-button {
-  padding: 10px 20px;
+.edit-guest-back-button,
+.edit-guest-break-button {
+  padding: 8px 12px;
   border: none;
   cursor: pointer;
   border-radius: 4px;
@@ -126,9 +100,18 @@
   color: white;
 }
 
-.edit-guest-cancel-button {
+.edit-guest-cancel-button,
+.edit-guest-cancel-button-wide {
   background-color: #dc3545;
   color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
 }
 
 .edit-guest-back-button {
@@ -137,15 +120,43 @@
 }
 
 .edit-guest-break-button {
-  background-color: #ff9800;
+  background-color: #ffc107;
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
 }
 
-.edit-guest-break-button:hover {
-  background-color: #e68900;
+.edit-guest-list {
+  max-height: 600px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #f9f9f9;
+  color: #000;
+}
+
+.edit-guest-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.edit-guest-list li {
+  padding: 10px;
+  cursor: pointer;
+  color: #000;
+  border-bottom: 1px solid #ddd;
+}
+
+.edit-guest-list li:hover {
+  background-color: #eee;
+}
+
+.edit-guest-error-message {
+  color: red;
+}
+
+.edit-guest-image-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-top: 10px;
 }
