@@ -5,7 +5,6 @@ import './Blog.css';
 
 const Blog = () => {
   const [blogs, setBlogs] = useState([]);
-  const [isAddBlogModalOpen, setIsAddBlogModalOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
 
   useEffect(() => {
@@ -22,21 +21,6 @@ const Blog = () => {
     }
   };
 
-  const handleAddBlog = (newBlog) => {
-    if (!newBlog.id) {
-      newBlog.id = Date.now(); // Temporary unique ID if the backend doesn't return one
-    }
-    setBlogs((prevBlogs) => [...prevBlogs, newBlog]);
-  };  
-
-  const openAddBlogModal = () => {
-    setIsAddBlogModalOpen(true);
-  };
-
-  const closeAddBlogModal = () => {
-    setIsAddBlogModalOpen(false);
-  };
-
   const openViewBlogModal = (blog) => {
     setSelectedBlog(blog);
   };
@@ -45,23 +29,20 @@ const Blog = () => {
     setSelectedBlog(null);
   };
 
-    // Function to render content with line breaks
-    const renderContentWithLineBreaks = (content) => {
-        return content.split('\n').map((line, index) => (
-          <React.Fragment key={index}>
-            {line}
-            <br />
-          </React.Fragment>
-        ));
-      };
+  // Function to render content with line breaks
+  const renderContentWithLineBreaks = (content) => {
+    return content.split('\n').map((line, index) => (
+      <React.Fragment key={index}>
+        {line}
+        <br />
+      </React.Fragment>
+    ));
+  };
 
   return (
     <div className="blog-page">
       <Header />
       <div className="blog-content">
-        <button className="add-blog-button" onClick={openAddBlogModal}>
-          Add Blog
-        </button>
         {blogs.map((blog) => (
           <div key={blog.id} className="blog-post" onClick={() => openViewBlogModal(blog)}>
             <h2>{blog.title}</h2>

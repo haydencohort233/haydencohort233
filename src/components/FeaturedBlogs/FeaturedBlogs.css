@@ -9,8 +9,7 @@
   
   .featured-blog {
     padding: 15px;
-    background-color: #f8f8f8;
-    border-radius: 0px;
+    background-color: #d3d3d3;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
   }
@@ -23,6 +22,7 @@
   .featured-blog h3 {
     font-size: 22px;
     margin-bottom: 8px;
+    color: #000;
   }
   
   .featured-blog p {
@@ -40,7 +40,6 @@
     text-decoration: underline;
   }
   
-/* Error message */
 .error-message {
     color: #d9534f;
     font-size: 16px;
@@ -53,15 +52,15 @@
     text-align: center;
   }
 
-  .read-more-link {
+  .featured-blog-read-more-link {
     color: #007bff !important;
-    text-decoration: none !important;
-    font-weight: bold !important;
-    text-align: center !important;
-    width: 100% !important;
-    cursor: pointer !important;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
 }
 
-.read-more-link:hover {
-    text-decoration: underline !important;
+.featured-blog-read-more-link:hover {
+    text-decoration: underline;
 }

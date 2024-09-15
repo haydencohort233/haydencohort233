@@ -51,13 +51,13 @@ const EditVendor = ({ isOpen, onClose }) => {
         onClose();
       }
     };
-  
+
     document.addEventListener('keydown', handleKeyDown);
-  
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onClose]);  
+  }, [onClose]);
 
   useEffect(() => {
     if (selectedVendorId) {
@@ -127,7 +127,7 @@ const EditVendor = ({ isOpen, onClose }) => {
       <div className="edit-vendor-modal-content">
         <h2 className="edit-vendor-title">
           Edit Vendors
-          <span className="edit-vendor-close-modal" onClick={onClose}>×</span>
+          <span className="edit-vendor-close-button" onClick={onClose}>×</span>
         </h2>
         {error && <p className="edit-vendor-error-message">{error}</p>}
         {!selectedVendorId ? (
@@ -166,12 +166,17 @@ const EditVendor = ({ isOpen, onClose }) => {
             <div className="edit-vendor-buttons">
               <div className="edit-vendor-buttons-left">
                 <button type="button" className="edit-vendor-back-button" onClick={() => setSelectedVendorId(null)}>← Back</button>
-                <button type="button" className="edit-vendor-cancel-button" onClick={onClose}>Cancel</button>
               </div>
               <button type="submit" className="edit-vendor-save-button">Update Vendor</button>
             </div>
           </form>
         )}
+        {/* Cancel button added here */}
+        <div className="edit-vendor-footer">
+          <button type="button" className="edit-vendor-list-cancel-button" onClick={onClose}>
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

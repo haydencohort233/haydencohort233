@@ -11,7 +11,7 @@
   box-sizing: border-box;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   min-height: 200px;
-  overflow: visible; /* Ensure badge is not clipped */
+  overflow: visible;
 }
 
 .new-badge {
@@ -44,6 +44,8 @@
   margin: 0 0 -10px;
   text-align: center;
   width: 100%;
+  color: #000;
+  text-decoration: underline;
 }
 
 .vendor-card-description {
