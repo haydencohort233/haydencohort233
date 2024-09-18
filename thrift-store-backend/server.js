@@ -74,7 +74,7 @@ app.get('/api/status', (req, res) => {
     // Get database size
     db.query('SELECT SUM(data_length + index_length) AS size FROM information_schema.tables WHERE table_schema = ?', [process.env.DB_NAME], (err, result) => {
       if (!err && result && result[0]) {
-        statusData.dbSize = `${(result[0].size / (1024 * 1024)).toFixed(2)} MB`; // Convert to MB
+        statusData.dbSize = `${(result[0].size / (1024 * 1024)).toFixed(2)} MB`;
       }
 
       // Get the largest table
@@ -91,7 +91,7 @@ app.get('/api/status', (req, res) => {
 
           // Send the final status data as JSON response
           res.setHeader('Content-Type', 'application/json');
-          return res.status(200).json(statusData); // This ensures valid JSON is sent
+          return res.status(200).json(statusData);
         });
       });
     });

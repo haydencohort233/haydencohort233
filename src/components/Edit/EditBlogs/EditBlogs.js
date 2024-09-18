@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 import './EditBlogs.css';
 
 const EditBlogs = React.forwardRef(({ isOpen, onClose }, ref) => {
@@ -13,7 +14,6 @@ const EditBlogs = React.forwardRef(({ isOpen, onClose }, ref) => {
   });
   const [error, setError] = useState('');
 
-  // Fetch all blogs when the modal opens
   useEffect(() => {
     if (isOpen) {
       fetch('http://localhost:5000/api/blogs')
@@ -47,9 +47,9 @@ const EditBlogs = React.forwardRef(({ isOpen, onClose }, ref) => {
           setBlogData({
             title: data.title,
             content: data.content,
-            date: data.date.split('T')[0], // Format date for input
+            date: data.date.split('T')[0],
             preview_text: data.preview_text,
-            photo: null, // Reset photo
+            photo: null,
           });
         })
         .catch(err => {
@@ -70,11 +70,10 @@ const EditBlogs = React.forwardRef(({ isOpen, onClose }, ref) => {
     setBlogData({ ...blogData, photo: e.target.files[0] });
   };
 
-  // Handle form submission to update the blog
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedBlogId) return;
-
+  
     const formData = new FormData();
     formData.append('title', blogData.title);
     formData.append('content', blogData.content);
@@ -83,15 +82,20 @@ const EditBlogs = React.forwardRef(({ isOpen, onClose }, ref) => {
     if (blogData.photo) {
       formData.append('photo', blogData.photo);
     }
-
+  
+    const adminUsername = Cookies.get('adminUsername');
+  
     try {
       const response = await fetch(`http://localhost:5000/api/blogs/${selectedBlogId}`, {
         method: 'PUT',
         body: formData,
+        headers: {
+          'X-Admin-Username': adminUsername,
+        },
       });
-
+  
       if (response.ok) {
-        onClose(); // Close modal after successful update
+        onClose();
       } else {
         const errorData = await response.json();
         console.error('Error updating blog:', errorData);
@@ -101,7 +105,7 @@ const EditBlogs = React.forwardRef(({ isOpen, onClose }, ref) => {
       console.error('Error updating blog:', err);
       setError('Failed to update blog. Please try again.');
     }
-  };
+  };  
 
   if (!isOpen) return null;
 

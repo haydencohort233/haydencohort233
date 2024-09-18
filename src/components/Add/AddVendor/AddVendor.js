@@ -13,13 +13,11 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
   });
   const [error, setError] = useState(null);
 
-  // Handle text inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setVendor({ ...vendor, [name]: value });
   };
 
-  // Handle file inputs for avatar and vendorphoto
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
@@ -44,21 +42,21 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
     formData.append('category', vendor.category);
   
     if (vendor.avatar) {
-      formData.append('avatar', vendor.avatar); // Avatar file
+      formData.append('avatar', vendor.avatar);
     }
   
     if (vendor.vendorphoto) {
-      formData.append('vendorphoto', vendor.vendorphoto); // Vendor photo file
+      formData.append('vendorphoto', vendor.vendorphoto);
     }
   
-    // Get the admin username from the cookies
+    // Get the admin username from cookies
     const adminUsername = Cookies.get('adminUsername');
   
     fetch('http://localhost:5000/api/vendors', {
       method: 'POST',
       body: formData,
       headers: {
-        'X-Admin-Username': adminUsername, // Pass admin username in the request headers
+        'X-Admin-Username': adminUsername,
       },
     })
       .then((response) => {

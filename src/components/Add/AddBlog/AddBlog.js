@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
+import Cookies from 'js-cookie';
+import DOMPurify from 'dompurify';
 import 'react-quill/dist/quill.snow.css';
 import './AddBlog.css';
 
@@ -25,17 +27,27 @@ const AddBlog = ({ isOpen, onClose, onSubmit }) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
+    // Sanitize the content before saving it to the database
+    const sanitizedContent = DOMPurify.sanitize(content);
+
     try {
       const formData = new FormData();
       formData.append('title', title);
-      formData.append('content', content);
+      formData.append('content', sanitizedContent);  // Append the sanitized content
       formData.append('date', date);
       formData.append('preview_text', previewText);
-      formData.append('photo', photo);
+      if (photo) {
+        formData.append('photo', photo);
+      }
+
+      const adminUsername = Cookies.get('adminUsername');
 
       const response = await fetch('http://localhost:5000/api/blogs', {
         method: 'POST',
         body: formData,
+        headers: {
+          'X-Admin-Username': adminUsername,
+        },
       });
 
       const data = await response.json();
@@ -43,8 +55,8 @@ const AddBlog = ({ isOpen, onClose, onSubmit }) => {
         throw new Error(data.error || 'Something went wrong!');
       }
 
-      onSubmit(data);
-      onClose();
+      onSubmit(data); // Call onSubmit function when successful
+      onClose(); // Close the modal after successful submission
     } catch (err) {
       setError(err.message);
     } finally {
