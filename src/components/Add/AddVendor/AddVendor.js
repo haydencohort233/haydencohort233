@@ -1,4 +1,5 @@
 import React, { useState, forwardRef } from 'react';
+import Cookies from 'js-cookie';
 import './AddVendor.css';
 
 const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
@@ -12,11 +13,13 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
   });
   const [error, setError] = useState(null);
 
+  // Handle text inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setVendor({ ...vendor, [name]: value });
   };
 
+  // Handle file inputs for avatar and vendorphoto
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
@@ -34,38 +37,53 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
+  
     formData.append('name', vendor.name);
     formData.append('description', vendor.description);
     formData.append('location', vendor.location);
     formData.append('category', vendor.category);
+  
     if (vendor.avatar) {
-      formData.append('avatar', vendor.avatar);
+      formData.append('avatar', vendor.avatar); // Avatar file
     }
+  
     if (vendor.vendorphoto) {
-      formData.append('vendorphoto', vendor.vendorphoto);
+      formData.append('vendorphoto', vendor.vendorphoto); // Vendor photo file
     }
-
+  
+    // Get the admin username from the cookies
+    const adminUsername = Cookies.get('adminUsername');
+  
     fetch('http://localhost:5000/api/vendors', {
       method: 'POST',
       body: formData,
+      headers: {
+        'X-Admin-Username': adminUsername, // Pass admin username in the request headers
+      },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to add vendor');
+        }
+        return response.json();
+      })
       .then((data) => {
-        console.log('Vendor added:', data);
-        onClose();
+        // Console log that matches the format
+        console.log(`Vendor added: ${vendor.name} (ID: ${data.id})`);
+  
+        onClose(); // Close modal after adding vendor
       })
       .catch((error) => {
         console.error('Error adding vendor:', error);
         setError('An error occurred while adding the vendor.');
       });
-  };
+  };  
 
   if (!isOpen) return null;
 
   return (
     <div className="add-vendor-modal-overlay" ref={ref}>
       <div className="add-vendor-modal-content">
-        {/* Close button */}
         <button className="add-vendor-close-button" onClick={onClose}>
           ×
         </button>

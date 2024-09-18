@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import Tools from '../Tools/Tools';
-import Status from '../Status/Status'; // Import the Status component
+import Status from '../Status/Status';
 import './AdminPage.css';
 
 const AdminPage = () => {
@@ -19,6 +19,7 @@ const AdminPage = () => {
 
     if (username === validUsername && password === validPassword) {
       Cookies.set('adminAuthenticated', 'true', { expires: 1 }); // Cookie expires in 1 day
+      Cookies.set('adminUsername', username, { expires: 1 }); // Store the username in a cookie
       setIsAuthenticated(true);
       setError('');
     } else {
@@ -37,6 +38,7 @@ const AdminPage = () => {
   // Handle logout
   const handleLogout = () => {
     Cookies.remove('adminAuthenticated');
+    Cookies.remove('adminUsername');
     setIsAuthenticated(false);
   };
 

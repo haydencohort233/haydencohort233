@@ -10,12 +10,11 @@ const GuestCard = ({ guest }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const baseURL = 'http://localhost:5000';
-  const avatarURL = guestavatar ? `${baseURL}${guestavatar}` : '/public/images/avatar.png';
+  const avatarURL = guestavatar ? `${baseURL}${guestavatar}` : `${process.env.PUBLIC_URL}/images/placeholder.png`;
 
   // Parse the schedule to get open and close times in 24-hour format
   const parseSchedule = (schedule) => {
-    // Example schedule: "12pm to 6pm"
-    const times = schedule.match(/(\d{1,2}(?::\d{2})?\s?[apmAPM]+)/g); // Matches times like "12pm" or "6:00pm"
+    const times = schedule.match(/(\d{1,2}(?::\d{2})?\s?[apmAPM]+)/g);
     if (times && times.length === 2) {
       const [openTime, closeTime] = times.map((time) => convertTo24HourFormat(time));
       return { openTime, closeTime };
@@ -32,7 +31,7 @@ const GuestCard = ({ guest }) => {
     if (modifier === 'pm' && hours !== 12) hours += 12;
     if (modifier === 'am' && hours === 12) hours = 0;
 
-    return hours * 60 + minutes; // Returns total minutes since midnight
+    return hours * 60 + minutes;
   };
 
   const checkOpenStatus = () => {
@@ -48,7 +47,6 @@ const GuestCard = ({ guest }) => {
     }
 
     const { openTime, closeTime } = scheduleTimes;
-
     const now = new Date();
     const currentTime = now.getHours() * 60 + now.getMinutes();
 
@@ -91,11 +89,13 @@ const GuestCard = ({ guest }) => {
         </div>
       </div>
 
-      <ViewGuest
-        guest={guest}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      />
+      {isModalOpen && (
+        <ViewGuest
+          guest={guest}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </>
   );
 };

@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const path = require('path');
+const { logAction } = require('../utils/logHelper');
 
 exports.getAllVendors = (req, res) => {
   // Get the sort parameter from the query string; default to 'asc' if not provided
@@ -65,34 +66,66 @@ exports.getFeaturedVendors = (req, res) => {
 
 exports.addVendor = (req, res) => {
   const { name, description, location, category } = req.body;
-  const avatarPath = req.file.avatar ? `/uploads/vendors/${req.file.filename}` : '/public/images/avatar.png';
-  const vendorPhoto = req.file.vendorphoto ? `/uploads/vendors/${req.file.filename}` : '/public/images/avatar.png';
 
-  // Set current date for datecreated
+  const avatarPath = req.files && req.files.avatar ? `/uploads/vendors/${req.files.avatar[0].filename}` : '/public/images/avatar.png';
+  const vendorPhoto = req.files && req.files.vendorphoto ? `/uploads/vendors/${req.files.vendorphoto[0].filename}` : '/public/images/avatar.png';
+
   const dateCreated = new Date();
-
   const query = 'INSERT INTO vendorshops (name, description, location, category, avatar, vendorphoto, datecreated) VALUES (?, ?, ?, ?, ?, ?, ?)';
   const values = [name, description, location, category, avatarPath, vendorPhoto, dateCreated];
 
-  // Execute SQL query
+  const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+
   db.query(query, values, (err, results) => {
     if (err) {
       console.error('Error adding vendor:', err);
       return res.status(500).json({ error: 'Database query failed' });
     }
+
+    logAction('Added', name, results.insertId, adminUsername); // Log action with name and vendor ID
     res.status(201).json({ message: 'Vendor added successfully', id: results.insertId });
   });
 };
 
-exports.updateVendor = (req, res) => {
-  const vendorId = req.params.id; // Get the vendor ID from the route parameter
-  const { name, description, location, category } = req.body; // Get the updated data from the request body
+exports.deleteVendor = (req, res) => {
+  const vendorId = req.params.id;
+  const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
-  // Check if avatar and vendorphoto are being updated
+  // Fetch the vendor's name before deleting
+  const getVendorQuery = `SELECT name FROM vendorshops WHERE id = ?`;
+  db.query(getVendorQuery, [vendorId], (err, vendorResults) => {
+    if (err || vendorResults.length === 0) {
+      return res.status(404).json({ error: 'Vendor not found' });
+    }
+
+    const vendorName = vendorResults[0].name;
+
+    // Now delete the vendor
+    const deleteQuery = `DELETE FROM vendorshops WHERE id = ?`;
+    db.query(deleteQuery, [vendorId], (err, deleteResults) => {
+      if (err) {
+        console.error('Error deleting vendor:', err);
+        return res.status(500).json({ error: 'Failed to delete vendor' });
+      }
+
+      if (deleteResults.affectedRows === 0) {
+        return res.status(404).json({ error: 'Vendor not found' });
+      }
+
+      logAction('Deleted', vendorName, vendorId, adminUsername);
+      res.json({ message: `Vendor ${vendorName} (ID: ${vendorId}) deleted successfully` });
+    });
+  });
+};
+
+exports.updateVendor = (req, res) => {
+  const vendorId = req.params.id;
+  const { name, description, location, category } = req.body;
+  const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+
   const avatarPath = req.files && req.files.avatar ? `/uploads/vendors/${req.files.avatar[0].filename}` : null;
   const vendorPhotoPath = req.files && req.files.vendorphoto ? `/uploads/vendors/${req.files.vendorphoto[0].filename}` : null;
 
-  // SQL query to update the vendor's data
   let query = `UPDATE vendorshops SET name = ?, description = ?, location = ?, category = ?`;
   const values = [name, description, location, category];
 
@@ -109,7 +142,6 @@ exports.updateVendor = (req, res) => {
   query += ` WHERE id = ?`;
   values.push(vendorId);
 
-  // Execute the update query
   db.query(query, values, (err, results) => {
     if (err) {
       console.error('Error updating vendor:', err);
@@ -120,7 +152,8 @@ exports.updateVendor = (req, res) => {
       return res.status(404).json({ error: 'Vendor not found' });
     }
 
-    res.json({ message: 'Vendor updated successfully' });
+    logAction('Modified', name, vendorId, adminUsername);
+    res.json({ message: `Vendor ${name} (ID: ${vendorId}) updated successfully` });
   });
 };
 

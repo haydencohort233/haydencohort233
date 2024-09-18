@@ -4,8 +4,9 @@
   border: 1px solid #ddd;
   padding: 5px;
   background-color: #f7f7f7;
-  max-width: 250px; /* Adjust width as needed */
+  max-width: 250px;
   margin: 5px;
+  transition: background-color 0.3s ease;
 }
 
 .guest-status-thumbnail {
@@ -29,7 +30,7 @@
   font-size: 14px;
   font-weight: bold;
   margin: 0;
-  color: #fff;
+  color: #000;
 }
 
 .guest-status-description {
@@ -41,17 +42,35 @@
 .guest-status-schedule {
   font-size: 12px;
   margin-top: 3px;
+  color: #000;
 }
 
-/* Added minimalistic status colors */
+/* Background colors based on open/closed status */
 .status-open {
-  color: #28a745; /* Green for open */
+  background-color: #31f769 !important;
   border: 1px solid #28a745;
-  background-color: #e7f9ec;
 }
 
 .status-closed {
-  color: #d9534f; /* Red for closed */
+  background-color: #fa6471;
   border: 1px solid #d9534f;
-  background-color: #f8d7da;
+}
+
+/* Hide elements on mobile view */
+@media (max-width: 768px) {
+  .guest-status-thumbnail {
+    display: none;
+  }
+
+  .guest-status-description {
+    display: none;
+  }
+
+  .guest-status {
+    max-width: 200px;
+  }
+
+  .guest-status-schedule {
+    font-size: 11px;
+  }
 }

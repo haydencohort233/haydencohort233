@@ -1,56 +1,4 @@
-.view-vendor-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 10vh;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1001;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
-  }
-  
-  .view-vendor-content {
-    background-color: white;
-    padding: 20px;
-    max-width: 600px;
-    width: 100%;
-    position: relative;
-    overflow-y: auto;
-    max-height: 80%;
-  }
-  
-  .close-vendor-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: red !important;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .view-vendorphoto {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    margin: 20px 0;
-  }
-  
-  .vendor-category {
-    color: #888;
-    font-size: 0.9em;
-  }
-  
-  .vendor-description {
-    line-height: 1.6;
-    margin-top: 10px;
-    color: #333;
-  }
-  
-  /* ViewVendor.css */
+/* ViewVendor.css */
 .view-vendor-modal {
   position: fixed;
   top: 0;
@@ -61,18 +9,53 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999999;
+  z-index: 9999;
 }
 
-.modal-content {
+.view-vendor-content {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
+  max-width: 600px;
+  width: 100%;
+  overflow-y: auto;
+  max-height: 80%;
 }
 
-.location-link {
+.view-vendor-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.view-vendor-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.view-vendor-photo {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+.view-vendor-category {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.view-vendor-description {
+  color: #333;
+  line-height: 1.6;
+}
+
+.view-vendor-location-link {
   color: blue;
   cursor: pointer;
   text-decoration: underline;

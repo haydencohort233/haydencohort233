@@ -26,18 +26,21 @@ const Header = () => {
     }
   };
 
-  // Fetch the latest guest vendor data
+  // Fetch all guest vendors and select the latest one
   useEffect(() => {
     const fetchLatestGuest = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/guests/latest');
+        const response = await fetch('http://localhost:5000/api/guests');
         if (!response.ok) {
           throw new Error('Failed to fetch guest data');
         }
         const data = await response.json();
-        setGuest(data);
+
+        // Get the last guest vendor in the array (assuming it's the most recent)
+        const latestGuest = data.length > 0 ? data[data.length - 1] : null;
+        setGuest(latestGuest);
       } catch (error) {
-        console.error('Error fetching latest guest vendor:', error);
+        console.error('Error fetching guest vendors:', error);
       }
     };
 
@@ -56,17 +59,17 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-logo-title">
-        <a href="/" className="logo-link">
-          <img src="/images/logo.png" alt="Chasing Nostalgia Logo" className="header-logo" />
+        <a href="/haydencohort233/#/" className="logo-link">
+          <img src={`${process.env.PUBLIC_URL}/images/logo.png`} alt="Chasing Nostalgia Logo" className="header-logo" />
         </a>
       </div>
-      {guest && <GuestStatus guest={guest} />} {/* Render GuestStatus only if data is available */}
+      {guest && <GuestStatus guest={guest} />}
       <nav className={`nav ${isMenuOpen ? 'open' : ''}`} ref={menuRef}>
         <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/blogs">Blogs</a></li>
-          <li><a href="/events">Events</a></li>
-          <li><a href="/vendors">Vendors</a></li>
+          <li><a href="/haydencohort233/#/">Home</a></li>
+          <li><a href="/haydencohort233/#/blogs">Blogs</a></li>
+          <li><a href="/haydencohort233/#/events">Events</a></li>
+          <li><a href="/haydencohort233/#/vendors">Vendors</a></li>
         </ul>
       </nav>
       <div className="menu-icon" onClick={toggleMenu}>

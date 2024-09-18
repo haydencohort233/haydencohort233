@@ -43,6 +43,9 @@ router.get('/vendors/:id', vendorsController.getVendorById);
 // GET featured vendors
 router.get('/featured', vendorsController.getFeaturedVendors);
 
+// DELETE a vendor by ID
+router.delete('/vendors/:id', vendorsController.deleteVendor);
+
 // POST to add a vendor
 router.post('/vendors', upload.fields([
   { name: 'avatar', maxCount: 1 },

@@ -1,4 +1,5 @@
 import React, { useState, forwardRef } from 'react';
+import Cookies from 'js-cookie';
 import './AddGuest.css';
 
 const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
@@ -11,24 +12,22 @@ const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
   });
   const [error, setError] = useState(null);
 
+  // Handle text inputs
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setGuest({
-      ...guest,
-      [name]: type === 'checkbox' ? checked : value,
-    });
+    const { name, value } = e.target;
+    setGuest({ ...guest, [name]: value });
   };
 
+  // Handle file inputs for avatar and guest photo
   const handleFileChange = (e) => {
-    const { name } = e.target;
-    const file = e.target.files[0];
+    const { name, files } = e.target;
+    const file = files[0];
     if (file) {
       const validTypes = ['image/jpeg', 'image/png'];
       if (!validTypes.includes(file.type)) {
         setError('Please upload a .jpg or .png file.');
         return;
       }
-
       setGuest({ ...guest, [name]: file });
       setError(null); // Clear any previous error
     }
@@ -48,14 +47,26 @@ const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
       formData.append('guestphoto', guest.guestphoto);
     }
 
+    // Get the admin username from the cookies
+    const adminUsername = Cookies.get('adminUsername');
+
     fetch('http://localhost:5000/api/guests', {
       method: 'POST',
       body: formData,
+      headers: {
+        'X-Admin-Username': adminUsername, // Pass admin username in the request headers
+      },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to add guest');
+        }
+        return response.json();
+      })
       .then((data) => {
-        console.log('Guest added:', data);
-        onClose();
+        // Console log that matches the format in AddVendor
+        console.log(`Guest added: ${guest.name} (ID: ${data.id})`);
+        onClose(); // Close modal after adding guest
       })
       .catch((error) => {
         console.error('Error adding guest:', error);
@@ -68,8 +79,10 @@ const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
   return (
     <div className="add-guest-modal-overlay" ref={ref}>
       <div className="add-guest-modal-content">
+        <button className="add-guest-close-button" onClick={onClose}>
+          ×
+        </button>
         <h2 className="add-guest-title">Add New Guest</h2>
-        <span className="add-guest-close-button" onClick={onClose}>×</span>
         <form onSubmit={handleSubmit} className="add-guest-form">
           <label className="add-guest-label">
             Name:
@@ -79,8 +92,8 @@ const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
               className="add-guest-input"
               value={guest.name}
               onChange={handleChange}
-              placeholder="Guest Vendor Name"
               required
+              placeholder="Guest Name"
             />
           </label>
           <label className="add-guest-label">
@@ -90,8 +103,8 @@ const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
               className="add-guest-textarea"
               value={guest.description}
               onChange={handleChange}
-              placeholder="Guest Vendor Description (e.g. Tattoo Apprentice, Local DJ)"
               required
+              placeholder="Guest Description (e.g., Tattoo Artist)"
             />
           </label>
           <label className="add-guest-label">
@@ -102,7 +115,7 @@ const AddGuest = forwardRef(({ isOpen, onClose }, ref) => {
               className="add-guest-input"
               value={guest.schedule}
               onChange={handleChange}
-              placeholder="e.g., Open 10am - 6pm"
+              placeholder="e.g., 10am - 6pm"
               required
             />
           </label>
