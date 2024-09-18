@@ -80,9 +80,9 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
     const { name, files } = e.target;
     if (files && files.length > 0) {
       if (name === 'guestavatar') {
-        setAvatarPreview(URL.createObjectURL(files[0])); // Set avatar preview
+        setAvatarPreview(URL.createObjectURL(files[0]));
       } else if (name === 'guestphoto') {
-        setGuestPhotoPreview(URL.createObjectURL(files[0])); // Set photo preview
+        setGuestPhotoPreview(URL.createObjectURL(files[0]));
       }
       setGuestData({ ...guestData, [name]: files[0] });
     }
@@ -98,19 +98,19 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
     if (guestData.guestavatar) formData.append('guestavatar', guestData.guestavatar);
     if (guestData.guestphoto) formData.append('guestphoto', guestData.guestphoto);
   
-    const adminUsername = Cookies.get('adminUsername'); // Get admin username from cookies
+    const adminUsername = Cookies.get('adminUsername');
   
     try {
       const response = await fetch(`http://localhost:5000/api/guests/${selectedGuestId}`, {
         method: 'PATCH',
         body: formData,
         headers: {
-          'X-Admin-Username': adminUsername, // Pass the username in the request header
+          'X-Admin-Username': adminUsername,
         },
       });
   
       if (response.ok) {
-        console.log(`Guest updated successfully: ${guestData.name}`); // Log success message
+        console.log(`Guest updated successfully: ${guestData.name}`);
         onClose(); // Close modal
       } else {
         const errorData = await response.json();
@@ -121,23 +121,23 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
       console.error('Error updating guest:', err);
       setError('Failed to update guest. Please try again.');
     }
-  };  
+  };
 
   const handleDelete = async (id) => {
     const confirmation = prompt('Are you sure to delete this guest? Type "DELETE" to confirm.');
     if (confirmation === 'DELETE') {
-      const adminUsername = Cookies.get('adminUsername'); // Get the admin username from the cookie
+      const adminUsername = Cookies.get('adminUsername');
 
       try {
         const response = await fetch(`http://localhost:5000/api/guests/${id}`, {
           method: 'DELETE',
           headers: {
-            'X-Admin-Username': adminUsername, // Pass the username in the request header
+            'X-Admin-Username': adminUsername,
           },
         });
 
         if (response.ok) {
-          console.log(`Guest deleted successfully: ${guestData.name} (ID: ${id})`); // Log success message
+          console.log(`Guest deleted successfully: ${guestData.name} (ID: ${id})`);
           setGuests(guests.filter(guest => guest.id !== id));
           if (selectedGuestId === id) {
             setSelectedGuestId(null);
@@ -153,7 +153,7 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
   };
 
   const handleToggleBreak = async () => {
-    const confirmBreak = window.confirm(`Are you sure you want ${guestData.name} to go on break?`);
+    const confirmBreak = window.confirm(`Are you sure you want to change the break status for ${guestData.name}?`);
     if (!confirmBreak) return;
   
     try {
@@ -164,7 +164,7 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
       });
   
       if (response.ok) {
-        setGuestData({ ...guestData, break: !guestData.break }); // Toggle the break status
+        setGuestData({ ...guestData, break: !guestData.break });
       } else {
         const errorData = await response.json();
         console.error('Error toggling break status:', errorData);
@@ -192,8 +192,16 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
             <h3>Select a Guest</h3>
             <ul>
               {guests.map((guest) => (
-                <li key={guest.id} onClick={() => setSelectedGuestId(guest.id)}>
-                  {guest.name}
+                <li key={guest.id}>
+                  <span onClick={() => setSelectedGuestId(guest.id)}>
+                    {guest.name}
+                  </span>
+                  <span
+                    className="delete-guest-button"
+                    onClick={() => handleDelete(guest.id)}
+                  >
+                    ✖
+                  </span>
                 </li>
               ))}
             </ul>
@@ -261,10 +269,13 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
               <div className="edit-guest-buttons-left">
                 <button type="button" className="edit-guest-back-button" onClick={() => setSelectedGuestId(null)}>← Back</button>
                 <button type="button" className="edit-guest-cancel-button" onClick={onClose}>Cancel</button>
-              </div>
+                </div>
+                <button type="button" className="edit-guest-break-button" onClick={handleToggleBreak}>
+                  {guestData.break ? 'Off Break' : 'On Break'}
+                </button>
               <button type="submit" className="edit-guest-save-button">Update Guest</button>
-              <button type="button" className="edit-guest-break-button" onClick={handleToggleBreak}>
-                {guestData.break ? 'Off Break' : 'On Break'}
+              <button type="button" className="edit-guest-delete-button" onClick={() => handleDelete(selectedGuestId)}>
+                Delete Guest
               </button>
             </div>
           </form>
@@ -275,3 +286,4 @@ const EditGuestVendor = ({ isOpen, onClose }) => {
 };
 
 export default EditGuestVendor;
+

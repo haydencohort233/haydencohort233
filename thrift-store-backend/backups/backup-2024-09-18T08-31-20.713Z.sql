@@ -91,7 +91,7 @@ CREATE TABLE `guestvendors` (
   `schedule` text NOT NULL,
   `break` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,7 +100,7 @@ CREATE TABLE `guestvendors` (
 
 LOCK TABLES `guestvendors` WRITE;
 /*!40000 ALTER TABLE `guestvendors` DISABLE KEYS */;
-INSERT INTO `guestvendors` VALUES (1,'Apprentice Danny','/uploads/vendors/guests/apprentice-thumbnail.png','/uploads/vendors/guests/apprentice-photo.png','$20 Apprentice Flash Tattoos','Open from 1:30 PM to 5:00 PM',0);
+INSERT INTO `guestvendors` VALUES (1,'Apprentice Danny','/uploads/vendors/guests/apprentice-thumbnail.png','/uploads/vendors/guests/apprentice-photo.png','$20 Apprentice Flash Tattoos','Open from 10:00 AM to 5:00 PM',0);
 /*!40000 ALTER TABLE `guestvendors` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -121,7 +121,7 @@ CREATE TABLE `vendorshops` (
   `vendorphoto` varchar(255) DEFAULT NULL,
   `datecreated` date NOT NULL DEFAULT curdate(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -130,7 +130,7 @@ CREATE TABLE `vendorshops` (
 
 LOCK TABLES `vendorshops` WRITE;
 /*!40000 ALTER TABLE `vendorshops` DISABLE KEYS */;
-INSERT INTO `vendorshops` VALUES (11,'Love Morgue','The one and only! Custom made graffiti and safety pin hats, ties, masks and so much more!','10A','Clothing','/uploads/vendors/1724206564095-lovemorgue-1.png','/uploads/vendors/1724207434908-lovemorgue-2.png','2023-12-01'),(12,'Fleaboard Skate Shop','Secondhand Skate & Thrift Shop! Skatewear and accessories\n\n@fleaboardshop on Instagram','1A','Skateboards','/uploads/vendors/1724209350000-fleaboardshop-1.png',NULL,'2024-09-01'),(13,'Gemzies Treasures','Handmade jewelry, art and more! based in the Bay Area\r\n\r\n@gemzies.treasure on Instagram\r\n@gemzies.treasure on Etsy','9A','Jewelry','/uploads/vendors/1724284581143-gemziestreasure-1.png',NULL,'2024-09-02'),(14,'Chasing Nostalgia','Checking AGAIN!','FRONT','Clothing','/uploads/vendors/1724209100000-chasingnostalgia-1.png',NULL,'2023-09-01'),(15,'Buck Lucky','Custom mad beautiful clothes for beautiful people! Come get find something lucky!\n\n@bucklucky on Instagram','5A','Fashion','/uploads/vendors/1724209100000-bucklucky1.png',NULL,'2024-08-02'),(16,'DVLSH','Sustainable Satanic Clothing\r\nSustainable Satanic Clothing\r\nSustainable Satanic Clothing\r\n\r\n@dvlsh on Instagram','3A','Clothing','/uploads/vendors/1724209100000-dvlish1.png',NULL,'2024-07-04'),(17,'Cherry on Top','Nonconformists to the core, they sell custom patches, ripped apparel, and punk accessories that scream defiance.','2A','Clothing','/uploads/vendors/1724209100000-cherryontop1.png',NULL,'2024-09-03'),(18,'Superinsaiyanfinds','Sick streetwear, vintage clothing & toys! Always stocking the store with something new.','7A','Clothing','/uploads/vendors/1724209100000-supersaiynfinds1.png',NULL,'2024-09-03'),(19,'The Lemonheads','The Lemonheads 🍋\n--THRIFT WITH A TWIST--\nOffering sustainable thrift and threds.\nCome shop our booth @chasingnostalgia__ off McHenry and Leveland behind the Nations Giant Burger in Modesto. See you there!','8A','Clothing','/uploads/vendors/1724209100000-lemonheadsthrift1.png',NULL,'2024-09-03'),(20,'GAMERB0YZ','Cloaked in secrecy, this vendor\'s goods are rare finds that you can only discover here. From cloaks to hidden trinkets, each item has a story.','6A','Video Games','/uploads/vendors/172420910000-gamerb0yz1.png',NULL,'2024-09-03'),(21,'Ambition Thrift','Favorite lesbian love couple with beautifully custom made waist beads, clothes and more!','4A','Fashion','/uploads/vendors/1724209100000-ambitionthrift1.png',NULL,'2024-05-05'),(22,'Retro Nani209','Front row shop! Plenty of stuff from Video Games, Vintage Merch, Magazines and Action Figures! Come check us out.','11A','Video Games','/uploads/vendors/1724209100000-retronani2091.png',NULL,'2024-07-17'),(23,'Test Vendor','Test Vendor','FRONT','Clothing','/uploads/vendors/1725677095396-lovemorgue-hat-1.png','/uploads/vendors/1725677095400-yapperlogo.png','2024-09-06'),(24,'Danny Duncan','YouTuber','11A','Test','/uploads/vendors/1725678017594-lovemorgue-tshirt-1.png','/uploads/vendors/1725678017598-lovemorgue-hat-2.png','2024-09-06');
+INSERT INTO `vendorshops` VALUES (11,'Love Morgue','The one and only! Custom made graffiti and safety pin hats, ties, masks and so much more!','10A','Clothing','/uploads/vendors/1724206564095-lovemorgue-1.png','/uploads/vendors/1724207434908-lovemorgue-2.png','2023-12-01'),(12,'Fleaboard Skate Shop','Secondhand Skate & Thrift Shop! Skatewear and accessories\n\n@fleaboardshop on Instagram','1A','Skateboards','/uploads/vendors/1724209350000-fleaboardshop-1.png',NULL,'2024-09-01'),(13,'Gemzies Treasures','Handmade jewelry, art and more! based in the Bay Area\r\n\r\n@gemzies.treasure on Instagram\r\n@gemzies.treasure on Etsy','9A','Jewelry','/uploads/vendors/1724284581143-gemziestreasure-1.png',NULL,'2024-09-02'),(14,'Chasing Nostalgia','Logs test #14555555','FRONT','Clothing','/uploads/vendors/1724209100000-chasingnostalgia-1.png',NULL,'2023-09-01'),(15,'Buck Lucky','Custom mad beautiful clothes for beautiful people! Come get find something lucky!\n\n@bucklucky on Instagram','5A','Fashion','/uploads/vendors/1724209100000-bucklucky1.png',NULL,'2024-08-02'),(16,'DVLSH','Sustainable Satanic Clothing\r\nSustainable Satanic Clothing\r\nSustainable Satanic Clothing\r\n\r\n@dvlsh on Instagram','3A','Clothing','/uploads/vendors/1724209100000-dvlish1.png',NULL,'2024-07-04'),(17,'Cherry on Top','Nonconformists to the core, they sell custom patches, ripped apparel, and punk accessories that scream defiance.','2A','Clothing','/uploads/vendors/1724209100000-cherryontop1.png',NULL,'2024-09-03'),(18,'Superinsaiyanfinds','Sick streetwear, vintage clothing & toys! Always stocking the store with something new.','7A','Clothing','/uploads/vendors/1724209100000-supersaiynfinds1.png',NULL,'2024-09-03'),(19,'The Lemonheads','The Lemonheads 🍋\n--THRIFT WITH A TWIST--\nOffering sustainable thrift and threds.\nCome shop our booth @chasingnostalgia__ off McHenry and Leveland behind the Nations Giant Burger in Modesto. See you there!','8A','Clothing','/uploads/vendors/1724209100000-lemonheadsthrift1.png',NULL,'2024-09-03'),(20,'GAMERB0YZ','Cloaked in secrecy, this vendor\'s goods are rare finds that you can only discover here. From cloaks to hidden trinkets, each item has a story.','6A','Video Games','/uploads/vendors/172420910000-gamerb0yz1.png',NULL,'2024-09-03'),(21,'Ambition Thrift','Favorite lesbian love couple with beautifully custom made waist beads, clothes and more!','4A','Fashion','/uploads/vendors/1724209100000-ambitionthrift1.png',NULL,'2024-05-05'),(22,'Retro Nani209','Front row shop! Plenty of stuff from Video Games, Vintage Merch, Magazines and Action Figures! Come check us out.','11A','Video Games','/uploads/vendors/1724209100000-retronani2091.png',NULL,'2024-07-17');
 /*!40000 ALTER TABLE `vendorshops` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -143,4 +143,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-14 17:04:16
+-- Dump completed on 2024-09-18  1:31:20

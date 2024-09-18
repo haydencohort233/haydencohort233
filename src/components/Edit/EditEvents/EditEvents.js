@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 import './EditEvents.css';
 
 const EditEvents = ({ isOpen, onClose }) => {
@@ -73,18 +74,22 @@ const EditEvents = ({ isOpen, onClose }) => {
     setEventData({ ...eventData, [name]: value });
   };
 
-  // Handle form submission to update event
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedEventId) return;
-
+  
+    const adminUsername = Cookies.get('adminUsername'); // Get the admin username from cookies
+  
     try {
       const response = await fetch(`http://localhost:5000/api/events/${selectedEventId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Username': adminUsername, // Pass the admin username in headers
+        },
         body: JSON.stringify(eventData),
       });
-
+  
       if (response.ok) {
         handleClose(); // Close modal after successful update
       } else {
@@ -96,7 +101,7 @@ const EditEvents = ({ isOpen, onClose }) => {
       console.error('Error updating event:', err);
       setError('Failed to update event. Please try again.');
     }
-  };
+  };  
 
   // Reset the component state when closing
   const handleClose = () => {

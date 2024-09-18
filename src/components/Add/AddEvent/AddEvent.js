@@ -1,4 +1,5 @@
 import React, { useState, forwardRef } from 'react';
+import Cookies from 'js-cookie';
 import './AddEvent.css';
 
 const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
@@ -39,21 +40,26 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
     if (event.photo) {
       formData.append('photo', event.photo);
     }
-
+  
+    const adminUsername = Cookies.get('adminUsername'); // Get the admin username from cookies
+  
     fetch('http://localhost:5000/api/events', {
       method: 'POST',
       body: formData,
+      headers: {
+        'X-Admin-Username': adminUsername, // Pass admin username in the request headers
+      },
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log('Event added:', data);
+        console.log(`Event added: ${event.title} (ID: ${data.id})`);
         onClose();
       })
       .catch((error) => {
         console.error('Error adding event:', error);
         setError('An error occurred while adding the event.');
       });
-  };
+  };  
   
   if (!isOpen) return null;
 

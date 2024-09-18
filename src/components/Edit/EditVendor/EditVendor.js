@@ -109,12 +109,12 @@ const EditVendor = ({ isOpen, onClose }) => {
         method: 'PUT',
         body: formData,
         headers: {
-          'X-Admin-Username': adminUsername, // Pass the username in the request header
+          'X-Admin-Username': adminUsername,
         },
       });
   
       if (response.ok) {
-        console.log(`Vendor updated successfully: ${vendorData.name}`); // Log success message
+        console.log(`Vendor updated successfully: ${vendorData.name}`);
         onClose(); // Close modal
       } else {
         const errorData = await response.json();
@@ -130,19 +130,19 @@ const EditVendor = ({ isOpen, onClose }) => {
   const handleDelete = async (id) => {
     const confirmation = prompt('Are you sure to delete this vendor? Type "DELETE" to confirm.');
     if (confirmation === 'DELETE') {
-      const adminUsername = Cookies.get('adminUsername'); // Get the admin username from the cookie
+      const adminUsername = Cookies.get('adminUsername');
   
       try {
         const response = await fetch(`http://localhost:5000/api/vendors/${id}`, {
           method: 'DELETE',
           headers: {
-            'X-Admin-Username': adminUsername, // Pass the username in the request header
+            'X-Admin-Username': adminUsername,
           },
         });
         if (response.ok) {
-          console.log(`Vendor deleted successfully: ${id}`); // Log success message
+          console.log(`Vendor deleted successfully: ${id}`);
           setVendors(vendors.filter(vendor => vendor.id !== id));
-          if (selectedVendorId === id) resetState(); // If deleted vendor is selected, reset the state
+          if (selectedVendorId === id) resetState();
         } else {
           console.error('Failed to delete vendor');
         }

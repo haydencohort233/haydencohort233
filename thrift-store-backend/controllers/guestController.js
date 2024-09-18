@@ -2,7 +2,6 @@ const db = require('../config/db');
 const path = require('path');
 const { logAction } = require('../utils/logHelper');
 
-// Get all guest vendors
 exports.getAllGuests = (req, res) => {
   const query = `SELECT id, name, guestavatar, guestphoto, description, schedule, break FROM guestvendors ORDER BY name ASC`;
 
@@ -15,7 +14,6 @@ exports.getAllGuests = (req, res) => {
   });
 };
 
-// Get guest vendor by ID
 exports.getGuestById = (req, res) => {
   const { id } = req.params; // Get the guest ID from the route parameter
 
@@ -35,7 +33,6 @@ exports.getGuestById = (req, res) => {
   });
 };
 
-// Get latest guest vendor
 exports.getLatestGuest = (req, res) => {
   const query = `SELECT id, name, guestavatar, guestphoto, description, schedule, break FROM guestvendors ORDER BY id DESC LIMIT 1`;
 
@@ -47,11 +44,10 @@ exports.getLatestGuest = (req, res) => {
     if (results.length === 0) {
       return res.status(404).json({ error: 'No guest vendors available' });
     }
-    res.json(results[0]); // Send the latest guest vendor
+    res.json(results[0]);
   });
 };
 
-// Add a guest vendor
 exports.addGuest = (req, res) => {
   const { name, description, schedule } = req.body;
   const guestAvatarPath = req.files['guestavatar'] 
@@ -64,7 +60,6 @@ exports.addGuest = (req, res) => {
   const query = 'INSERT INTO guestvendors (name, guestavatar, guestphoto, description, schedule, break) VALUES (?, ?, ?, ?, ?, ?)';
   const values = [name, guestAvatarPath, guestPhotoPath, description, schedule, false];
 
-  // Retrieve the admin username from the request header
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
   db.query(query, values, (err, results) => {
@@ -73,14 +68,12 @@ exports.addGuest = (req, res) => {
       return res.status(500).json({ error: 'Database query failed' });
     }
 
-    // Log the action with the admin username
-    logAction('Added', name, results.insertId, adminUsername);
+    logAction('Guest Added', name, results.insertId, adminUsername);
 
     res.status(201).json({ message: 'Guest vendor added successfully', id: results.insertId });
   });
 };
 
-// Toggle guest vendor break status
 exports.toggleGuestBreak = (req, res) => {
   const { id } = req.params;
   const { break: breakStatus } = req.body;
@@ -102,12 +95,10 @@ exports.toggleGuestBreak = (req, res) => {
   });
 };
 
-// Edit guest vendor
 exports.editGuest = (req, res) => {
   const { id } = req.params;
   const { name, description, schedule } = req.body;
 
-  // Retrieve the admin username from the request header
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
   // Handle new file uploads
@@ -118,11 +109,9 @@ exports.editGuest = (req, res) => {
     ? `/uploads/guests/${req.files['guestphoto'][0].filename}` 
     : null;
 
-  // Update query
   let query = 'UPDATE guestvendors SET name = ?, description = ?, schedule = ?';
   let values = [name, description, schedule];
 
-  // Add file paths to query if provided
   if (guestAvatarPath) {
     query += ', guestavatar = ?';
     values.push(guestAvatarPath);
@@ -144,9 +133,40 @@ exports.editGuest = (req, res) => {
       return res.status(404).json({ error: 'Guest not found' });
     }
 
-    // Log the action with the correct guest name, ID, and admin username
     logAction('Guest Modified', name, id, adminUsername);
 
     res.json({ message: 'Guest updated successfully' });
+  });
+};
+
+exports.deleteGuest = (req, res) => {
+  const guestId = req.params.id;
+  const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+
+  // Fetch the guest's name before deleting
+  const getGuestQuery = `SELECT name FROM guestvendors WHERE id = ?`;
+  db.query(getGuestQuery, [guestId], (err, guestResults) => {
+    if (err || guestResults.length === 0) {
+      return res.status(404).json({ error: 'Guest vendor not found' });
+    }
+
+    const guestName = guestResults[0].name;
+
+    // Now delete the guest
+    const deleteQuery = `DELETE FROM guestvendors WHERE id = ?`;
+    db.query(deleteQuery, [guestId], (err, deleteResults) => {
+      if (err) {
+        console.error('Error deleting guest vendor:', err);
+        return res.status(500).json({ error: 'Failed to delete guest vendor' });
+      }
+
+      if (deleteResults.affectedRows === 0) {
+        return res.status(404).json({ error: 'Guest vendor not found' });
+      }
+
+      // Log the deletion action
+      logAction('Guest Deleted', guestName, guestId, adminUsername);
+      res.json({ message: `Guest vendor ${guestName} (ID: ${guestId}) deleted successfully` });
+    });
   });
 };

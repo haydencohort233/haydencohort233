@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { logAction } = require('../utils/logHelper');
 
 // Fetch the next 3 upcoming events
 exports.getUpcomingEvents = (req, res) => {
@@ -18,7 +19,6 @@ exports.getUpcomingEvents = (req, res) => {
   });
 };
 
-// Fetch all events
 exports.getAllEvents = (req, res) => {
   const query = `
     SELECT id, title AS name, date, time, description
@@ -34,7 +34,6 @@ exports.getAllEvents = (req, res) => {
   });
 };
 
-// Add a new event
 exports.addEvent = (req, res) => {
   const { title, date, time, description, preview_text } = req.body;
   const photoUrl = req.file ? `/uploads/events/${req.file.filename}` : null;
@@ -45,12 +44,17 @@ exports.addEvent = (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
   const values = [title, date, time, description, preview_text, photoUrl, titlePhoto];
+  
+  const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
   db.query(query, values, (err, results) => {
     if (err) {
       console.error('Error adding event:', err);
       return res.status(500).json({ error: 'Database query failed' });
     }
+
+    logAction('Event Added', title, results.insertId, adminUsername);
+
     res.status(201).json({ message: 'Event added successfully', id: results.insertId });
   });
 };
@@ -58,6 +62,9 @@ exports.addEvent = (req, res) => {
 exports.updateEvent = (req, res) => {
   const { id } = req.params;
   const { name, description, date } = req.body;
+  
+  const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+
   const query = 'UPDATE chasingevents SET title = ?, description = ?, date = ? WHERE id = ?';
   const values = [name, description, date, id];
 
@@ -66,14 +73,17 @@ exports.updateEvent = (req, res) => {
       console.error('Error updating event:', err);
       return res.status(500).json({ error: 'Database query failed' });
     }
+
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'Event not found' });
     }
+
+    logAction('Event Modified', name, id, adminUsername);
+
     res.json({ message: 'Event updated successfully' });
   });
 };
 
-// Fetch an event by its ID
 exports.getEventById = (req, res) => {
   const { id } = req.params;
   const query = 'SELECT id, title AS name, description, date, time FROM chasingevents WHERE id = ?';

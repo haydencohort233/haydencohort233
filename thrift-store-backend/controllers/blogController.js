@@ -1,7 +1,7 @@
-const db = require('../config/db'); // Ensure this points to your MySQL database configuration
+const db = require('../config/db');
+const { logAction } = require('../utils/logHelper');
 const path = require('path');
 
-// Get all blogs
 exports.getAllBlogs = (req, res) => {
   const limit = req.query.limit ? `LIMIT ${parseInt(req.query.limit)}` : '';
   const query = `SELECT * FROM chasingblogs ORDER BY date DESC ${limit}`;
@@ -15,7 +15,6 @@ exports.getAllBlogs = (req, res) => {
   });
 };
 
-// Get single blog by ID
 exports.getSingleBlog = (req, res) => {
   const query = 'SELECT * FROM chasingblogs WHERE id = ?';
   db.query(query, [req.params.id], (error, results) => {
@@ -31,47 +30,47 @@ exports.getSingleBlog = (req, res) => {
 };
 
 exports.createBlog = (req, res) => {
-    try {
-      console.log('Create blog endpoint accessed'); // Log when the endpoint is accessed
-      console.log('Request body:', req.body); // Log request body content
-      console.log('Request file:', req.file); // Log file details if any
-  
-      const { title, content, date, preview_text } = req.body;
-      const photo_url = req.file ? `/uploads/blogs/${req.file.filename}` : null;
-  
-      if (!title || !content || !date) {
-        return res.status(400).json({ error: 'Title, content, and date are required' });
-      }
-  
-      const query = 'INSERT INTO chasingblogs (title, content, date, preview_text, photo_url) VALUES (?, ?, ?, ?, ?)';
-      db.query(query, [title, content, date, preview_text, photo_url], (error, results) => {
-        if (error) {
-          console.error('Database error:', error);
-          return res.status(500).json({ error: 'Failed to create blog' });
-        }
-        res.status(201).json({
-          message: 'Blog created successfully',
-          blog: {
-            id: results.insertId,
-            title,
-            content,
-            date,
-            preview_text,
-            photo_url,
-          },
-        });
-      });
-    } catch (err) {
-      console.error('Server error:', err);
-      res.status(500).json({ error: 'Server error' });
+  try {
+    const { title, content, date, preview_text } = req.body;
+    const photo_url = req.file ? `/uploads/blogs/${req.file.filename}` : null;
+
+    if (!title || !content || !date) {
+      return res.status(400).json({ error: 'Title, content, and date are required' });
     }
-  };
-  
-  
-// Update a blog
+
+    const query = 'INSERT INTO chasingblogs (title, content, date, preview_text, photo_url) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [title, content, date, preview_text, photo_url], (error, results) => {
+      if (error) {
+        console.error('Database error:', error);
+        return res.status(500).json({ error: 'Failed to create blog' });
+      }
+
+      const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+      logAction('Blog Added', title, results.insertId, adminUsername);
+
+      res.status(201).json({
+        message: 'Blog created successfully',
+        blog: {
+          id: results.insertId,
+          title,
+          content,
+          date,
+          preview_text,
+          photo_url,
+        },
+      });
+    });
+  } catch (err) {
+    console.error('Server error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 exports.updateBlog = (req, res) => {
   const { title, content, date, preview_text } = req.body;
   const photo_url = req.file ? `/uploads/blogs/${req.file.filename}` : null;
+
+  const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
   const query = `
     UPDATE chasingblogs SET
@@ -90,13 +89,17 @@ exports.updateBlog = (req, res) => {
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'Blog not found' });
     }
+
+    logAction('Blog Modified', title, req.params.id, adminUsername);
+
     res.status(200).json({ message: 'Blog updated successfully' });
   });
 };
 
-// Delete a blog
 exports.deleteBlog = (req, res) => {
   const query = 'DELETE FROM chasingblogs WHERE id = ?';
+  const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+
   db.query(query, [req.params.id], (error, results) => {
     if (error) {
       console.error('Error deleting blog:', error);
@@ -105,6 +108,9 @@ exports.deleteBlog = (req, res) => {
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'Blog not found' });
     }
+
+    logAction('Blog Deleted', req.params.id, req.params.id, adminUsername);
+
     res.status(200).json({ message: 'Blog deleted successfully' });
   });
 };

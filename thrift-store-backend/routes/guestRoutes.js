@@ -1,15 +1,17 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const router = express.Router();
 const {
   getAllGuests,
-  getGuestById,  
+  getGuestById,
   addGuest,
   getLatestGuest,
   editGuest,
-  toggleGuestBreak
+  toggleGuestBreak,
+  deleteGuest // Import the deleteGuest function
 } = require('../controllers/guestController');
+
+const router = express.Router(); // Define the router
 
 // Configure multer storage and upload setup
 const storage = multer.diskStorage({
@@ -49,5 +51,6 @@ router.get('/guests/latest', getLatestGuest);
 router.post('/guests', upload, addGuest);
 router.patch('/guests/:id', upload, editGuest);
 router.patch('/guests/:id/toggle-break', toggleGuestBreak);
+router.delete('/guests/:id', deleteGuest); // Add DELETE route
 
 module.exports = router;

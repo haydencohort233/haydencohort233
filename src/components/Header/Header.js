@@ -7,12 +7,10 @@ const Header = () => {
   const [guest, setGuest] = useState(null);
   const menuRef = useRef(null);
 
-  // Toggle the menu open/close state
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Close menu if click outside of the menu
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
       setIsMenuOpen(false);
@@ -26,7 +24,7 @@ const Header = () => {
     }
   };
 
-  // Fetch all guest vendors and select the latest one
+  // Fetch all guest vendors and filter out guests that are on break
   useEffect(() => {
     const fetchLatestGuest = async () => {
       try {
@@ -36,8 +34,9 @@ const Header = () => {
         }
         const data = await response.json();
 
-        // Get the last guest vendor in the array (assuming it's the most recent)
-        const latestGuest = data.length > 0 ? data[data.length - 1] : null;
+        const availableGuests = data.filter((guest) => !guest.break);
+
+        const latestGuest = availableGuests.length > 0 ? availableGuests[availableGuests.length - 1] : null;
         setGuest(latestGuest);
       } catch (error) {
         console.error('Error fetching guest vendors:', error);
@@ -63,7 +62,9 @@ const Header = () => {
           <img src={`${process.env.PUBLIC_URL}/images/logo.png`} alt="Chasing Nostalgia Logo" className="header-logo" />
         </a>
       </div>
+
       {guest && <GuestStatus guest={guest} />}
+
       <nav className={`nav ${isMenuOpen ? 'open' : ''}`} ref={menuRef}>
         <ul>
           <li><a href="/haydencohort233/#/">Home</a></li>
