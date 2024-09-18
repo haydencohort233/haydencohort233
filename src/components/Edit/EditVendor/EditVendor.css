@@ -124,13 +124,17 @@
 }
 
 .edit-vendor-list li {
+  display: flex;
+  justify-content: space-between;
   padding: 10px;
   cursor: pointer;
   border-bottom: 1px solid #ddd;
+  position: relative;
 }
 
 .edit-vendor-list li:hover {
   background-color: #eee;
+  color: #000;
 }
 
 .edit-vendor-error-message {
@@ -159,4 +163,20 @@
 
 .edit-vendor-list-cancel-button:hover {
   background-color: #bb2130;
+}
+
+.delete-vendor-button {
+  color: red;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;
+  opacity: 0; /* Starts hidden */
+}
+
+.delete-vendor-button:hover {
+  color: darkred;
+}
+
+.edit-vendor-list li:hover .delete-vendor-button {
+  opacity: 1; /* Show on hover */
 }

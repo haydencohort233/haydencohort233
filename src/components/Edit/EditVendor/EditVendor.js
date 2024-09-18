@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 import './EditVendor.css';
 
 const EditVendor = ({ isOpen, onClose }) => {
@@ -100,15 +101,21 @@ const EditVendor = ({ isOpen, onClose }) => {
     formData.append('category', vendorData.category);
     if (vendorData.avatar) formData.append('avatar', vendorData.avatar);
     if (vendorData.vendorphoto) formData.append('vendorphoto', vendorData.vendorphoto);
-
+  
+    const adminUsername = Cookies.get('adminUsername'); // Get admin username from cookies
+  
     try {
       const response = await fetch(`http://localhost:5000/api/vendors/${selectedVendorId}`, {
         method: 'PUT',
         body: formData,
+        headers: {
+          'X-Admin-Username': adminUsername, // Pass the username in the request header
+        },
       });
-
+  
       if (response.ok) {
-        onClose();
+        console.log(`Vendor updated successfully: ${vendorData.name}`); // Log success message
+        onClose(); // Close modal
       } else {
         const errorData = await response.json();
         console.error('Error updating vendor:', errorData);
@@ -119,6 +126,31 @@ const EditVendor = ({ isOpen, onClose }) => {
       setError('Failed to update vendor. Please try again.');
     }
   };
+  
+  const handleDelete = async (id) => {
+    const confirmation = prompt('Are you sure to delete this vendor? Type "DELETE" to confirm.');
+    if (confirmation === 'DELETE') {
+      const adminUsername = Cookies.get('adminUsername'); // Get the admin username from the cookie
+  
+      try {
+        const response = await fetch(`http://localhost:5000/api/vendors/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'X-Admin-Username': adminUsername, // Pass the username in the request header
+          },
+        });
+        if (response.ok) {
+          console.log(`Vendor deleted successfully: ${id}`); // Log success message
+          setVendors(vendors.filter(vendor => vendor.id !== id));
+          if (selectedVendorId === id) resetState(); // If deleted vendor is selected, reset the state
+        } else {
+          console.error('Failed to delete vendor');
+        }
+      } catch (err) {
+        console.error('Error deleting vendor:', err);
+      }
+    }
+  };  
 
   if (!isOpen) return null;
 
@@ -135,8 +167,16 @@ const EditVendor = ({ isOpen, onClose }) => {
             <h3>Select a Vendor</h3>
             <ul>
               {vendors.map(vendor => (
-                <li key={vendor.id} onClick={() => setSelectedVendorId(vendor.id)}>
-                  {vendor.name}
+                <li key={vendor.id}>
+                  <span onClick={() => setSelectedVendorId(vendor.id)}>
+                    {vendor.name}
+                  </span>
+                  <span
+                    className="delete-vendor-button"
+                    onClick={() => handleDelete(vendor.id)}
+                  >
+                    ✖
+                  </span>
                 </li>
               ))}
             </ul>
@@ -171,7 +211,6 @@ const EditVendor = ({ isOpen, onClose }) => {
             </div>
           </form>
         )}
-        {/* Cancel button added here */}
         <div className="edit-vendor-footer">
           <button type="button" className="edit-vendor-list-cancel-button" onClick={onClose}>
             Cancel

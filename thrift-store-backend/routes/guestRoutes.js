@@ -3,15 +3,15 @@ const multer = require('multer');
 const path = require('path');
 const router = express.Router();
 const {
-  getAllGuestVendors,
-  getGuestVendorById,  // Import the new controller method
-  addGuestVendor,
-  getLatestGuestVendor,
-  editGuestVendor,
-  toggleGuestVendorBreak
+  getAllGuests,
+  getGuestById,  
+  addGuest,
+  getLatestGuest,
+  editGuest,
+  toggleGuestBreak
 } = require('../controllers/guestController');
 
-// Configure multer storage and upload setup (same as before)
+// Configure multer storage and upload setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/vendors/guests/');
@@ -42,13 +42,12 @@ const upload = multer({
   { name: 'guestphoto', maxCount: 1 }
 ]);
 
-// Add the route for fetching a guest vendor by ID
-router.get('/guests/:id', getGuestVendorById); // New route
-
-router.get('/guests', getAllGuestVendors);
-router.get('/guests/latest', getLatestGuestVendor);
-router.post('/guests', upload, addGuestVendor);
-router.patch('/guests/:id', upload, editGuestVendor);
-router.patch('/guests/:id/toggle-break', toggleGuestVendorBreak);
+// Define the routes
+router.get('/guests/:id', getGuestById);
+router.get('/guests', getAllGuests);
+router.get('/guests/latest', getLatestGuest);
+router.post('/guests', upload, addGuest);
+router.patch('/guests/:id', upload, editGuest);
+router.patch('/guests/:id/toggle-break', toggleGuestBreak);
 
 module.exports = router;

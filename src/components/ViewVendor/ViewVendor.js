@@ -1,17 +1,17 @@
-// ViewVendor.js
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import VendorMap from '../VendorMap/VendorMap'; // Import the VendorMap component
+import VendorMap from '../VendorMap/VendorMap';
 import './ViewVendor.css';
 
 const ViewVendor = ({ vendor, onClose }) => {
   const { name, description, category, location, vendorphoto } = vendor;
-  const vendorPhoto = vendorphoto ? `http://localhost:5000${vendorphoto}` : '/images/avatar.png';
+  
+  // Use process.env.PUBLIC_URL for assets in public folder
+  const vendorPhoto = vendorphoto ? `http://localhost:5000${vendorphoto}` : `${process.env.PUBLIC_URL}/images/placeholder.png`;
 
   const modalRef = useRef(null);
-  const [showVendorMap, setShowVendorMap] = useState(false); // State to manage VendorMap visibility
+  const [showVendorMap, setShowVendorMap] = useState(false);
 
-  // Function to render description with line breaks
   const renderDescriptionWithLineBreaks = (text) => {
     return text.split('\n').map((line, index) => (
       <React.Fragment key={index}>
@@ -54,37 +54,38 @@ const ViewVendor = ({ vendor, onClose }) => {
   const modalContent = (
     <div className="view-vendor-modal">
       <div className="view-vendor-content" ref={modalRef}>
-        <button className="close-vendor-button" onClick={onClose}>
+        <button className="view-vendor-close-button" onClick={onClose}>
           X
         </button>
-        <h2>{name}</h2>
-          <img
-          src={vendor.vendorphoto ? `http://localhost:5000${vendor.vendorphoto}` : '/images/placeholder.png'}
-            alt={vendor.name}
-            className="view-vendorphoto"
-          />
-        <p className="vendor-category">
+        <h2 className="view-vendor-title">{name}</h2>
+        <img
+          src={vendorPhoto}
+          alt={name}
+          className="view-vendor-photo"
+          onError={(e) => {
+            e.target.src = `${process.env.PUBLIC_URL}/images/placeholder.png`; // Fallback to placeholder image
+          }}
+        />
+        <p className="view-vendor-category">
           Category: {category} |{' '}
-          <span className="location-link" onClick={() => setShowVendorMap(true)}>
+          <span className="view-vendor-location-link" onClick={() => setShowVendorMap(true)}>
             Location: {location}
           </span>
         </p>
-        <div className="vendor-description">
+        <div className="view-vendor-description">
           {renderDescriptionWithLineBreaks(description)}
         </div>
       </div>
 
-      {/* Conditionally render VendorMap, keeping ViewVendor underneath */}
       {showVendorMap && (
         <VendorMap
           location={location}
-          onClose={() => setShowVendorMap(false)} // Close VendorMap and return to ViewVendor
+          onClose={() => setShowVendorMap(false)}
         />
       )}
     </div>
   );
 
-  // Render modal content inside a portal to detach it from the parent component's layout constraints
   return ReactDOM.createPortal(modalContent, document.body);
 };
 

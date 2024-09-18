@@ -4,45 +4,57 @@ import './GuestStatus.css';
 const GuestStatus = ({ guest }) => {
   const { name, guestphoto, description, schedule, break: isOnBreak } = guest;
 
-  // Helper function to convert 24-hour format to 12-hour format with AM/PM
-  const convertTo12HourFormat = (time) => {
-    let [hours, minutes] = time.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12; // Convert hour '0' to '12' for 12 AM
-    return `${hours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  // Helper function to convert 12-hour format time to minutes since midnight
+  const convertTo24HourFormat = (time) => {
+    const [timePart, modifier] = time.toLowerCase().split(/([apm]+)/).filter(Boolean);
+    let [hours, minutes] = timePart.split(':').map(Number);
+    if (isNaN(minutes)) minutes = 0; // Default minutes to 0 if not provided
+
+    if (modifier === 'pm' && hours !== 12) hours += 12;
+    if (modifier === 'am' && hours === 12) hours = 0;
+
+    return hours * 60 + minutes; // Total minutes since midnight
   };
 
-  // Parse the schedule to format the times in 12-hour format
-  const formatSchedule = (schedule) => {
-    // Match times in either 12-hour (e.g., "12:00pm") or 24-hour (e.g., "12:00") format
-    const times = schedule.match(/(\d{1,2}(?::\d{2})?\s?[apmAPM]*)/g);
+  // Parse the schedule to get open and close times in 24-hour format
+  const parseSchedule = (schedule) => {
+    const times = schedule.match(/(\d{1,2}(?::\d{2})?\s?[apmAPM]+)/g);
     if (times && times.length === 2) {
-      const [openTime, closeTime] = times;
-      const formattedOpenTime = openTime.includes('AM') || openTime.includes('PM')
-        ? openTime // Already in 12-hour format
-        : convertTo12HourFormat(openTime); // Convert 24-hour to 12-hour format
-      const formattedCloseTime = closeTime.includes('AM') || closeTime.includes('PM')
-        ? closeTime
-        : convertTo12HourFormat(closeTime);
-      return `Open: ${formattedOpenTime}, Close: ${formattedCloseTime}`;
+      const [openTime, closeTime] = times.map((time) => convertTo24HourFormat(time));
+      return { openTime, closeTime };
     }
-    return schedule; // Return the schedule as-is if parsing fails
+    return null;
   };
 
-  // Determine if the guest is open or closed based on the schedule and break status
-  const isOpen = !isOnBreak && schedule.toLowerCase().includes('open');
-  const statusText = isOpen ? 'Open' : 'Closed';
+  // Check if the vendor is open based on the schedule and break status
+  const checkIfOpen = () => {
+    const scheduleTimes = parseSchedule(schedule);
+    if (!scheduleTimes || isOnBreak) {
+      return false; // Closed if no schedule is available or the vendor is on break
+    }
+
+    const { openTime, closeTime } = scheduleTimes;
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes since midnight
+
+    return currentTime >= openTime && currentTime < closeTime;
+  };
+
+  const isOpen = checkIfOpen();
   const statusClass = isOpen ? 'status-open' : 'status-closed';
 
-  // Set the guest photo URL or fall back to a placeholder image
-  const photoURL = guestphoto ? `http://localhost:5000${guestphoto}` : '/public/images/avatar.png';
+  // Set the guest photo or fallback to a default image
+  const photoURL = guestphoto ? `http://localhost:5000${guestphoto}` : `${process.env.PUBLIC_URL}/images/avatar.png`;
 
   return (
-    <div className="guest-status">
+    <div className={`guest-status ${statusClass}`}>
+      <div className="guest-status-thumbnail">
+        <img src={photoURL} alt={name} className="guest-photo" />
+      </div>
       <div className="guest-status-info">
         <h4 className="guest-status-name">{name}</h4>
         <p className="guest-status-description">{description || 'No description available.'}</p>
-        <span className={`guest-status-schedule ${statusClass}`}>{formatSchedule(schedule)}</span>
+        <span className="guest-status-schedule">{schedule.replace(",", " - ")}</span>
       </div>
     </div>
   );
