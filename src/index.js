@@ -6,6 +6,7 @@ import Events from './components/Events/Events';
 import VendorList from './components/VendorList/VendorList';
 import Blog from './components/Blog/Blog';
 import AdminPage from './components/AdminPage/AdminPage';
+import DisplaySocials from './components/DisplaySocials/DisplaySocials';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -18,6 +19,7 @@ root.render(
         <Route path="/vendors" element={<VendorList />} />
         <Route path="/blogs" element={<Blog />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/socials" element={<DisplaySocials />} />
       </Routes>
     </Router>
   </React.StrictMode>
