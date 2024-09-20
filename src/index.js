@@ -21,6 +21,9 @@ root.render(
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/socials" element={<DisplaySocials />} />
       </Routes>
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+      </div>
     </Router>
   </React.StrictMode>
 );
