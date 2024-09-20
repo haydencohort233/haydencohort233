@@ -3,11 +3,10 @@ const path = require('path');
 const { logAction } = require('../utils/logHelper');
 
 exports.getAllVendors = (req, res) => {
-  // Get the sort parameter from the query string; default to 'asc' if not provided
   const sort = req.query.sort || 'asc';
   let orderByClause = 'name ASC'; // Default sorting order
 
-  // Determine the sorting order based on the sort parameter
+  // Determine the sorting order
   switch (sort) {
     case 'asc':
       orderByClause = 'name ASC';
@@ -25,7 +24,6 @@ exports.getAllVendors = (req, res) => {
       orderByClause = 'name ASC';
   }
 
-  // Update the SQL query to include the ORDER BY clause and datecreated field
   const query = `SELECT id, name, description, location, category, avatar, vendorphoto, datecreated FROM vendorshops ORDER BY ${orderByClause}`;
   
   db.query(query, (err, results) => {
@@ -43,7 +41,7 @@ exports.getFeaturedVendors = (req, res) => {
   let query = 'SELECT id, name, description, location, category, avatar, vendorphoto, datecreated FROM vendorshops';
   
   if (ids) {
-    const idArray = ids.split(',').map(id => parseInt(id, 10)); // Convert IDs to integers
+    const idArray = ids.split(',').map(id => parseInt(id, 10));
     query += ' WHERE id IN (?)'; // Use parameterized query
     db.query(query, [idArray], (err, results) => {
       if (err) {
@@ -82,7 +80,7 @@ exports.addVendor = (req, res) => {
       return res.status(500).json({ error: 'Database query failed' });
     }
 
-    logAction('Added', name, results.insertId, adminUsername); // Log action with name and vendor ID
+    logAction('Vendor Added', name, results.insertId, adminUsername); // Log action with name and vendor ID
     res.status(201).json({ message: 'Vendor added successfully', id: results.insertId });
   });
 };
@@ -91,7 +89,7 @@ exports.deleteVendor = (req, res) => {
   const vendorId = req.params.id;
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
-  // Fetch the vendor's name before deleting
+  // Get vendor's name before deleting
   const getVendorQuery = `SELECT name FROM vendorshops WHERE id = ?`;
   db.query(getVendorQuery, [vendorId], (err, vendorResults) => {
     if (err || vendorResults.length === 0) {
@@ -112,7 +110,7 @@ exports.deleteVendor = (req, res) => {
         return res.status(404).json({ error: 'Vendor not found' });
       }
 
-      logAction('Deleted', vendorName, vendorId, adminUsername);
+      logAction('Vendor Deleted', vendorName, vendorId, adminUsername);
       res.json({ message: `Vendor ${vendorName} (ID: ${vendorId}) deleted successfully` });
     });
   });
@@ -152,7 +150,7 @@ exports.updateVendor = (req, res) => {
       return res.status(404).json({ error: 'Vendor not found' });
     }
 
-    logAction('Modified', name, vendorId, adminUsername);
+    logAction('Vendor Modified', name, vendorId, adminUsername);
     res.json({ message: `Vendor ${name} (ID: ${vendorId}) updated successfully` });
   });
 };
@@ -172,6 +170,6 @@ exports.getVendorById = (req, res) => {
       return res.status(404).json({ error: 'Vendor not found' });
     }
 
-    res.json(results[0]); // Send the vendor data
+    res.json(results[0]);
   });
 };

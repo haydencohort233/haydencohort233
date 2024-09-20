@@ -1,33 +1,41 @@
-import React, { useEffect, useRef, forwardRef } from 'react';
+import React, { useEffect, useRef, useState, forwardRef } from 'react';
 import './VendorMap.css';
 
 const VendorMap = forwardRef(({ location, onClose }, ref) => {
   const mapRef = useRef(null);
+  const [vendors, setVendors] = useState([]);
+  const [hoveredVendor, setHoveredVendor] = useState(null); // Track the hovered vendor
 
   // Mapping locations to specific coordinates
   const locationCoordinates = {
     // Main Building
-    "FRONT": { top: '520px', left: '240px', name: 'Chasing Nostalgia'},
-    "1A": { top: '15px', left: '20px', name: 'Fleaboard Skateshop' },
-    "2A": { top: '75px', left: '20px', name: 'Cherry on Top'  },
-    "3A": { top: '135px', left: '20px', name: 'Devilish Clothing'  },
-    "4A": { top: '195px', left: '20px', name: 'Ambition Thrift'  },
-    "5A": { top: '255px', left: '20px', name: 'Buck Lucky'  },
-    "6A": { top: '312px', left: '20px', name: 'GAMERB0YZ'  },
-    "7A": { top: '135px', left: '300px', name: 'Supersaiyanfinds'  },
-    "8A": { top: '195px', left: '300px', name: 'The Lemonheads'  },
-    "9A": { top: '255px', left: '300px', name: 'Gemzies Treasures'  },
-    "10A": { top: '320px', left: '300px', name: 'Love Morgue'  },
-    "11A": { top: '380px', left: '300px', name: 'Retro_Nani209'  },
-
-    // Side Building
+    "FRONT": { top: '520px', left: '240px' },
+    "1A": { top: '15px', left: '20px' },
+    "2A": { top: '75px', left: '20px' },
+    "3A": { top: '135px', left: '20px' },
+    "4A": { top: '195px', left: '20px' },
+    "5A": { top: '255px', left: '20px' },
+    "6A": { top: '312px', left: '20px' },
+    "7A": { top: '135px', left: '300px' },
+    "8A": { top: '195px', left: '300px' },
+    "9A": { top: '255px', left: '300px' },
+    "10A": { top: '320px', left: '300px' },
+    "11A": { top: '380px', left: '300px' },
   };
 
+  // Fetch vendors data from backend
+  useEffect(() => {
+    fetch('http://localhost:5000/api/vendors')
+      .then(response => response.json())
+      .then(data => setVendors(data))
+      .catch(err => console.error('Error fetching vendors:', err));
+  }, []);
+
+  // Highlight location on initial render
   useEffect(() => {
     const highlightLocation = () => {
       if (!mapRef.current) return;
 
-      // Find the square based on the current location prop
       const selectedSquare = mapRef.current.querySelector(
         `.vendor-location[data-location="${location}"]`
       );
@@ -47,6 +55,15 @@ const VendorMap = forwardRef(({ location, onClose }, ref) => {
     highlightLocation();
   }, [location]);
 
+  // Handle hover state change
+  const handleMouseEnter = (loc) => {
+    setHoveredVendor(loc);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredVendor(null);
+  };
+
   return (
     <div className="vendor-map-modal" ref={ref}>
       <div className="vendor-map-overlay" onClick={onClose} />
@@ -55,23 +72,29 @@ const VendorMap = forwardRef(({ location, onClose }, ref) => {
           X
         </button>
         <img
-          src="/images/vendor-layout.png"
+          src={process.env.PUBLIC_URL + '/images/vendor-layout.png'}
           alt="Vendor Layout Map"
           className="vendor-map-image"
         />
         {/* Dynamically add squares based on the location mapping */}
-        {Object.entries(locationCoordinates).map(([loc, coords]) => (
-          <div
-            key={loc}
-            className="vendor-location"
-            data-location={loc}
-            style={{ top: coords.top, left: coords.left }}
-            title={coords.name} // Adding a title for hover effect
-          >
-            {/* Display vendor name above the square */}
-            <div className="vendor-name">{coords.name}</div>
-          </div>
-        ))}
+        {vendors.map(vendor => {
+          const coordinates = locationCoordinates[vendor.location];
+          if (!coordinates) return null; // Skip if no coordinates found for location
+
+          return (
+            <div
+              key={vendor.id}
+              className={`vendor-location ${hoveredVendor === vendor.location ? 'hovered' : ''}`}
+              data-location={vendor.location}
+              style={{ top: coordinates.top, left: coordinates.left }}
+              onMouseEnter={() => handleMouseEnter(vendor.location)}
+              onMouseLeave={handleMouseLeave}
+            >
+              {/* Display vendor name above the square */}
+              <div className="vendor-name">{vendor.name}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,92 +1,104 @@
 .vendor-map-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 4000; /* Higher z-index than ViewVendor */
-  }
-  
-  .vendor-map-overlay {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-  }
-  
-  .vendor-map-content {
-    position: relative;
-    max-width: 90%;
-    max-height: 90%;
-    background: white;
-    border: 2px solid black;
-    overflow: hidden;
-  }
-  
-  .close-map-button {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    background: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 0 10px;
-    z-index: 1001;
-  }
-  
-  .vendor-map-image {
-    width: 100%;
-    height: auto;
-  }
-  
-  .vendor-location {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    border: 2px solid transparent;
-    box-sizing: border-box;
-    pointer-events: none;
-  }
-  
-  .vendor-name {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    width: 100px;
-    transform: translateX(-50%);
-    color: red;
-    background-color: white;
-    padding: 2px 4px;
-    border: 1px solid black;
-    font-size: 12px;
-    pointer-events: none; /* Clicking through Vendor name */
-    display: none;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 4000;
+}
+
+.vendor-map-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.vendor-map-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: white;
+  border: 2px solid black;
+  overflow: hidden;
+}
+
+.close-map-button {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 0 10px;
+  z-index: 1001;
+}
+
+.vendor-map-image {
+  width: 100%;
+  height: auto;
+}
+
+.vendor-location {
+  position: absolute;
+  width: 90px;
+  height: 50px;
+  border: 2px solid transparent; /* Default to transparent border */
+  background-color: transparent; /* No background by default */
+  box-sizing: border-box;
+  pointer-events: auto; /* Allow interaction */
+  cursor: pointer; /* Show pointer cursor */
+  z-index: 1; /* Ensure it's above the map image */
+}
+
+.vendor-name {
+  position: absolute;
+  top: -25px; /* Adjusted to move up */
+  left: 50%;
+  transform: translateX(-50%); /* Center the name horizontally */
+  width: max-content; /* Fit content width */
+  color: #333;
+  background-color: white;
+  padding: 2px 4px;
+  border: 1px solid black;
+  font-size: 12px;
+  pointer-events: none; /* Prevent pointer events */
+  display: none; /* Hide by default */
+  white-space: nowrap;
+  z-index: 9999;
+}
+
+@media (min-width: 768px) {
   .vendor-location:hover .vendor-name {
-    display: block; /* Show vendor name on hover */
+    display: block; /* Show vendor name on hover for desktop */
   }
-  
-  .flashing {
+
+  .vendor-location.hovered {
+    border-color: rgba(255, 0, 0, 0.5); /* Opaque red border */
+    background-color: rgba(255, 0, 0, 0.2); /* Light red background with opacity */
+    z-index: 2; /* Bring to front */
+  }
+}
+
+.flashing {
+  border-color: red;
+  animation: flash 1.5s infinite;
+}
+
+.flashing .vendor-name {
+  display: block; /* Show the vendor name above the flashing square */
+}
+
+@keyframes flash {
+  0%, 100% {
     border-color: red;
-    animation: flash 1.5s infinite;
   }
-  
-  .flashing .vendor-name {
-    display: block; /* Show the vendor name above the flashing square */
+  50% {
+    border-color: transparent;
   }
-  
-  @keyframes flash {
-    0%, 100% {
-      border-color: red;
-    }
-    50% {
-      border-color: transparent;
-    }
-  }
-  
+}

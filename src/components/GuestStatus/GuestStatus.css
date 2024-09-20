@@ -35,7 +35,7 @@
 
 .guest-status-description {
   font-size: 12px;
-  color: #555;
+  color: #444444;
   margin: 2px 0;
 }
 
@@ -45,15 +45,14 @@
   color: #000;
 }
 
-/* Background colors based on open/closed status */
 .status-open {
   background-color: #31f769 !important;
   border: 1px solid #28a745;
 }
 
 .status-closed {
-  background-color: #fa6471;
-  border: 1px solid #d9534f;
+  background-color: #f83343 !important;
+  border: 2px solid #f0f0f0 !important;
 }
 
 /* Hide elements on mobile view */
