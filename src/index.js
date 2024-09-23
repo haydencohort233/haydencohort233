@@ -6,7 +6,7 @@ import Events from './components/Events/Events';
 import VendorList from './components/VendorList/VendorList';
 import Blog from './components/Blog/Blog';
 import AdminPage from './components/AdminPage/AdminPage';
-import DisplaySocials from './components/DisplaySocials/DisplaySocials';
+import ScrapedPosts from './components/ScrapedPosts/ScrapedPosts';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -19,11 +19,8 @@ root.render(
         <Route path="/vendors" element={<VendorList />} />
         <Route path="/blogs" element={<Blog />} />
         <Route path="/admin" element={<AdminPage />} />
-        <Route path="/socials" element={<DisplaySocials />} />
+        <Route path="/scraped-posts" element={<ScrapedPosts />} />
       </Routes>
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-      </div>
     </Router>
   </React.StrictMode>
 );

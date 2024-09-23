@@ -7,6 +7,8 @@ const { promisify } = require('util');
 const db = require('../config/db');
 const query = promisify(db.query).bind(db); // Promisify db.query for async/await
 const { fetchVendorInstagramPosts } = require('../controllers/vendorController');
+require('dotenv').config();
+const { exec } = require('child_process'); // For executing Python script
 
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -38,67 +40,41 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 }, // Set file size limit (2MB)
 });
 
-// GET all vendors
+// Routes for vendors
 router.get('/vendors', vendorsController.getAllVendors);
-
-// GET a vendor by ID
 router.get('/vendors/:id', vendorsController.getVendorById);
-
-// GET vendors with Instagram filled out
 router.get('/vendors-with-instagram', vendorsController.getVendorsWithInstagram);
-
-// GET featured vendors
 router.get('/featured', vendorsController.getFeaturedVendors);
-
-// DELETE a vendor by ID
 router.delete('/vendors/:id', vendorsController.deleteVendor);
-
-// POST to add a vendor
 router.post('/vendors', upload.fields([
   { name: 'avatar', maxCount: 1 },
   { name: 'vendorphoto', maxCount: 1 },
 ]), vendorsController.addVendor);
-
-// PUT to update a vendor
 router.put('/vendors/:id', upload.fields([
   { name: 'avatar', maxCount: 1 },
   { name: 'vendorphoto', maxCount: 1 },
 ]), vendorsController.updateVendor);
 
+// Route to trigger the scraping process
+router.get('/scrape', (req, res) => {
+  exec('python scraper.py', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing Python script: ${error}`);
+      return res.status(500).json({ message: 'Error during scraping, please try again.' });
+    }
+    
+    console.log(`Scraping output: ${stdout}`);
+    res.json({ message: 'Scraping completed successfully!' });
+  });
+});
 
-
-router.get('/vendors-instagram-posts', async (req, res) => {
-  const { selectedVendors } = req.query;
-
-  if (!selectedVendors || selectedVendors.length === 0) {
-    return res.json([]); // Return an empty array if no vendors are selected
-  }
-
-  const vendorIds = selectedVendors.split(',').map(id => parseInt(id, 10));
-
+router.get('/scraped-posts', async (req, res) => {
   try {
-    // Fetch vendors from the database
-    const vendors = await query(
-      'SELECT id, name, instagram FROM vendorshops WHERE id IN (?) AND instagram IS NOT NULL AND instagram != ""',
-      [vendorIds]
-    );
-
-    // Fetch Instagram posts for each selected vendor
-    const vendorPostsPromises = vendors.map(async (vendor) => {
-      console.log(`Fetching posts for vendor: ${vendor.name} (${vendor.instagram})`);
-      const posts = await fetchVendorInstagramPosts(vendor.instagram);
-      return {
-        vendor: vendor.name,
-        posts: posts || [],
-      };
-    });
-
-    const vendorPosts = await Promise.all(vendorPostsPromises);
-    console.log('Vendor Posts:', vendorPosts);
-    res.json(vendorPosts);
+    const posts = await query('SELECT * FROM scraped_posts ORDER BY timestamp DESC');
+    res.json(posts);
   } catch (error) {
-    console.error('Error fetching vendor Instagram posts:', error);
-    res.status(500).json({ message: 'Error fetching vendor Instagram posts' });
+    console.error('Error fetching scraped posts:', error);
+    res.status(500).json({ error: 'Failed to fetch scraped posts' });
   }
 });
 

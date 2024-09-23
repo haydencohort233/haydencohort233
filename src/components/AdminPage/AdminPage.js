@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import Tools from '../Tools/Tools';
+import Scrape from '../Tools/Scrape';
 import Status from '../Status/Status';
 import './AdminPage.css';
 
@@ -60,6 +61,7 @@ const AdminPage = () => {
         <div className="admin-content">
           <Tools /> {/* Display the Tools component */}
           <Status /> {/* Display the Status component */}
+          <Scrape />
         </div>
       </div>
     );
