@@ -7,7 +7,6 @@ const ScrapedPosts = () => {
   const [error, setError] = useState('');
   const [visiblePosts, setVisiblePosts] = useState(9);
   const [currentIndex, setCurrentIndex] = useState({});
-  const [playingVideo, setPlayingVideo] = useState(null); // Keep track of which post is currently playing
 
   // Fetch scraped posts on component mount
   useEffect(() => {
@@ -17,7 +16,7 @@ const ScrapedPosts = () => {
         setPosts(response.data); // Store the fetched posts in the state
         // Initialize current index state for each post
         const initialIndexes = response.data.reduce((acc, post) => {
-          acc[post.post_id] = 0; // Each post starts with the first image
+          acc[post.post_id] = 0; // Each post starts with the first image or video
           return acc;
         }, {});
         setCurrentIndex(initialIndexes);
@@ -32,23 +31,25 @@ const ScrapedPosts = () => {
     setVisiblePosts(visiblePosts + 9); // Show 9 more posts when clicked
   };
 
-  // Function to get the correct path for the media
-  const getMediaPath = (filename, isVideo = false, isThumbnail = false) => {
-    if (!filename) return ''; // Return empty string if no filename is provided
-    let basePath = '';
+// Function to get the correct path for the media
+const getMediaPath = (filename) => {
+  if (!filename) return ''; // Return empty string if no filename is provided
 
-    if (isThumbnail) {
-      basePath = '/downloads/videos/thumbnails/';
-    } else if (isVideo) {
-      basePath = '/downloads/videos/';
-    } else {
-      basePath = '/downloads/photos/';
-    }
+  // Check the filename to determine the correct base path
+  let basePath = '';
 
-    const fullPath = `http://localhost:5000${basePath}${filename}`;
-    console.log(`Fetching media from: ${fullPath}`); // Debug: Log media path
-    return fullPath;
-  };
+  if (filename.endsWith('.mp4')) {
+    basePath = '/downloads/videos/';
+  } else if (filename.includes('thumbnail')) {
+    basePath = '/downloads/videos/thumbnails/';
+  } else {
+    basePath = '/downloads/photos/';
+  }
+
+  const fullPath = `http://localhost:5000${basePath}${filename}`;
+  console.log(`Fetching media from: ${fullPath}`); // Debug: Log media path
+  return fullPath;
+};
 
   // Function to separate hashtags from caption
   const separateHashtags = (caption) => {
@@ -74,12 +75,6 @@ const ScrapedPosts = () => {
     }));
   };
 
-  // Handle play button click or image click
-  const handlePlayVideo = (post_id) => {
-    console.log(`Playing video for post: ${post_id}`); // Debug: Log video play
-    setPlayingVideo(post_id); // Set the current post_id as the playing video
-  };
-
   return (
     <div className="scraped-posts-container">
       <h1>Scraped Instagram Posts</h1>
@@ -87,7 +82,6 @@ const ScrapedPosts = () => {
       {posts.length > 0 ? (
         <div className="posts-grid">
           {posts.slice(0, visiblePosts).map((post, index) => {
-            const isVideo = !!post.video_url; // Check if the post has a video
             const mediaFiles = post.media_url.split(','); // Split media URLs into an array
 
             // Add any additional media files, if available
@@ -95,12 +89,16 @@ const ScrapedPosts = () => {
               mediaFiles.push(...post.additional_media_urls.split(','));
             }
 
+            // Include video URL if available
+            if (post.video_url) {
+              mediaFiles.unshift(post.video_url);
+            }
+
             // Current media to display
             const currentMedia = mediaFiles[currentIndex[post.post_id]];
 
             // Determine if the current media is a video or an image
             const isCurrentMediaVideo = currentMedia.endsWith('.mp4');
-            const isCurrentMediaThumbnail = currentMedia.includes('thumbnail');
 
             // Separate caption and hashtags
             const { mainCaption, hashtags } = separateHashtags(post.caption);
@@ -115,23 +113,20 @@ const ScrapedPosts = () => {
                     </button>
                   )}
 
-                  {isCurrentMediaVideo && playingVideo === post.post_id ? (
+                  {isCurrentMediaVideo ? (
                     <video
                       controls
                       src={getMediaPath(currentMedia, true)} // Video path
                       className="post-video"
-                      autoPlay
                       onError={(e) => console.error('Video playback error:', e)} // Debug: Log video playback errors
                     >
                       Your browser does not support the video tag.
                     </video>
                   ) : (
                     <img
-                      src={getMediaPath(currentMedia, isCurrentMediaVideo, isCurrentMediaThumbnail)} // Display the image or video thumbnail
+                      src={getMediaPath(currentMedia)} // Display the image or video thumbnail
                       alt={post.caption}
                       className="post-image"
-                      onClick={() => isCurrentMediaVideo && handlePlayVideo(post.post_id)} // Click to play video if it's a thumbnail
-                      style={{ cursor: isCurrentMediaVideo ? 'pointer' : 'default' }} // Change cursor style if it's a video thumbnail
                       onError={(e) => console.error('Image load error:', e)} // Debug: Log image loading errors
                     />
                   )}

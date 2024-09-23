@@ -132,26 +132,25 @@
   
 /* Updated CSS for play button */
 .thumbnail-container {
-    position: relative; /* Allows for play button positioning */
-  }
-  
-  .video-play-button {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.5);
-    color: #fff;
-    border: none;
-    padding: 10px 20px; /* Add some padding for the button */
-    font-size: 1em; /* Adjust font size for visibility */
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .video-play-button:hover {
-    background-color: rgba(0, 0, 0, 0.7);
-  }
+  position: relative; /* Allows for play button positioning */
+  display: inline-block; /* Adjust as needed for layout */
+}
+
+.play-button-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px; /* Adjust size as needed */
+  height: 50px; /* Adjust size as needed */
+  cursor: pointer;
+  opacity: 0.8; /* Slight transparency */
+  transition: opacity 0.3s;
+}
+
+.play-button-overlay:hover {
+  opacity: 1; /* Fully opaque on hover */
+}
   
   /* Hashtags Styles */
 .hashtags {
