@@ -1,0 +1,173 @@
+.scraped-posts-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(to top left, purple 0%, green 100%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1, h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #000;
+  }
+  
+  .error-message {
+    color: red;
+    text-align: center;
+  }
+  
+  .posts-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .post-card {
+    width: 300px;
+    border: 3px solid #000000;
+    background: linear-gradient(to top left, yellow 0%, green 100%);
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    text-align: center;
+    position: relative; /* For positioning carousel buttons */
+  }
+  
+  .post-image {
+    width: 100%;
+    height: auto;
+  }
+  
+  .post-video {
+    width: 300px;
+    height: 380px;
+    border-radius: 4px;
+  }
+  
+  .caption {
+    font-size: 0.9em;
+    margin: 10px 0;
+    max-height: 10em; /* Approx. 3 lines of text */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+  }
+  
+  .caption.expanded {
+    max-height: none; /* Remove height restriction */
+    white-space: normal; /* Allow text to wrap */
+  }
+  
+  .caption-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 1.5em;
+    background: linear-gradient(to top, #fff, transparent);
+    pointer-events: none;
+  }
+  
+  .timestamp {
+    font-size: 0.8em;
+    color: #ffffff;
+  }
+  
+  .read-more-button {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: #007bff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+  
+  .read-more-button:hover {
+    color: #0056b3;
+  }
+  
+  /* Carousel Styles */
+  .carousel-container {
+    position: relative; /* Allow positioning of the carousel buttons */
+    overflow: hidden; /* Hide overflow of images */
+  }
+  
+  .carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0);
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1.3em;
+    line-height: 0px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .carousel-button:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .carousel-button.left {
+    left: 5px;
+  }
+  
+  .carousel-button.right {
+    right: 5px;
+  }
+  
+  /* Video Play Button */
+  .post-video-thumbnail {
+    position: relative;
+  }
+  
+/* Updated CSS for play button */
+.thumbnail-container {
+    position: relative; /* Allows for play button positioning */
+  }
+  
+  .video-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    padding: 10px 20px; /* Add some padding for the button */
+    font-size: 1em; /* Adjust font size for visibility */
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .video-play-button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Hashtags Styles */
+.hashtags {
+    font-size: 0.85em; /* Slightly smaller than the main caption */
+    color: #333; /* A dark color for contrast */
+    margin-top: 5px; /* Space between the caption and hashtags */
+    text-align: center; /* Center the hashtags */
+    line-height: 1.4; /* Increase line height for readability */
+}
+
+.hashtags a {
+    color: #007bff; /* Make hashtags blue */
+    text-decoration: none; /* Remove underline from hashtags */
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+.hashtags a:hover {
+    text-decoration: underline; /* Underline hashtags on hover */
+}

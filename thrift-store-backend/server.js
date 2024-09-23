@@ -1,9 +1,11 @@
 require('dotenv').config();
 const cors = require('cors');
+const path = require('path');
 const axios = require('axios');
 const morgan = require('morgan');
 const db = require('./config/db');
 const express = require('express');
+const fs = require('fs');
 const { promisify } = require('util');
 
 const app = express();
@@ -24,7 +26,35 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
+// Serve the 'downloads' directory for image files
+app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 app.use(morgan('dev'));
+
+// Serve images and videos with correct MIME types
+app.get('/downloads/:filename', (req, res) => {
+  const filePath = path.join(__dirname, 'downloads', req.params.filename);
+  const fileExtension = path.extname(filePath).toLowerCase();
+
+  // Determine the correct MIME type for the file
+  let contentType = 'application/octet-stream'; // Default MIME type
+  if (fileExtension === '.mp4') {
+    contentType = 'video/mp4';
+  } else if (fileExtension === '.jpg' || fileExtension === '.jpeg') {
+    contentType = 'image/jpeg';
+  } else if (fileExtension === '.png') {
+    contentType = 'image/png';
+  }
+
+  // Check if the file exists and serve it with the correct MIME type
+  fs.exists(filePath, (exists) => {
+    if (exists) {
+      res.setHeader('Content-Type', contentType);
+      res.sendFile(filePath);
+    } else {
+      res.status(404).send('File not found');
+    }
+  });
+});
 
 // Routes
 const vendorRoutes = require('./routes/vendorRoutes');
@@ -128,7 +158,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start the server
+// Serve the privacy policy file
+app.get('/privacy-policy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'privacy-policy.html'));
+});
+
+// Handle all other routes with the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

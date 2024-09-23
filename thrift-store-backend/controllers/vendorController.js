@@ -192,32 +192,30 @@ const getVendorsWithInstagram = (req, res) => {
   });
 };
 
-// 8. Fetch Vendor Instagram Posts
-async function fetchVendorInstagramPosts(username) {
-  try {
-    // Make a request to the Instagram Graph API with the username
-    const response = await axios.get(`https://graph.instagram.com/v12.0/${username}/media`, {
-      params: {
-        access_token: accessToken, // Use access token from environment variables
-        fields: 'id,caption,media_type,media_url,permalink,thumbnail_url,timestamp',
-      },
-    });
+// 8. Scrape Vendor Instagram Posts
+const scrapeVendorInstagramPosts = (req, res) => {
+  exec('python scraper.py', (err, stdout, stderr) => {
+    if (err) {
+      console.error(`Error executing scraper: ${err}`);
+      return res.status(500).json({ error: 'Failed to execute scraper' });
+    }
 
-    return response.data.data; // Return an array of posts
-  } catch (error) {
-    console.error(`Error fetching Instagram posts for username ${username}:`, error.response ? error.response.data.error.message : error.message);
-    return null; // Return null on error
-  }
-}
+    console.log(`Scraper Output: ${stdout}`);
+    if (stderr) {
+      console.error(`Scraper Errors: ${stderr}`);
+    }
+
+    res.json({ message: 'Scraping completed', output: stdout });
+  });
+};
 
 // Correctly export all functions
 module.exports = { 
-  getAllVendors, 
-  getVendorById, 
-  getVendorsWithInstagram, 
-  getFeaturedVendors, 
-  addVendor, 
-  deleteVendor, 
-  updateVendor, 
-  fetchVendorInstagramPosts 
+  getAllVendors,
+  getVendorById,
+  getVendorsWithInstagram,
+  getFeaturedVendors,
+  addVendor,
+  deleteVendor,
+  updateVendor
 };
