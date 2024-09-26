@@ -3,20 +3,16 @@ const multer = require('multer');
 const path = require('path');
 const router = express.Router();
 const vendorsController = require('../controllers/vendorController');
-const { promisify } = require('util');
-const db = require('../config/db');
-const query = promisify(db.query).bind(db); // Promisify db.query for async/await
-const { fetchVendorInstagramPosts } = require('../controllers/vendorController');
+const { exec } = require('child_process');
 require('dotenv').config();
-const { exec } = require('child_process'); // For executing Python script
 
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/vendors/'); // Save files to 'uploads/vendors/' directory
+    cb(null, 'uploads/vendors/');
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`); // Generate a unique filename with a timestamp
+    cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
 
@@ -37,7 +33,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 2 * 1024 * 1024 }, // Set file size limit (2MB)
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
 });
 
 // Routes for vendors
@@ -45,6 +41,7 @@ router.get('/vendors', vendorsController.getAllVendors);
 router.get('/vendors/:id', vendorsController.getVendorById);
 router.get('/vendors-with-instagram', vendorsController.getVendorsWithInstagram);
 router.get('/featured', vendorsController.getFeaturedVendors);
+router.get('/scraped-posts/:username', vendorsController.getScrapedPostsByUsername);
 router.delete('/vendors/:id', vendorsController.deleteVendor);
 router.post('/vendors', upload.fields([
   { name: 'avatar', maxCount: 1 },
@@ -62,12 +59,12 @@ router.get('/scrape', (req, res) => {
       console.error(`Error executing Python script: ${error}`);
       return res.status(500).json({ message: 'Error during scraping, please try again.' });
     }
-    
     console.log(`Scraping output: ${stdout}`);
     res.json({ message: 'Scraping completed successfully!' });
   });
 });
 
+// Route for fetching all scraped posts
 router.get('/scraped-posts', async (req, res) => {
   try {
     const posts = await query('SELECT * FROM scraped_posts ORDER BY timestamp DESC');

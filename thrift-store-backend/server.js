@@ -26,7 +26,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
-// Serve the 'downloads' directory for image files
 app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 app.use(morgan('dev'));
 
@@ -35,7 +34,6 @@ app.get('/downloads/:filename', (req, res) => {
   const filePath = path.join(__dirname, 'downloads', req.params.filename);
   const fileExtension = path.extname(filePath).toLowerCase();
 
-  // Determine the correct MIME type for the file
   let contentType = 'application/octet-stream'; // Default MIME type
   if (fileExtension === '.mp4') {
     contentType = 'video/mp4';
@@ -45,7 +43,6 @@ app.get('/downloads/:filename', (req, res) => {
     contentType = 'image/png';
   }
 
-  // Check if the file exists and serve it with the correct MIME type
   fs.exists(filePath, (exists) => {
     if (exists) {
       res.setHeader('Content-Type', contentType);
@@ -55,6 +52,30 @@ app.get('/downloads/:filename', (req, res) => {
     }
   });
 });
+
+// Serve image files from the "downloads/photos" directory
+app.get('/downloads/photos/:filename', (req, res) => {
+  const filePath = path.join(__dirname, 'downloads/photos', req.params.filename);
+  const fileExtension = path.extname(filePath).toLowerCase();
+
+  let contentType = 'application/octet-stream'; // Default MIME type
+  if (fileExtension === '.jpg' || fileExtension === '.jpeg') {
+    contentType = 'image/jpeg';
+  } else if (fileExtension === '.png') {
+    contentType = 'image/png';
+  }
+
+  // Check if file exists and serve it with the correct MIME type
+  fs.exists(filePath, (exists) => {
+    if (exists) {
+      res.setHeader('Content-Type', contentType);
+      res.sendFile(filePath);
+    } else {
+      res.status(404).send('File not found');
+    }
+  });
+});
+
 
 // Routes
 const vendorRoutes = require('./routes/vendorRoutes');
@@ -70,7 +91,7 @@ app.use('/api', blogRoutes);
 app.use('/api', guestRoutes);
 app.use('/api', statusRoutes);
 
-// Instagram Route
+// Instagram Route (Ensure `fetchVendorInstagramPosts` is defined and imported)
 app.get('/api/vendors-instagram-posts', async (req, res) => {
   const { selectedVendors } = req.query;
 
@@ -81,14 +102,13 @@ app.get('/api/vendors-instagram-posts', async (req, res) => {
   const vendorIds = selectedVendors.split(',').map(id => parseInt(id, 10));
 
   try {
-    // Use the promisified query function
     const vendors = await query(
-      'SELECT id, name, instagram FROM vendorshops WHERE id IN (?) AND instagram IS NOT NULL AND instagram != ""',
+      'SELECT id, name, instagram_username FROM vendorshops WHERE id IN (?) AND instagram_username IS NOT NULL AND instagram_username != ""',
       [vendorIds]
     );
 
     const vendorPostsPromises = vendors.map(async (vendor) => {
-      const posts = await fetchVendorInstagramPosts(vendor.instagram); // Ensure this function is correctly defined
+      const posts = await fetchVendorInstagramPosts(vendor.instagram_username);
       return {
         vendor: vendor.name,
         posts: posts || [],
