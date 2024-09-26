@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import Tools from '../Tools/Tools';
-import Scrape from '../Tools/Scrape';
 import Status from '../Status/Status';
 import './AdminPage.css';
 
@@ -35,8 +34,7 @@ const AdminPage = () => {
       setIsAuthenticated(true);
     }
   }, []);
-
-  // Handle logout
+  
   const handleLogout = () => {
     Cookies.remove('adminAuthenticated');
     Cookies.remove('adminUsername');
@@ -44,7 +42,7 @@ const AdminPage = () => {
   };
 
   const handleBackToHome = () => {
-    window.location.href = '/'; // Redirect to home page
+    window.location.href = '/'; // Homepage
   };
 
   if (isAuthenticated) {
@@ -59,9 +57,8 @@ const AdminPage = () => {
           </button>
         </div>
         <div className="admin-content">
-          <Tools /> {/* Display the Tools component */}
-          <Status /> {/* Display the Status component */}
-          <Scrape />
+          <Tools />
+          <Status />
         </div>
       </div>
     );

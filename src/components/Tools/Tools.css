@@ -14,7 +14,7 @@
   flex-direction: column;
   align-items: center;
   background: rgba(255, 255, 255, 0.8);
-  border: 2px solid #000;
+  border: 3px solid #000;
   color: #000;
   padding: 10px;
   max-width: 300px;
@@ -37,7 +37,9 @@
 .edit-vendor-button,
 .edit-guest-button,
 .edit-event-button,
-.edit-blogs-button {
+.edit-blogs-button,
+.scrape-button,
+.perform-backup-button {
   width: 200px;
   padding: 10px 20px;
   font-size: 16px;
@@ -133,4 +135,27 @@
 
 .edit-blogs-button:hover {
   background-color: #880707;
+}
+
+.scrape-button {
+  background-color: #720788;
+}
+
+.scrape-button:hover {
+  background-color: #a717c4;
+}
+
+.perform-backup-button {
+  background-color: #00ffaa;
+}
+
+.perform-backup-button:hover {
+  background-color: #00b377;
+}
+
+.tools-divider {
+  width: 100%;
+  height: 2px;
+  background-color: #ccc;
+  margin: 6px 0;
 }

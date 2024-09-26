@@ -1,4 +1,3 @@
-/* ViewVendor.css */
 .view-vendor-modal {
   position: fixed;
   top: 0;
@@ -15,17 +14,19 @@
 .view-vendor-content {
   background: #fff;
   padding: 20px;
-  border-radius: 8px;
-  max-width: 600px;
+  max-width: 800px; /* Increased width to accommodate more posts */
   width: 100%;
   overflow-y: auto;
   max-height: 80%;
+  position: relative;
 }
 
 .view-vendor-close-button {
   position: absolute;
   top: 10px;
   right: 10px;
+  width: 50px;
+  height: 30px;
   background-color: red;
   color: white;
   border: none;
@@ -36,11 +37,12 @@
 .view-vendor-title {
   font-size: 24px;
   margin-bottom: 20px;
+  text-align: center; /* Centered title */
 }
 
 .view-vendor-photo {
   width: 100%;
-  max-height: 500px;
+  max-height: 300px; /* Reduced height for consistency */
   object-fit: cover;
   margin-bottom: 20px;
 }
@@ -48,15 +50,162 @@
 .view-vendor-category {
   color: #666;
   font-size: 0.9em;
+  margin-bottom: 10px; /* Add some space below the category */
 }
 
 .view-vendor-description {
   color: #333;
   line-height: 1.6;
+  margin-bottom: 20px; /* Add spacing below the description */
 }
 
 .view-vendor-location-link {
   color: blue;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.view-vendor-social {
+  margin-bottom: 20px; /* Space below social media username */
+  text-align: center;
+  font-size: 1em;
+}
+
+/* Social Media Posts Section */
+.view-vendor-social-media {
+  margin-top: 20px;
+}
+
+.view-vendor-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 posts per row */
+  gap: 20px;
+  justify-items: center;
+  align-items: start;
+}
+
+.view-vendor-post-card {
+  width: 100%; /* Take full width of the grid cell */
+  max-width: 250px; /* Maximum width for the card */
+  border: 1px solid #ddd;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  background-color: #f9f9f9;
+  cursor: pointer; /* Indicate that the card is clickable */
+}
+
+.view-vendor-post-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.view-vendor-post-image {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+}
+
+.view-vendor-post-caption {
+  font-size: 0.9em;
+  padding: 10px;
+  color: #333;
+  max-height: 60px; /* Limit caption height */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Styling for the first hashtag */
+.view-vendor-post-hashtag {
+  font-size: 0.9em;
+  padding: 0 10px 10px;
+  color: #007bff; /* Blue color for hashtag */
+  font-weight: bold; /* Make hashtag stand out */
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Styling for the timestamp with "Click to view" text */
+.view-vendor-post-timestamp {
+  font-size: 0.8em;
+  color: #666;
+  padding: 5px 10px;
+  display: flex; /* Flex to align "Click to view" and timestamp */
+  justify-content: space-between; /* Space between items */
+  align-items: center;
+  background-color: #f0f0f0;
+}
+
+.view-vendor-click-to-view {
+  color: #007bff; /* Blue color for the clickable text */
+  font-weight: bold; /* Make it stand out */
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ViewVendor.css */
+.view-vendor-content.blurred {
+  filter: blur(5px); /* Apply blur effect when ViewInstagram is open */
+}
+
+.view-instagram-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; /* Ensure it's above the ViewVendor */
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 800px) {
+  .view-vendor-content {
+    max-width: 90%;
+    padding: 15px;
+  }
+
+  .view-vendor-title {
+    font-size: 20px;
+  }
+
+  .view-vendor-posts-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 posts per row on medium screens */
+  }
+
+  .view-vendor-post-card {
+    max-width: 200px; /* Smaller card width for medium screens */
+  }
+
+  .view-vendor-post-image {
+    height: 120px; /* Reduced height for images */
+  }
+}
+
+@media (max-width: 600px) {
+  .view-vendor-content {
+    max-width: 95%;
+    padding: 15px;
+  }
+
+  .view-vendor-title {
+    font-size: 20px;
+  }
+
+  .view-vendor-posts-grid {
+    grid-template-columns: 1fr; /* 1 post per row on small screens */
+  }
+
+  .view-vendor-post-card {
+    width: 100%; /* Full width on mobile */
+    max-width: none; /* No max-width on mobile */
+  }
+
+  .view-vendor-post-image {
+    height: 150px; /* Reduced height for smaller screens */
+  }
 }

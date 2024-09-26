@@ -10,6 +10,7 @@ const VendorList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [vendorsPerPage, setVendorsPerPage] = useState(20);
+  const [selectedVendorId, setSelectedVendorId] = useState(null);
 
   // Detect viewport size and set vendorsPerPage
   useEffect(() => {
@@ -47,6 +48,10 @@ const VendorList = () => {
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
   };
+
+  const handleVendorClick = (id) => {
+    setSelectedVendorId(id); // Open ViewVendor with the selected vendor ID
+  };  
 
   const parseLocation = (location) => {
     const match = location.match(/(\d+)([A-Z]?)/i);
@@ -131,6 +136,7 @@ const VendorList = () => {
                   vendorphoto: vendor.vendorphoto,
                   datecreated: vendor.datecreated,
                 }}
+                onClick={() => handleVendorClick(vendor.id)}
               />
             ))}
           </div>
