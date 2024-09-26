@@ -28,7 +28,7 @@ const getAllVendors = (req, res) => {
       orderByClause = 'name ASC';
   }
 
-  const query = `SELECT id, name, description, location, category, avatar, vendorphoto, datecreated FROM vendorshops ORDER BY ${orderByClause}`;
+  const query = `SELECT id, name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated FROM vendorshops ORDER BY ${orderByClause}`;
   
   db.query(query, (err, results) => {
     if (err) {
@@ -43,7 +43,7 @@ const getAllVendors = (req, res) => {
 const getFeaturedVendors = (req, res) => {
   const { ids } = req.query;
 
-  let query = 'SELECT id, name, description, location, category, avatar, vendorphoto, datecreated FROM vendorshops';
+  let query = 'SELECT id, name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated FROM vendorshops';
   
   if (ids) {
     const idArray = ids.split(',').map(id => parseInt(id, 10));
@@ -69,14 +69,14 @@ const getFeaturedVendors = (req, res) => {
 
 // 3. Add Vendor
 const addVendor = (req, res) => {
-  const { name, description, location, category } = req.body;
+  const { name, description, location, category, instagram_username, website_url } = req.body;
 
   const avatarPath = req.files && req.files.avatar ? `/uploads/vendors/${req.files.avatar[0].filename}` : '/public/images/avatar.png';
   const vendorPhoto = req.files && req.files.vendorphoto ? `/uploads/vendors/${req.files.vendorphoto[0].filename}` : '/public/images/avatar.png';
 
   const dateCreated = new Date();
-  const query = 'INSERT INTO vendorshops (name, description, location, category, avatar, vendorphoto, datecreated) VALUES (?, ?, ?, ?, ?, ?, ?)';
-  const values = [name, description, location, category, avatarPath, vendorPhoto, dateCreated];
+  const query = 'INSERT INTO vendorshops (name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  const values = [name, description, location, category, avatarPath, vendorPhoto, instagram_username, website_url, dateCreated];
 
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
@@ -123,14 +123,14 @@ const deleteVendor = (req, res) => {
 // 5. Update Vendor
 const updateVendor = (req, res) => {
   const vendorId = req.params.id;
-  const { name, description, location, category } = req.body;
+  const { name, description, location, category, instagram_username, website_url } = req.body;
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
   const avatarPath = req.files && req.files.avatar ? `/uploads/vendors/${req.files.avatar[0].filename}` : null;
   const vendorPhotoPath = req.files && req.files.vendorphoto ? `/uploads/vendors/${req.files.vendorphoto[0].filename}` : null;
 
-  let query = `UPDATE vendorshops SET name = ?, description = ?, location = ?, category = ?`;
-  const values = [name, description, location, category];
+  let query = `UPDATE vendorshops SET name = ?, description = ?, location = ?, category = ?, instagram_username = ?, website_url = ?`;
+  const values = [name, description, location, category, instagram_username, website_url];
 
   if (avatarPath) {
     query += `, avatar = ?`;
@@ -163,7 +163,7 @@ const updateVendor = (req, res) => {
 // 6. Get Vendor by ID
 const getVendorById = (req, res) => {
   const vendorId = req.params.id;
-  const query = `SELECT id, name, description, location, category, avatar, vendorphoto FROM vendorshops WHERE id = ?`;
+  const query = `SELECT id, name, description, location, category, avatar, vendorphoto, instagram_username, website_url FROM vendorshops WHERE id = ?`;
   
   db.query(query, [vendorId], (err, results) => {
     if (err) {
@@ -181,7 +181,7 @@ const getVendorById = (req, res) => {
 
 // 7. Get Vendors with Instagram
 const getVendorsWithInstagram = (req, res) => {
-  const query = `SELECT id, name, instagram FROM vendorshops WHERE instagram IS NOT NULL AND instagram != ''`;
+  const query = `SELECT id, name, instagram_username FROM vendorshops WHERE instagram_username IS NOT NULL AND instagram_username != ''`;
 
   db.query(query, (err, results) => {
     if (err) {
@@ -209,6 +209,28 @@ const scrapeVendorInstagramPosts = (req, res) => {
   });
 };
 
+// 9. Get Scraped Posts by Instagram Username
+// Check the function implementation
+const getScrapedPostsByUsername = (req, res) => {
+  const { username } = req.params; // Make sure this is correctly retrieved
+
+  // Log the username for debugging
+  console.log(`Received username for scraped posts: ${username}`);
+
+  const query = `SELECT * FROM scraped_posts WHERE username = ? ORDER BY timestamp DESC LIMIT 3`;
+  
+  db.query(query, [username], (err, results) => {
+    if (err) {
+      console.error('Error fetching scraped posts:', err);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No posts found for this username' });
+    }
+    res.json(results);
+  });
+};
+
 // Correctly export all functions
 module.exports = { 
   getAllVendors,
@@ -217,5 +239,7 @@ module.exports = {
   getFeaturedVendors,
   addVendor,
   deleteVendor,
-  updateVendor
+  updateVendor,
+  scrapeVendorInstagramPosts,
+  getScrapedPostsByUsername
 };

@@ -122,6 +122,7 @@ const VendorList = () => {
               <VendorCard
                 key={vendor.id}
                 vendor={{
+                  id: vendor.id,
                   name: vendor.name,
                   description: vendor.description,
                   location: vendor.location,

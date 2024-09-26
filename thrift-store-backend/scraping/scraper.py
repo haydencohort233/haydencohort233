@@ -4,6 +4,16 @@ from datetime import datetime
 import os
 import requests
 
+# Initialize Instaloader and login
+loader = instaloader.Instaloader()
+
+# Load or login to Instagram
+try:
+    loader.load_session_from_file('deleteddfanaccount')
+except FileNotFoundError:
+    loader.login('deleteddfanaccount', '!Motoross72')
+    loader.save_session_to_file()
+
 # Connect to MySQL database
 db = mysql.connector.connect(
     host="localhost",
@@ -13,9 +23,6 @@ db = mysql.connector.connect(
 )
 
 cursor = db.cursor()
-
-# Initialize Instaloader
-loader = instaloader.Instaloader()
 
 # Define the directory structure to save downloaded images and videos
 DOWNLOAD_DIR = os.path.join(os.path.dirname(__file__), '../downloads')
@@ -28,13 +35,13 @@ os.makedirs(PHOTOS_DIR, exist_ok=True)
 os.makedirs(VIDEOS_DIR, exist_ok=True)
 os.makedirs(THUMBNAILS_DIR, exist_ok=True)
 
-# Maximum number of photos to download per post
-MAX_PHOTOS = 2
+# Maximum number of photos to download per post and posts per vendor
+MAX_PHOTOS = 3 # Photos per post (swipe to see more)
+MAX_POSTS_PER_VENDOR = 1 # Posts to gather per vendor per scrape
 
 # Function to detect if IP might be banned
 def check_ip_ban():
     try:
-        # Check if Instagram is accessible, a common method
         response = requests.get('https://www.instagram.com', timeout=5)
         if response.status_code != 200:
             print("Warning: Unable to access Instagram. Possible IP ban or network issue.")
@@ -84,11 +91,43 @@ def post_exists(post_id):
     cursor.execute("SELECT post_id FROM scraped_posts WHERE post_id = %s", (post_id,))
     return cursor.fetchone() is not None
 
+# Function to get the number of posts in the database for a specific user
+def get_saved_post_count(username):
+    cursor.execute("SELECT COUNT(*) FROM scraped_posts WHERE username = %s", (username,))
+    return cursor.fetchone()[0]
+
+# Function to get the number of posts on Instagram for a specific user
+def get_instagram_post_count(username):
+    try:
+        profile = instaloader.Profile.from_username(loader.context, username)
+        return profile.mediacount
+    except Exception as e:
+        print(f"Error fetching Instagram post count for {username}: {e}")
+        return None
+
 # Function to scrape posts from a specific user
 def scrape_user_posts(username):
     if check_ip_ban():
         print(f"Stopping scraping for {username} due to potential IP ban.")
         return
+
+    # Check the number of posts on Instagram
+    insta_post_count = get_instagram_post_count(username)
+    if insta_post_count is None:
+        print(f"Could not get Instagram post count for {username}. Skipping...")
+        return
+
+    # Check the number of posts saved in the database
+    saved_post_count = get_saved_post_count(username)
+
+    print(f"Instagram post count: {insta_post_count}, Saved post count: {saved_post_count}")
+
+    # If the numbers are the same, skip scraping
+    if insta_post_count == saved_post_count:
+        print(f"No new posts to scrape for {username}. Skipping...")
+        return
+
+    successful_scrapes = 0  # Track the number of successful scrapes for the vendor
 
     try:
         # Load the Instagram profile
@@ -96,12 +135,12 @@ def scrape_user_posts(username):
 
         # Iterate through posts and save them to the database
         for index, post in enumerate(profile.get_posts()):
-            if index >= 2:  # Limit to 2 posts per vendor
-                break
+            if successful_scrapes >= MAX_POSTS_PER_VENDOR:
+                break  # Stop if we've successfully scraped the max allowed posts for this vendor
 
             if post_exists(post.shortcode):
                 print(f"Post {post.shortcode} already exists. Skipping...")
-                continue
+                continue  # Skip existing posts without counting as a successful scrape
 
             print(f"Scraping post {post.shortcode} from {username}...")
 
@@ -131,6 +170,7 @@ def scrape_user_posts(username):
                     datetime.now()
                 ))
                 db.commit()
+                successful_scrapes += 1  # Increment successful scrapes counter
 
             elif post.is_video:
                 # Download the thumbnail first to the THUMBNAILS_DIR directory
@@ -157,6 +197,7 @@ def scrape_user_posts(username):
                         video_filename  # Store the video filename in video_url
                     ))
                     db.commit()
+                    successful_scrapes += 1  # Increment successful scrapes counter
 
             else:
                 # For single image posts, download the image
@@ -176,6 +217,7 @@ def scrape_user_posts(username):
                     datetime.now()
                 ))
                 db.commit()
+                successful_scrapes += 1  # Increment successful scrapes counter
 
         print(f"Finished scraping {username}")
 
