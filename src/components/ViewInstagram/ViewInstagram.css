@@ -1,0 +1,78 @@
+/* ViewInstagram.css */
+
+.view-instagram-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .view-instagram-content {
+    background: #fff;
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  .view-instagram-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background-color: red;
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .view-instagram-username {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .view-instagram-media {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .view-instagram-image,
+  .view-instagram-video {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+  }
+  
+  .view-instagram-caption {
+    font-size: 1em;
+    margin: 10px 0;
+    color: #333;
+    text-align: center;
+  }
+  
+  .view-instagram-hashtags {
+    font-size: 0.9em;
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .view-instagram-timestamp {
+    font-size: 0.8em;
+    color: #666;
+    text-align: center;
+  }
+  

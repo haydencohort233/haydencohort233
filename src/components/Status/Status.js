@@ -1,3 +1,4 @@
+// Status.js
 import React, { useEffect, useState } from 'react';
 import './Status.css';
 
@@ -12,11 +13,9 @@ const Status = () => {
     largestTable: 'Loading...',
     mostRecentEntry: 'Loading...',
   });
-  const [backupError, setBackupError] = useState('');
 
   // Fetch database and backup status
   const fetchStatus = () => {
-    // Ensure this uses the correct backend port
     fetch('http://localhost:5000/api/status')
       .then((response) => {
         if (!response.ok) {
@@ -42,32 +41,6 @@ const Status = () => {
           ...statusData,
           dbStatus: 'Database Offline',
         });
-      });
-  };
-
-  // Trigger a manual backup
-  const performBackup = () => {
-    setBackupError(''); // Clear any previous errors
-    fetch('http://localhost:5000/api/backup')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to perform backup');
-        }
-        return response.json(); 
-      })
-      .then((data) => {
-        console.log('Backup response:', data);
-        setStatusData({
-          ...statusData,
-          backupStatus: 'Backup successful',
-          lastBackup: new Date().toISOString(),
-          backupSize: data.backupSize || 'Unknown',
-        });
-        fetchStatus(); // Optionally refetch status to update the "lastBackup" field
-      })
-      .catch((error) => {
-        console.error('Backup error:', error.message);
-        setBackupError('Backup failed. Please try again.');
       });
   };
 
@@ -102,11 +75,6 @@ const Status = () => {
       <div className="status-item">
         <span>Backup Status:</span> {statusData.backupStatus}
       </div>
-
-      <button onClick={performBackup} className="perform-backup-button">
-        Perform Backup
-      </button>
-      {backupError && <p className="error-message">{backupError}</p>}
     </div>
   );
 };

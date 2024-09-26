@@ -8,6 +8,8 @@ const EditVendor = ({ isOpen, onClose }) => {
   const [vendorData, setVendorData] = useState({
     name: '',
     description: '',
+    instagram_username: '',
+    website_url: '',
     location: '',
     category: '',
     avatar: '',
@@ -19,7 +21,7 @@ const EditVendor = ({ isOpen, onClose }) => {
 
   const resetState = () => {
     setSelectedVendorId(null);
-    setVendorData({ name: '', description: '', location: '', category: '', avatar: '', vendorphoto: '' });
+    setVendorData({ name: '', description: '', instagram_username: '', website_url: '', location: '', category: '', avatar: '', vendorphoto: '' });
     setAvatarPreview(null);
     setVendorPhotoPreview(null);
     setError('');
@@ -97,6 +99,8 @@ const EditVendor = ({ isOpen, onClose }) => {
     const formData = new FormData();
     formData.append('name', vendorData.name);
     formData.append('description', vendorData.description);
+    formData.append('instagram_username', vendorData.instagram_username);
+    formData.append('website_url', vendorData.website_url);
     formData.append('location', vendorData.location);
     formData.append('category', vendorData.category);
     if (vendorData.avatar) formData.append('avatar', vendorData.avatar);
@@ -188,6 +192,12 @@ const EditVendor = ({ isOpen, onClose }) => {
             </label>
             <label className="edit-vendor-label">Description:
               <textarea name="description" className="edit-vendor-textarea" value={vendorData.description} onChange={handleInputChange} required />
+            </label>
+            <label className="edit-vendor-label">Instagram:
+              <input type="text" name="instagram_username" className="edit-vendor-input" placeholder='Insert your Instagram (e.g. chasingnostalgia__)' value={vendorData.instagram_username} onChange={handleInputChange} />
+            </label>
+            <label className="edit-vendor-label">Website:
+              <input type="text" name="website_url" className="edit-vendor-input" placeholder='Insert your Website URL (e.g. www.chasingnostalgia.com)' value={vendorData.website_url} onChange={handleInputChange} />
             </label>
             <label className="edit-vendor-label">Location:
               <input type="text" name="location" className="edit-vendor-input" value={vendorData.location} onChange={handleInputChange} required />

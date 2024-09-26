@@ -2,46 +2,41 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import VendorMap from '../VendorMap/VendorMap';
+import ViewInstagram from '../ViewInstagram/ViewInstagram'; // Import ViewInstagram component
 import './ViewVendor.css';
 
 const ViewVendor = ({ vendorId, onClose }) => {
   const [vendor, setVendor] = useState(null);
   const [showVendorMap, setShowVendorMap] = useState(false);
   const [socialMediaPosts, setSocialMediaPosts] = useState([]);
+  const [selectedPost, setSelectedPost] = useState(null); // State to track selected post
   const modalRef = useRef(null);
-
-  console.log("Received Vendor ID:", vendorId); // Debug: Check received vendorId
 
   // Fetch vendor data by ID
   useEffect(() => {
-    if (vendorId) { // Only make the API call if vendorId is valid
+    if (vendorId) {
       axios.get(`http://localhost:5000/api/vendors/${vendorId}`)
         .then(response => {
-          console.log("Fetched Vendor Data from API:", response.data);
           setVendor(response.data);
         })
         .catch(error => {
           console.error('Error fetching vendor data:', error);
         });
-    } else {
-      console.error('No valid vendorId provided to ViewVendor component.');
     }
   }, [vendorId]);
 
   // Fetch social media posts if Instagram username is available
   useEffect(() => {
     if (vendor && vendor.instagram_username) {
-      console.log(`Fetching posts for: ${vendor.instagram_username}`);
       axios.get(`http://localhost:5000/api/scraped-posts/${vendor.instagram_username}`)
         .then(response => {
-          console.log("Fetched Social Media Posts:", response.data);
           setSocialMediaPosts(response.data);
         })
         .catch(error => {
           console.error('Error fetching social media posts:', error);
         });
     }
-  }, [vendor]); // This useEffect depends on the vendor state being updated
+  }, [vendor]);
 
   useEffect(() => {
     const vendorScrollElement = document.querySelector('.vendor-scroll');
@@ -56,10 +51,12 @@ const ViewVendor = ({ vendorId, onClose }) => {
     };
 
     const handleEscKey = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && !selectedPost) { // Only close if no post is selected
         onClose();
+      } else if (event.key === 'Escape' && selectedPost) { // Close the post view if one is selected
+        setSelectedPost(null);
       }
-    };
+    };    
 
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscKey);
@@ -71,7 +68,7 @@ const ViewVendor = ({ vendorId, onClose }) => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscKey);
     };
-  }, [onClose]);
+  }, [onClose, selectedPost]);
 
   if (!vendorId) {
     return <div>Error: No vendor ID provided.</div>;
@@ -81,13 +78,27 @@ const ViewVendor = ({ vendorId, onClose }) => {
     return <div>Loading...</div>;
   }
 
-  const { name, description, category, location, vendorphoto, instagram_username } = vendor;
-
-  console.log("Vendor ID:", vendorId); // Log vendor ID to see which vendor is being displayed
-  console.log("Fetched Vendor Data:", vendor); // Log complete vendor object
-  console.log("Instagram Username:", instagram_username); // Log specific instagram_username
+  const { name, description, category, location, vendorphoto } = vendor;
 
   const vendorPhoto = vendorphoto ? `http://localhost:5000${vendorphoto}` : `${process.env.PUBLIC_URL}/images/placeholder.png`;
+
+  const getMediaPath = (filename) => {
+    if (!filename) return '';
+    if (filename.endsWith('.mp4')) {
+      return `http://localhost:5000/downloads/videos/${filename}`;
+    } else if (filename.includes('thumbnail')) {
+      return `http://localhost:5000/downloads/videos/thumbnails/${filename}`;
+    } else {
+      return `http://localhost:5000/downloads/photos/${filename}`;
+    }
+  };
+
+  // Function to get the first hashtag from the caption
+  const getFirstHashtag = (caption) => {
+    if (!caption) return '';
+    const hashtags = caption.match(/#[\w]+/g); // Match all hashtags
+    return hashtags ? hashtags[0] : ''; // Return the first hashtag if available
+  };
 
   const renderDescriptionWithLineBreaks = (text) => {
     return text.split('\n').map((line, index) => (
@@ -98,9 +109,13 @@ const ViewVendor = ({ vendorId, onClose }) => {
     ));
   };
 
+  const handlePostClick = (post) => {
+    setSelectedPost(post); // Set the selected post
+  };
+
   const modalContent = (
     <div className="view-vendor-modal">
-      <div className="view-vendor-content" ref={modalRef}>
+      <div className={`view-vendor-content ${selectedPost ? 'blurred' : ''}`} ref={modalRef}>
         <button className="view-vendor-close-button" onClick={onClose}>X</button>
         <h2 className="view-vendor-title">{name}</h2>
         <img
@@ -121,42 +136,61 @@ const ViewVendor = ({ vendorId, onClose }) => {
           {renderDescriptionWithLineBreaks(description)}
         </div>
 
-        {/* Display Instagram Username */}
-        {instagram_username ? (
-          <div className="view-vendor-social">
-            <p className="view-vendor-instagram">Instagram: @{instagram_username}</p>
-          </div>
-        ) : (
-          <p>No Instagram username provided.</p>
-        )}
-
-        {/* Social Media Posts Section */}
         {socialMediaPosts.length > 0 ? (
           <div className="view-vendor-social-media">
-            <h3>Latest Social Media Posts</h3>
+            <h3>Last 3 Instagram Posts</h3>
             <div className="view-vendor-posts-grid">
-              {socialMediaPosts.map((post, index) => (
-                <div key={index} className="view-vendor-post-card">
-                  {post.media_url && (
-                    <img
-                      src={`http://localhost:5000/downloads/photos/${post.media_url.split(',')[0]}`} // Display the first image
-                      alt={post.caption}
-                      className="view-vendor-post-image"
-                      onError={(e) => console.error('Error loading image:', e)}
-                    />
-                  )}
-                  <p className="view-vendor-post-caption">
-                    {post.caption ? post.caption.slice(0, 100) + '...' : ''}
-                  </p>
-                  <p className="view-vendor-post-timestamp">
-                    {new Date(post.timestamp).toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
+              {socialMediaPosts.slice(0, 3).map((post, index) => { // Show only the first 3 posts
+                const mediaFiles = post.media_url.split(',');
+                if (post.additional_media_urls) {
+                  mediaFiles.push(...post.additional_media_urls.split(','));
+                }
+
+                return (
+                  <div 
+                    key={index} 
+                    className="view-vendor-post-card" 
+                    onClick={() => handlePostClick(post)} // Handle click to open ViewInstagram
+                  >
+                    {mediaFiles.map((filename, mediaIndex) => (
+                      <div key={mediaIndex} className="view-vendor-media-container">
+                        {filename.endsWith('.mp4') ? (
+                          <video
+                            controls
+                            src={getMediaPath(filename)}
+                            className="view-vendor-post-video"
+                            onError={(e) => console.error('Error loading video:', e)}
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : (
+                          <img
+                            src={getMediaPath(filename)}
+                            alt={post.caption}
+                            className="view-vendor-post-image"
+                            onError={(e) => console.error('Error loading image:', e)}
+                          />
+                        )}
+                      </div>
+                    ))}
+                    <p className="view-vendor-post-caption">
+                      {post.caption ? post.caption.slice(0, 100) + '...' : ''}
+                    </p>
+                    <p className="view-vendor-post-hashtag">
+                      {getFirstHashtag(post.caption)}
+                    </p>
+                    <p className="view-vendor-post-timestamp">
+                      <span className="view-vendor-click-to-view">Click to view</span>
+                      {' '}
+                      {new Date(post.timestamp).toLocaleDateString()}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ) : (
-          <p>No social media posts available.</p> // Show this if no posts are found
+          <p>No social media posts available.</p>
         )}
       </div>
 
@@ -169,7 +203,18 @@ const ViewVendor = ({ vendorId, onClose }) => {
     </div>
   );
 
-  return ReactDOM.createPortal(modalContent, document.body);
+  return ReactDOM.createPortal(
+    <>
+      {modalContent}
+      {selectedPost && (
+        <ViewInstagram
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+        />
+      )}
+    </>,
+    document.body
+  );
 };
 
 export default ViewVendor;
