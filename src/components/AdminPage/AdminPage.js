@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import Tools from '../Tools/Tools';
 import Status from '../Status/Status';
+import Metrics from '../Metrics/Metrics';
 import './AdminPage.css';
 
 const AdminPage = () => {
@@ -9,6 +10,7 @@ const AdminPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isToolsOpen, setIsToolsOpen] = useState(false); // State to manage Tools sidebar visibility
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -45,6 +47,10 @@ const AdminPage = () => {
     window.location.href = '/'; // Homepage
   };
 
+  const toggleTools = () => {
+    setIsToolsOpen(!isToolsOpen);
+  };
+
   if (isAuthenticated) {
     return (
       <div className="admin-page">
@@ -57,8 +63,19 @@ const AdminPage = () => {
           </button>
         </div>
         <div className="admin-content">
-          <Tools />
-          <Status />
+          {/* Tools sidebar */}
+          <div className={`tools-sidebar ${isToolsOpen ? 'open' : ''}`}>
+            <Tools />
+          </div>
+          {/* Toggle button for tools sidebar */}
+          <button className="tools-toggle-button" onClick={toggleTools}>
+            {isToolsOpen ? '←' : '→'}
+          </button>
+          {/* Metrics and Status container */}
+          <div className="metrics-status-container">
+            <Metrics />
+            <Status />
+          </div>
         </div>
       </div>
     );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import VendorCard from '../VendorCard/VendorCard';
 import Header from '../Header/Header';
+import ViewVendor from '../ViewVendor/ViewVendor'; // Import ViewVendor component
 import './VendorList.css';
 
 const VendorList = () => {
@@ -50,7 +51,7 @@ const VendorList = () => {
   };
 
   const handleVendorClick = (id) => {
-    setSelectedVendorId(id); // Open ViewVendor with the selected vendor ID
+    setSelectedVendorId(id); // Set selectedVendorId
   };  
 
   const parseLocation = (location) => {
@@ -136,12 +137,20 @@ const VendorList = () => {
                   vendorphoto: vendor.vendorphoto,
                   datecreated: vendor.datecreated,
                 }}
-                onClick={() => handleVendorClick(vendor.id)}
+                onCardClick={handleVendorClick} // Pass handleVendorClick to VendorCard
               />
             ))}
           </div>
           {renderPaginationButtons()}
         </>
+      )}
+
+      {/* Render ViewVendor only when selectedVendorId is set */}
+      {selectedVendorId && (
+        <ViewVendor
+          vendorId={selectedVendorId}
+          onClose={() => setSelectedVendorId(null)}
+        />
       )}
     </div>
   );
