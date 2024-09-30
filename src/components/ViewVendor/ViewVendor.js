@@ -2,35 +2,48 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import VendorMap from '../VendorMap/VendorMap';
-import ViewInstagram from '../ViewInstagram/ViewInstagram'; // Import ViewInstagram component
+import ViewInstagram from '../ViewInstagram/ViewInstagram';
 import './ViewVendor.css';
 
 const ViewVendor = ({ vendorId, onClose }) => {
   const [vendor, setVendor] = useState(null);
   const [showVendorMap, setShowVendorMap] = useState(false);
   const [socialMediaPosts, setSocialMediaPosts] = useState([]);
-  const [selectedPost, setSelectedPost] = useState(null); // State to track selected post
+  const [selectedPost, setSelectedPost] = useState(null);
   const modalRef = useRef(null);
 
-  // Fetch vendor data by ID
+  // Debug: Check if vendorId is being passed correctly
   useEffect(() => {
-    if (vendorId) {
-      axios.get(`http://localhost:5000/api/vendors/${vendorId}`)
-        .then(response => {
-          setVendor(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching vendor data:', error);
-        });
-    }
+    console.log('VendorId received:', vendorId);
   }, [vendorId]);
 
-  // Fetch social media posts if Instagram username is available
+  // Fetch vendor data by ID
   useEffect(() => {
     if (vendor && vendor.instagram_username) {
       axios.get(`http://localhost:5000/api/scraped-posts/${vendor.instagram_username}`)
         .then(response => {
-          setSocialMediaPosts(response.data);
+          if (response.status === 200) {
+            setSocialMediaPosts(response.data);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching social media posts:', error);
+        });
+    }
+  }, [vendor]);  
+
+  // Fetch social media posts if Instagram username is available
+  useEffect(() => {
+    if (vendor && vendor.instagram_username) {
+      console.log(`Fetching social media posts for username: ${vendor.instagram_username}`);
+      axios.get(`http://localhost:5000/api/scraped-posts/${vendor.instagram_username}`)
+        .then(response => {
+          if (response.status === 200) {
+            console.log('Social media posts fetched:', response.data);
+            setSocialMediaPosts(response.data);
+          } else {
+            console.warn('Social media posts not modified (304 status)');
+          }
         })
         .catch(error => {
           console.error('Error fetching social media posts:', error);
@@ -38,12 +51,8 @@ const ViewVendor = ({ vendorId, onClose }) => {
     }
   }, [vendor]);
 
+  // Handle closing the modal on outside click or Escape key press
   useEffect(() => {
-    const vendorScrollElement = document.querySelector('.vendor-scroll');
-    if (vendorScrollElement) {
-      vendorScrollElement.style.animationPlayState = 'paused';
-    }
-
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
         onClose();
@@ -51,25 +60,23 @@ const ViewVendor = ({ vendorId, onClose }) => {
     };
 
     const handleEscKey = (event) => {
-      if (event.key === 'Escape' && !selectedPost) { // Only close if no post is selected
+      if (event.key === 'Escape' && !selectedPost) {
         onClose();
-      } else if (event.key === 'Escape' && selectedPost) { // Close the post view if one is selected
+      } else if (event.key === 'Escape' && selectedPost) {
         setSelectedPost(null);
       }
-    };    
+    };
 
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscKey);
 
     return () => {
-      if (vendorScrollElement) {
-        vendorScrollElement.style.animationPlayState = 'running';
-      }
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscKey);
     };
   }, [onClose, selectedPost]);
 
+  // Render loading indicator if vendor data is not available yet
   if (!vendorId) {
     return <div>Error: No vendor ID provided.</div>;
   }
@@ -93,11 +100,10 @@ const ViewVendor = ({ vendorId, onClose }) => {
     }
   };
 
-  // Function to get the first hashtag from the caption
   const getFirstHashtag = (caption) => {
     if (!caption) return '';
-    const hashtags = caption.match(/#[\w]+/g); // Match all hashtags
-    return hashtags ? hashtags[0] : ''; // Return the first hashtag if available
+    const hashtags = caption.match(/#[\w]+/g);
+    return hashtags ? hashtags[0] : '';
   };
 
   const renderDescriptionWithLineBreaks = (text) => {
@@ -110,7 +116,7 @@ const ViewVendor = ({ vendorId, onClose }) => {
   };
 
   const handlePostClick = (post) => {
-    setSelectedPost(post); // Set the selected post
+    setSelectedPost(post);
   };
 
   const modalContent = (
@@ -123,7 +129,7 @@ const ViewVendor = ({ vendorId, onClose }) => {
           alt={name}
           className="view-vendor-photo"
           onError={(e) => {
-            e.target.src = `${process.env.PUBLIC_URL}/images/placeholder.png`; // Fallback to placeholder image
+            e.target.src = `${process.env.PUBLIC_URL}/images/placeholder.png`;
           }}
         />
         <p className="view-vendor-category">
@@ -140,17 +146,18 @@ const ViewVendor = ({ vendorId, onClose }) => {
           <div className="view-vendor-social-media">
             <h3>Last 3 Instagram Posts</h3>
             <div className="view-vendor-posts-grid">
-              {socialMediaPosts.slice(0, 3).map((post, index) => { // Show only the first 3 posts
+              {socialMediaPosts.slice(0, 3).map((post, index) => {
+                console.log('Rendering post:', post);
                 const mediaFiles = post.media_url.split(',');
                 if (post.additional_media_urls) {
                   mediaFiles.push(...post.additional_media_urls.split(','));
                 }
 
                 return (
-                  <div 
-                    key={index} 
-                    className="view-vendor-post-card" 
-                    onClick={() => handlePostClick(post)} // Handle click to open ViewInstagram
+                  <div
+                    key={index}
+                    className="view-vendor-post-card"
+                    onClick={() => handlePostClick(post)}
                   >
                     {mediaFiles.map((filename, mediaIndex) => (
                       <div key={mediaIndex} className="view-vendor-media-container">

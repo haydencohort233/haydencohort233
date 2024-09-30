@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import './VendorCard.css';
 import ViewVendor from '../ViewVendor/ViewVendor';
 
-const VendorCard = ({ vendor }) => {
+const VendorCard = ({ vendor, onCardClick }) => { // Add onCardClick prop
   const [showModal, setShowModal] = useState(false);
 
   const avatarUrl = vendor.avatar ? `http://localhost:5000${vendor.avatar}` : '/images/avatar.png';
 
   const handleCardClick = () => {
     if (vendor.id) { // Ensure that vendor has an id before opening the modal
+      onCardClick(vendor.id); // Call the onCardClick prop with vendor id
       setShowModal(true);
     } else {
       console.error('Vendor ID is missing. Cannot open the modal.');
@@ -39,7 +40,7 @@ const VendorCard = ({ vendor }) => {
 
   return (
     <>
-      <div className="vendor-card" onClick={handleCardClick}>
+      <div className="vendor-card" onClick={handleCardClick}> {/* Call handleCardClick on click */}
         {isNewVendor() && (
           <div className="new-badge">NEW</div>
         )}
@@ -69,7 +70,8 @@ const VendorCard = ({ vendor }) => {
           vendorId={vendor.id} // Pass vendor.id here
           onClose={() => setShowModal(false)}
         />
-      )}    </>
+      )}
+    </>
   );
 };
 

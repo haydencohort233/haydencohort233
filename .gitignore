@@ -9,6 +9,17 @@
 # production
 /build
 
+# Ignore Python bytecode and cache
+__pycache__/
+*.pyc
+
+# Ignore session files in scraping directory
+/scraping/insta_session
+/scraping/sessions/*
+
+# Ignore other potential session files
+/scraping/deleteddfanaccount
+
 # misc
 .DS_Store
 .env.local

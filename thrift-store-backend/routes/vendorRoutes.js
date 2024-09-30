@@ -41,8 +41,6 @@ router.get('/vendors', vendorsController.getAllVendors);
 router.get('/vendors/:id', vendorsController.getVendorById);
 router.get('/vendors-with-instagram', vendorsController.getVendorsWithInstagram);
 router.get('/featured', vendorsController.getFeaturedVendors);
-router.get('/scraped-posts/:username', vendorsController.getScrapedPostsByUsername);
-router.delete('/vendors/:id', vendorsController.deleteVendor);
 router.post('/vendors', upload.fields([
   { name: 'avatar', maxCount: 1 },
   { name: 'vendorphoto', maxCount: 1 },
@@ -51,6 +49,7 @@ router.put('/vendors/:id', upload.fields([
   { name: 'avatar', maxCount: 1 },
   { name: 'vendorphoto', maxCount: 1 },
 ]), vendorsController.updateVendor);
+router.delete('/vendors/:id', vendorsController.deleteVendor);
 
 // Route to trigger the scraping process
 router.get('/scrape', (req, res) => {
@@ -62,17 +61,6 @@ router.get('/scrape', (req, res) => {
     console.log(`Scraping output: ${stdout}`);
     res.json({ message: 'Scraping completed successfully!' });
   });
-});
-
-// Route for fetching all scraped posts
-router.get('/scraped-posts', async (req, res) => {
-  try {
-    const posts = await query('SELECT * FROM scraped_posts ORDER BY timestamp DESC');
-    res.json(posts);
-  } catch (error) {
-    console.error('Error fetching scraped posts:', error);
-    res.status(500).json({ error: 'Failed to fetch scraped posts' });
-  }
 });
 
 module.exports = router;

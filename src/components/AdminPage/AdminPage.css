@@ -12,74 +12,115 @@
 .admin-content {
   display: flex;
   gap: 20px;
+  position: relative; /* To ensure the sidebar positioning works correctly */
 }
 
-/* Style for buttons */
-.back-to-home-button {
-  padding: 10px 20px;
+/* Tools sidebar */
+.tools-sidebar {
+  max-width: 300px;
+  position: fixed; /* Fix to the left side */
+  left: 0; /* Initially visible on larger screens */
+  top: 80px; /* Adjust this value based on your header height */
+  background: rgba(0, 0, 0, 0.7);
+  height: calc(100vh - 80px); /* Full height minus the header */
+  transition: left 0.3s ease; /* Smooth transition */
+  border-right: 3px solid #000;
+  z-index: 1000; /* Ensure it is above other content */
+  padding: 10px;
+  box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tools-sidebar.open {
+  left: 0; /* Slide into view */
+}
+
+/* Toggle button for tools sidebar */
+.tools-toggle-button {
+  display: none; /* Hidden on larger screens */
+  position: fixed;
+  top: 90px; /* Adjust according to the height of the header */
+  left: 10px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  z-index: 1100; /* Ensure it is above the sidebar */
 }
 
-.back-to-home-button .arrow {
-  font-size: 18px;
-}
-
-.back-to-home-button:hover {
+.tools-toggle-button:hover {
   background-color: #0056b3;
 }
 
-.logout-button {
-  padding: 10px 20px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.logout-button:hover {
-  background-color: #d32f2f;
-}
-
-/* Login page */
-.login-page {
+/* Metrics and Status container */
+.metrics-status-container {
+  margin-left: 320px; /* Space for the sidebar on larger screens */
+  flex-grow: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.metrics-container, .status-container {
   background: linear-gradient(to top left, purple 0%, green 100%);
+  padding: 10px;
+  color: #fff;
+  max-width: 600px;
+  margin: 0 auto;
+  border: 3px solid #fff;
+  margin-top: 24px;
 }
 
-.login-form {
-  background: white;
-  color: #000;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.login-form label {
-  display: block;
+h2, h3 {
+  color: #fff;
+  text-align: center;
   margin-bottom: 10px;
 }
 
-.login-form input {
-  width: 93%;
-  padding: 8px;
-  margin-top: 5px;
-}
-
-.error-message {
-  color: red;
-}
-
-.login-actions {
+.metrics-item, .status-item {
   display: flex;
   justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #fff;
+  font-size: 16px;
+}
+
+.metrics-item span, .status-item span {
+  font-weight: bold;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .admin-content {
+    flex-direction: column; /* Stack content vertically */
+  }
+
+  .tools-sidebar {
+    position: fixed; /* Fix sidebar to the left */
+    width: 250px; /* Smaller width for mobile */
+    left: -260px; /* Hide off-screen */
+    top: 60px; /* Adjust based on your header height */
+    height: calc(100vh - 60px); /* Full height minus header */
+  }
+
+  .tools-sidebar.open {
+    left: 0; /* Slide into view on mobile */
+  }
+
+  .metrics-status-container {
+    margin-left: 0; /* Reset margin */
+    width: 100%; /* Full width */
+  }
+
+  .tools-toggle-button {
+    display: block; /* Show the toggle button on mobile */
+  }
+
+  .metrics-container, .status-container {
+    width: 100%; /* Full width for mobile */
+    padding: 10px;
+  }
 }

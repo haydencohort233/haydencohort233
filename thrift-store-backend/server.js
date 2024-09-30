@@ -3,17 +3,13 @@ const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
 const morgan = require('morgan');
-const db = require('./config/db');
+const { db, query } = require('./config/db'); // Import db and query
 const express = require('express');
 const fs = require('fs');
 const { promisify } = require('util');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
-
-// Promisify db.query for easier async/await usage
-const query = promisify(db.query).bind(db);
 
 // Middleware
 app.use(cors({
@@ -76,6 +72,38 @@ app.get('/downloads/photos/:filename', (req, res) => {
   });
 });
 
+// Metrics endpoint to serve metrics.json
+app.get('/api/metrics', (req, res) => {
+  const metricsFilePath = path.join(__dirname, 'metrics/metrics.json');
+
+  fs.readFile(metricsFilePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading metrics file:', err); // More detailed error logging
+      return res.status(500).json({ error: 'Failed to read metrics file' });
+    }
+
+    try {
+      const metrics = JSON.parse(data);
+      res.json({
+        totalPostsScraped: metrics.total_posts_scraped || 0,
+        totalVendorsScraped: metrics.total_vendors_scraped || 0,
+        lastScrapeTime: metrics.end_time || '',
+        averagePostsPerVendor: metrics.total_vendors_scraped 
+          ? (metrics.total_posts_scraped / metrics.total_vendors_scraped).toFixed(2) 
+          : 0,
+        errorsDuringScraping: metrics.errors_encountered || 0,
+        totalTimeToComplete: metrics.total_time_to_complete || 0,
+        numberOfPostsDownloaded: metrics.number_of_posts_downloaded || 0,
+        scrapingSuccessRate: metrics.scraping_success_rate || 0,
+        vendorWithMaxPosts: metrics.vendor_with_max_posts || { name: 'Unknown', total_posts: 0 },
+        lastScrapingError: metrics.last_scraping_error || 'None'
+      });
+    } catch (parseError) {
+      console.error('Error parsing metrics file:', parseError); // Log parse error
+      res.status(500).json({ error: 'Failed to parse metrics file' });
+    }
+  });
+});
 
 // Routes
 const vendorRoutes = require('./routes/vendorRoutes');
@@ -83,6 +111,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const guestRoutes = require('./routes/guestRoutes');
 const statusRoutes = require('./routes/statusRoutes');
+const instagramRoutes = require('./routes/instagramRoutes');
 
 // Route integrations
 app.use('/api', vendorRoutes);
@@ -90,6 +119,7 @@ app.use('/api', eventRoutes);
 app.use('/api', blogRoutes);
 app.use('/api', guestRoutes);
 app.use('/api', statusRoutes);
+app.use('/api/instagram', instagramRoutes);
 
 // Instagram Route (Ensure `fetchVendorInstagramPosts` is defined and imported)
 app.get('/api/vendors-instagram-posts', async (req, res) => {
