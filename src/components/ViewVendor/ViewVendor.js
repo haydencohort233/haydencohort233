@@ -12,42 +12,33 @@ const ViewVendor = ({ vendorId, onClose }) => {
   const [selectedPost, setSelectedPost] = useState(null);
   const modalRef = useRef(null);
 
-  // Debug: Check if vendorId is being passed correctly
-  useEffect(() => {
-    console.log('VendorId received:', vendorId);
-  }, [vendorId]);
-
   // Fetch vendor data by ID
   useEffect(() => {
-    if (vendor && vendor.instagram_username) {
-      axios.get(`http://localhost:5000/api/scraped-posts/${vendor.instagram_username}`)
+    if (vendorId) {
+      axios.get(`http://localhost:5000/api/vendors/${vendorId}`)
         .then(response => {
           if (response.status === 200) {
-            setSocialMediaPosts(response.data);
+            setVendor(response.data); // Vendor data includes the Instagram username
           }
         })
         .catch(error => {
-          console.error('Error fetching social media posts:', error);
+          console.error('Error fetching vendor data:', error);
         });
     }
-  }, [vendor]);  
+  }, [vendorId]);
 
   // Fetch social media posts if Instagram username is available
   useEffect(() => {
     if (vendor && vendor.instagram_username) {
-      console.log(`Fetching social media posts for username: ${vendor.instagram_username}`);
-      axios.get(`http://localhost:5000/api/scraped-posts/${vendor.instagram_username}`)
-        .then(response => {
-          if (response.status === 200) {
-            console.log('Social media posts fetched:', response.data);
-            setSocialMediaPosts(response.data);
-          } else {
-            console.warn('Social media posts not modified (304 status)');
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching social media posts:', error);
-        });
+      axios.get(`http://localhost:5000/api/instagram/scraped-posts/${vendor.instagram_username}`)
+      .then(response => {
+        if (response.status === 200) {
+          setSocialMediaPosts(response.data);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching social media posts:', error);
+      });    
     }
   }, [vendor]);
 
@@ -76,18 +67,19 @@ const ViewVendor = ({ vendorId, onClose }) => {
     };
   }, [onClose, selectedPost]);
 
-  // Render loading indicator if vendor data is not available yet
+  // Remove "Loading..." from rendering
   if (!vendorId) {
     return <div>Error: No vendor ID provided.</div>;
   }
 
   if (!vendor) {
-    return <div>Loading...</div>;
+    console.log('Pulling vendor data...');
+    return null;
   }
 
   const { name, description, category, location, vendorphoto } = vendor;
 
-  const vendorPhoto = vendorphoto ? `http://localhost:5000${vendorphoto}` : `${process.env.PUBLIC_URL}/images/placeholder.png`;
+  const vendorPhoto = vendorphoto ? `http://localhost:5000${vendorphoto}` : `${process.env.PUBLIC_URL}/images/banner-placeholder.png`;
 
   const getMediaPath = (filename) => {
     if (!filename) return '';
@@ -147,7 +139,6 @@ const ViewVendor = ({ vendorId, onClose }) => {
             <h3>Last 3 Instagram Posts</h3>
             <div className="view-vendor-posts-grid">
               {socialMediaPosts.slice(0, 3).map((post, index) => {
-                console.log('Rendering post:', post);
                 const mediaFiles = post.media_url.split(',');
                 if (post.additional_media_urls) {
                   mediaFiles.push(...post.additional_media_urls.split(','));

@@ -2,13 +2,13 @@ const db = require('../config/db');
 const axios = require('axios');
 const path = require('path');
 const { logAction } = require('../utils/logHelper');
-const { query } = require('../config/db'); // Import the promisified query function
+const { query } = require('../config/db');
 require('dotenv').config();
 
 // 1. Get All Vendors
-const getAllVendors = (req, res) => {
+const getAllVendors = async (req, res) => {
   const sort = req.query.sort || 'asc';
-  let orderByClause = 'name ASC'; // Default sorting order
+  let orderByClause = 'name ASC';
 
   switch (sort) {
     case 'asc':
@@ -28,46 +28,41 @@ const getAllVendors = (req, res) => {
   }
 
   const sqlQuery = `SELECT id, name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated FROM vendorshops ORDER BY ${orderByClause}`;
-  
-  db.query(sqlQuery, (err, results) => {
-    if (err) {
-      console.error('Error fetching vendor data:', err);
-      return res.status(500).json({ error: 'Database query failed' });
-    }
+
+  try {
+    const results = await query(sqlQuery);
     res.json(results);
-  });
+  } catch (err) {
+    console.error('Error fetching vendor data:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
 };
 
 // 2. Get Featured Vendors
-const getFeaturedVendors = (req, res) => {
+const getFeaturedVendors = async (req, res) => {
   const { ids } = req.query;
 
   let sqlQuery = 'SELECT id, name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated FROM vendorshops';
   
-  if (ids) {
-    const idArray = ids.split(',').map(id => parseInt(id, 10));
-    sqlQuery += ' WHERE id IN (?)';
-    db.query(sqlQuery, [idArray], (err, results) => {
-      if (err) {
-        console.error('Error fetching featured vendors:', err);
-        return res.status(500).json({ error: 'Database query failed' });
-      }
+  try {
+    if (ids) {
+      const idArray = ids.split(',').map(id => parseInt(id, 10));
+      sqlQuery += ' WHERE id IN (?)';
+      const results = await query(sqlQuery, [idArray]);
       res.json(results);
-    });
-  } else {
-    sqlQuery += ' ORDER BY RAND() LIMIT 10';
-    db.query(sqlQuery, (err, results) => {
-      if (err) {
-        console.error('Error fetching featured vendors:', err);
-        return res.status(500).json({ error: 'Database query failed' });
-      }
+    } else {
+      sqlQuery += ' ORDER BY RAND() LIMIT 10';
+      const results = await query(sqlQuery);
       res.json(results);
-    });
+    }
+  } catch (err) {
+    console.error('Error fetching featured vendors:', err);
+    res.status(500).json({ error: 'Database query failed' });
   }
 };
 
 // 3. Add Vendor
-const addVendor = (req, res) => {
+const addVendor = async (req, res) => {
   const { name, description, location, category, instagram_username, website_url } = req.body;
 
   const avatarPath = req.files && req.files.avatar ? `/uploads/vendors/${req.files.avatar[0].filename}` : '/public/images/avatar.png';
@@ -79,15 +74,14 @@ const addVendor = (req, res) => {
 
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
-  db.query(sqlQuery, values, (err, results) => {
-    if (err) {
-      console.error('Error adding vendor:', err);
-      return res.status(500).json({ error: 'Database query failed' });
-    }
-
+  try {
+    const results = await query(sqlQuery, values);
     logAction('Vendor Added', name, results.insertId, adminUsername);
     res.status(201).json({ message: 'Vendor added successfully', id: results.insertId });
-  });
+  } catch (err) {
+    console.error('Error adding vendor:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
 };
 
 // 4. Delete Vendor

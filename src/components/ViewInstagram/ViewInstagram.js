@@ -3,7 +3,7 @@ import './ViewInstagram.css';
 
 const ViewInstagram = ({ post, onClose }) => {
   if (!post) {
-    return null; // Return null if there's no post to display
+    return null;
   }
 
   const { username, caption, media_url, timestamp } = post;
