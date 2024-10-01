@@ -1,4 +1,3 @@
-// FeaturedVendors.js
 import React, { useState, useEffect, useCallback } from 'react';
 import VendorCard from '../VendorCard/VendorCard';
 import ViewVendor from '../ViewVendor/ViewVendor';
@@ -12,15 +11,10 @@ const getRandomVendors = (vendors, maxCount) => {
   // Ensure vendors do not repeat consecutively
   while (result.length < maxCount) {
     for (const vendor of shuffled) {
-      // Prevent consecutive duplicates
       if (result.length > 0 && result[result.length - 1].id === vendor.id) continue;
       result.push(vendor);
       if (result.length === maxCount) break;
     }
-  }
-
-  while (result.length < maxCount) {
-    result.push(...shuffled);
   }
 
   return result.slice(0, maxCount);
@@ -55,28 +49,20 @@ const FeaturedVendors = () => {
   // Open the modal and pause the scroll animation
   const handleVendorClick = (vendor) => {
     setSelectedVendor(vendor);
-    document.querySelector('.vendor-scroll').style.animationPlayState = 'paused';
+    const vendorScroll = document.querySelector('.vendor-scroll');
+    if (vendorScroll) {
+      vendorScroll.style.animationPlayState = 'paused'; // Pause scroll
+    }
   };
 
   // Close the modal and resume the scroll animation
   const closeViewVendorModal = useCallback(() => {
     setSelectedVendor(null);
-    document.querySelector('.vendor-scroll').style.animationPlayState = 'running';
+    const vendorScroll = document.querySelector('.vendor-scroll');
+    if (vendorScroll) {
+      vendorScroll.style.animationPlayState = 'running'; // Resume scroll
+    }
   }, []);
-
-  // Window resize event to close modal and resume scroll
-  useEffect(() => {
-    const handleResize = () => {
-      if (selectedVendor) {
-        closeViewVendorModal();
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [selectedVendor, closeViewVendorModal]);
 
   return (
     <div className="featured-vendors">
@@ -90,7 +76,7 @@ const FeaturedVendors = () => {
             <VendorCard 
               key={index} 
               vendor={vendor} 
-              onClick={() => handleVendorClick(vendor)} 
+              onCardClick={() => handleVendorClick(vendor)}
             />
           ))}
         </div>
@@ -98,7 +84,7 @@ const FeaturedVendors = () => {
 
       {selectedVendor && (
         <ViewVendor
-          vendor={selectedVendor}
+          vendorId={selectedVendor.id}
           onClose={closeViewVendorModal}
         />
       )}

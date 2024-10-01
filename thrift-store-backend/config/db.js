@@ -8,6 +8,7 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
   connectTimeout: 10000, // 10 seconds timeout for connection
   acquireTimeout: 10000,  // 10 seconds timeout for acquiring connection
+  charset: 'utf8mb4',
 });
 
 db.connect((err) => {

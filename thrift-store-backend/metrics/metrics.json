@@ -1,11 +1,13 @@
 {
-    "total_posts_scraped": 0,
+    "total_posts_scraped": 20,
     "total_vendors_scraped": 10,
-    "errors_encountered": 1,
-    "posts_skipped": 0,
-    "scraping_time": {},
-    "start_time": "2024-09-27 22:54:33",
-    "end_time": "2024-09-27 22:54:57",
+    "errors_encountered": 0,
+    "posts_skipped": 4,
+    "scraping_time": {
+        "lovemorgue": 968.888153553009
+    },
+    "start_time": "2024-10-01 01:48:26",
+    "end_time": "2024-10-01 02:13:28",
     "total_time_to_complete": 211,
     "number_of_posts_downloaded": 35,
     "scraping_success_rate": 80,

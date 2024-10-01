@@ -41,6 +41,10 @@ router.get('/vendors', vendorsController.getAllVendors);
 router.get('/vendors/:id', vendorsController.getVendorById);
 router.get('/vendors-with-instagram', vendorsController.getVendorsWithInstagram);
 router.get('/featured', vendorsController.getFeaturedVendors);
+router.get('/taken-locations', vendorsController.getTakenLocations);
+
+router.delete('/vendors/:id', vendorsController.deleteVendor);
+
 router.post('/vendors', upload.fields([
   { name: 'avatar', maxCount: 1 },
   { name: 'vendorphoto', maxCount: 1 },
@@ -49,7 +53,6 @@ router.put('/vendors/:id', upload.fields([
   { name: 'avatar', maxCount: 1 },
   { name: 'vendorphoto', maxCount: 1 },
 ]), vendorsController.updateVendor);
-router.delete('/vendors/:id', vendorsController.deleteVendor);
 
 // Route to trigger the scraping process
 router.get('/scrape', (req, res) => {

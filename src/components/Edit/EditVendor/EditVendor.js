@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import './EditVendor.css';
+import locations from '../../Add/AddVendor/locations.json'; // Import the locations list
+import categories from '../../Add/AddVendor/categories.json'; // Import the categories list
 
 const EditVendor = ({ isOpen, onClose }) => {
   const [vendors, setVendors] = useState([]);
@@ -17,6 +19,7 @@ const EditVendor = ({ isOpen, onClose }) => {
   });
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [vendorPhotoPreview, setVendorPhotoPreview] = useState(null);
+  const [takenLocations, setTakenLocations] = useState([]);
   const [error, setError] = useState('');
 
   const resetState = () => {
@@ -43,36 +46,44 @@ const EditVendor = ({ isOpen, onClose }) => {
           console.error('Error fetching vendors:', err.message);
           setError('Failed to load vendors. Please try again.');
         });
+
+      // Fetch taken locations
+      fetch('http://localhost:5000/api/taken-locations')
+        .then(response => response.json())
+        .then(data => setTakenLocations(data))
+        .catch(err => console.error('Error fetching taken locations:', err));
     } else {
       resetState();
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [onClose]);
-
+  // Fetch selected vendor details and ensure UTF-8 handling
   useEffect(() => {
     if (selectedVendorId) {
       fetch(`http://localhost:5000/api/vendors/${selectedVendorId}`)
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then(data => {
-          setVendorData(data);
+          setVendorData({
+            name: data.name || '',
+            description: data.description || '',
+            instagram_username: data.instagram_username || '',
+            website_url: data.website_url || '',
+            location: data.location || '',
+            category: data.category || '',
+            avatar: data.avatar || '',
+            vendorphoto: data.vendorphoto || '',
+          });
           setAvatarPreview(data.avatar);
           setVendorPhotoPreview(data.vendorphoto);
         })
         .catch(err => {
-          console.error('Error fetching vendor data:', err);
+          console.error('Error fetching vendor data:', err.message);
+          setError('Failed to fetch vendor data. Please try again.');
         });
     }
   }, [selectedVendorId]);
@@ -105,9 +116,9 @@ const EditVendor = ({ isOpen, onClose }) => {
     formData.append('category', vendorData.category);
     if (vendorData.avatar) formData.append('avatar', vendorData.avatar);
     if (vendorData.vendorphoto) formData.append('vendorphoto', vendorData.vendorphoto);
-  
-    const adminUsername = Cookies.get('adminUsername'); // Get admin username from cookies
-  
+
+    const adminUsername = Cookies.get('adminUsername');
+
     try {
       const response = await fetch(`http://localhost:5000/api/vendors/${selectedVendorId}`, {
         method: 'PUT',
@@ -116,10 +127,10 @@ const EditVendor = ({ isOpen, onClose }) => {
           'X-Admin-Username': adminUsername,
         },
       });
-  
+
       if (response.ok) {
         console.log(`Vendor updated successfully: ${vendorData.name}`);
-        onClose(); // Close modal
+        onClose();
       } else {
         const errorData = await response.json();
         console.error('Error updating vendor:', errorData);
@@ -130,12 +141,12 @@ const EditVendor = ({ isOpen, onClose }) => {
       setError('Failed to update vendor. Please try again.');
     }
   };
-  
+
   const handleDelete = async (id) => {
     const confirmation = prompt('Are you sure to delete this vendor? Type "DELETE" to confirm.');
     if (confirmation === 'DELETE') {
       const adminUsername = Cookies.get('adminUsername');
-  
+
       try {
         const response = await fetch(`http://localhost:5000/api/vendors/${id}`, {
           method: 'DELETE',
@@ -154,7 +165,7 @@ const EditVendor = ({ isOpen, onClose }) => {
         console.error('Error deleting vendor:', err);
       }
     }
-  };  
+  };
 
   if (!isOpen) return null;
 
@@ -199,11 +210,37 @@ const EditVendor = ({ isOpen, onClose }) => {
             <label className="edit-vendor-label">Website:
               <input type="text" name="website_url" className="edit-vendor-input" placeholder='Insert your Website URL (e.g. www.chasingnostalgia.com)' value={vendorData.website_url} onChange={handleInputChange} />
             </label>
-            <label className="edit-vendor-label">Location:
-              <input type="text" name="location" className="edit-vendor-input" value={vendorData.location} onChange={handleInputChange} required />
+            <label className="add-vendor-label">Location:
+              <select
+                name="location"
+                className="add-vendor-dropdown"
+                value={vendorData.location}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="" disabled>Select a location</option>
+                {locations.map(location => (
+                  <option key={location} value={location} disabled={takenLocations.includes(location)}>
+                    {location}
+                  </option>
+                ))}
+              </select>
             </label>
-            <label className="edit-vendor-label">Category:
-              <input type="text" name="category" className="edit-vendor-input" value={vendorData.category} onChange={handleInputChange} required />
+            <label className="add-vendor-label">Category:
+              <select
+                name="category"
+                className="add-vendor-dropdown"
+                value={vendorData.category}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="" disabled>Select a category</option>
+                {categories.map(category => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
             </label>
             <label className="edit-vendor-label">Avatar:
               <input type="file" name="avatar" className="edit-vendor-input" accept="image/*" onChange={handleFileChange} />

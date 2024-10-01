@@ -12,12 +12,21 @@ const ScrapedPosts = () => {
   const [currentPlayingVideo, setCurrentPlayingVideo] = useState(null);
   const [sortOption, setSortOption] = useState('newest');
   const [filterOption, setFilterOption] = useState('all');
+  const [vendorFilter, setVendorFilter] = useState('all'); // Vendor filter
+  const [availableVendors, setAvailableVendors] = useState([]); // Available vendors
+
+  const fallbackImage = 'http://localhost:5000/downloads/default-placeholder.jpg';
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/instagram/scraped-posts')
       .then(response => {
         console.log("Fetched posts:", response.data);
         setPosts(response.data);
+
+        // Extract unique vendors from posts for the dropdown filter
+        const vendors = [...new Set(response.data.map(post => post.username))];
+        setAvailableVendors(vendors);
+
         const initialIndexes = response.data.reduce((acc, post) => {
           acc[post.post_id] = 0;
           return acc;
@@ -45,14 +54,29 @@ const ScrapedPosts = () => {
     });
   };
 
-  // Filter posts based on the selected option
+  // Filter posts based on selected options (vendor, media type)
   const filterPosts = (posts) => {
-    if (filterOption === 'reels') {
-      return posts.filter(post => post.video_url); // Show only videos
-    } else if (filterOption === 'photos') {
-      return posts.filter(post => !post.video_url); // Show only photos
+    let filteredPosts = posts;
+
+    // Filter by selected vendor
+    if (vendorFilter !== 'all') {
+      filteredPosts = filteredPosts.filter(post => post.username === vendorFilter);
     }
-    return posts; // Show all posts
+
+    // Filter by media type (reels or photos)
+    if (filterOption === 'reels') {
+      return filteredPosts.filter(post => post.video_url); // Show only videos
+    } else if (filterOption === 'photos') {
+      return filteredPosts.filter(post => !post.video_url); // Show only photos
+    }
+    return filteredPosts; // Show all posts
+  };
+
+  // Reset filters back to default
+  const clearFilters = () => {
+    setSortOption('newest');
+    setFilterOption('all');
+    setVendorFilter('all');
   };
 
   // Handle next image in carousel
@@ -124,7 +148,7 @@ const ScrapedPosts = () => {
   return (
     <div className="scraped-posts-container">
       {/* Insert Header Component */}
-      <Header /> {/* This is where the Header component is included */}
+      <Header />
 
       <h1 className="scraped-posts-header">Scraped Instagram Posts</h1>
 
@@ -151,6 +175,25 @@ const ScrapedPosts = () => {
           <option value="reels">🎥 Reels Only</option>
           <option value="photos">📷 Photos Only</option>
         </select>
+
+        {/* Vendor filter dropdown */}
+        <select
+          value={vendorFilter}
+          onChange={(e) => setVendorFilter(e.target.value)}
+          className="scraped-posts-select"
+        >
+          <option value="all">All Vendors</option>
+          {availableVendors.map((vendor, index) => (
+            <option key={index} value={vendor}>
+              {vendor}
+            </option>
+          ))}
+        </select>
+
+        {/* Clear Filters Button */}
+        <button className="clear-filters-button" onClick={clearFilters}>
+          Clear Filters
+        </button>
       </div>
 
       {/* Posts Grid */}
@@ -184,7 +227,7 @@ const ScrapedPosts = () => {
                   {!showVideo[post.post_id] && isCurrentMediaVideo ? (
                     <div className="scraped-posts-thumbnail-container" onClick={() => handlePlayButtonClick(post.post_id)}>
                       <img
-                        src={getMediaPath(currentMedia.replace('.mp4', '_thumbnail.jpg'))} // Display the video thumbnail
+                        src={getMediaPath(currentMedia.replace('.mp4', '_thumbnail.jpg'))}
                         alt={post.caption}
                         className="scraped-posts-post-image"
                         onError={(e) => console.error('Image load error:', e)}
@@ -198,7 +241,7 @@ const ScrapedPosts = () => {
                       <video
                         controls
                         autoPlay
-                        src={getMediaPath(currentMedia)} // Load and autoplay the video
+                        src={getMediaPath(currentMedia)}
                         className="scraped-posts-post-video"
                         onError={(e) => console.error('Video playback error:', e)}
                       >
@@ -223,7 +266,7 @@ const ScrapedPosts = () => {
                 <p className="scraped-posts-caption">
                   {mainCaption.length > 500 ? mainCaption.slice(0, 500) + '...' : mainCaption}
                 </p>
-                <hr className="scraped-posts-divider" /> {/* Divider below caption */}
+                <hr className="scraped-posts-divider" />
                 <p className="scraped-posts-hashtags">
                   {hashtags}
                 </p>
