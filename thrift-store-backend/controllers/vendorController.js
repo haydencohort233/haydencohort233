@@ -164,6 +164,7 @@ const getVendorById = async (req, res) => {
       return res.status(404).json({ message: 'Vendor not found' });
     }
     console.log('Vendor data fetched:', result[0]); // Log the fetched data
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.json(result[0]);
   } catch (error) {
     console.error('Error fetching vendor data:', error);
@@ -184,6 +185,22 @@ const getVendorsWithInstagram = (req, res) => {
   });
 };
 
+// 8. Get all taken locations (new)
+const getTakenLocations = (req, res) => {
+  const query = 'SELECT location FROM vendorshops WHERE location IS NOT NULL';
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching taken locations:', err);
+      return res.status(500).json({ message: 'Error fetching taken locations' });
+    }
+
+    // Map the results to an array of locations
+    const takenLocations = results.map((row) => row.location);
+    res.json(takenLocations);
+  });
+};
+
 // Correctly export all functions
 module.exports = { 
   getAllVendors,
@@ -193,4 +210,5 @@ module.exports = {
   addVendor,
   deleteVendor,
   updateVendor,
+  getTakenLocations
 };

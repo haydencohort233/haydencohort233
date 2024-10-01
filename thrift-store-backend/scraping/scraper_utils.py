@@ -43,7 +43,10 @@ def download_media(url, post_id, media_type="image", is_thumbnail=False, throttl
         folder_path = "thumbnails" if is_thumbnail else "videos" if media_type == "video" else "photos"
         full_path = os.path.join(SCRAPER_CONFIG['download_directory'], folder_path, local_filename)
 
-        # Get the total file size from the response headers
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+
+        # Download the file and throttle based on speed
         total_size = int(response.headers.get('content-length', 0))
         downloaded_size = 0
 
@@ -52,16 +55,16 @@ def download_media(url, post_id, media_type="image", is_thumbnail=False, throttl
                 if chunk:  # Filter out keep-alive chunks
                     f.write(chunk)
                     downloaded_size += len(chunk)
-                    
-                    # Throttle download speed
+                    # Throttle based on download speed
                     time.sleep(len(chunk) / (throttle_speed_kbps * 1024))
-                    
-                    progress_percentage = int((downloaded_size / total_size) * 100)  # Round to nearest integer
-                    logging.info(f"Downloading {media_type} {post_id}: {progress_percentage}% complete", end="\r")
-        
-        logging.info(f"Downloaded {media_type} to {full_path}")  # Log download location
+                    progress_percentage = int((downloaded_size / total_size) * 100)
+                    logging.info(f"Downloading {media_type} {post_id}: {progress_percentage}% complete")
+
+        logging.info(f"Downloaded {media_type} to {full_path}")
         metrics['total_posts_scraped'] += 1
-        return local_filename  # Return only the filename
+
+        return local_filename  # Return only the filename, not the full path
+
     except requests.exceptions.RequestException as e:
         handle_error(e, f"Error downloading {media_type} {url}")
         metrics['errors_encountered'] += 1

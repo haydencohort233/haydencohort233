@@ -51,6 +51,15 @@
   border-radius: 4px;
 }
 
+.add-vendor-dropdown {
+  width: 98.4%;
+  height: 30px;
+  padding: 6px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .add-vendor-textarea {
   height: 80px;
   overflow-y: auto;

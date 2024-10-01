@@ -1,6 +1,8 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import Cookies from 'js-cookie';
 import './AddVendor.css';
+import locations from './locations.json'; // Import the list of locations
+import categories from './categories.json'; // Import the list of categories
 
 const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
   const [vendor, setVendor] = useState({
@@ -12,6 +14,19 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
     vendorphoto: null,
   });
   const [error, setError] = useState(null);
+  const [takenLocations, setTakenLocations] = useState([]);
+
+  // Fetch the taken locations from the backend (assuming you have an API for this)
+  useEffect(() => {
+    fetch('http://localhost:5000/api/taken-locations')
+      .then(response => response.json())
+      .then(data => {
+        setTakenLocations(data); // Assume the API returns an array of taken locations
+      })
+      .catch(error => {
+        console.error('Error fetching taken locations:', error);
+      });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,23 +50,22 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
-  
     formData.append('name', vendor.name);
     formData.append('description', vendor.description);
     formData.append('location', vendor.location);
     formData.append('category', vendor.category);
-  
+
     if (vendor.avatar) {
       formData.append('avatar', vendor.avatar);
     }
-  
+
     if (vendor.vendorphoto) {
       formData.append('vendorphoto', vendor.vendorphoto);
     }
-  
+
     // Get the admin username from cookies
     const adminUsername = Cookies.get('adminUsername');
-  
+
     fetch('http://localhost:5000/api/vendors', {
       method: 'POST',
       body: formData,
@@ -66,16 +80,14 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
         return response.json();
       })
       .then((data) => {
-        // Console log that matches the format
         console.log(`Vendor added: ${vendor.name} (ID: ${data.id})`);
-  
-        onClose(); // Close modal after adding vendor
+        onClose();
       })
       .catch((error) => {
         console.error('Error adding vendor:', error);
         setError('An error occurred while adding the vendor.');
       });
-  };  
+  };
 
   if (!isOpen) return null;
 
@@ -112,25 +124,41 @@ const AddVendor = forwardRef(({ isOpen, onClose }, ref) => {
           </label>
           <label className="add-vendor-label">
             Location:
-            <input
-              type="text"
+            <select
               name="location"
-              className="add-vendor-input"
+              className="add-vendor-dropdown"
               value={vendor.location}
               onChange={handleChange}
               required
-              placeholder="12A"
-            />
+            >
+              <option value="">Vendor Location</option>
+              {locations.map((location) => (
+                <option 
+                  key={location} 
+                  value={location} 
+                  disabled={takenLocations.includes(location)}
+                >
+                  {location} {takenLocations.includes(location) && '(Taken)'}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="add-vendor-label">
             Category:
-            <input
-              type="text"
+            <select
               name="category"
-              className="add-vendor-input"
+              className="add-vendor-dropdown"
               value={vendor.category}
               onChange={handleChange}
-            />
+              required
+            >
+              <option value="">Select Category</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="add-vendor-label">
             Avatar:

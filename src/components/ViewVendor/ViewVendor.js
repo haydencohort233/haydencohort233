@@ -67,7 +67,6 @@ const ViewVendor = ({ vendorId, onClose }) => {
     };
   }, [onClose, selectedPost]);
 
-  // Remove "Loading..." from rendering
   if (!vendorId) {
     return <div>Error: No vendor ID provided.</div>;
   }

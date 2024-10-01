@@ -2,6 +2,7 @@ import os
 import instaloader
 import logging
 import browser_cookie3
+from config import SCRAPER_CONFIG
 from datetime import datetime, timedelta
 
 # Set up paths
@@ -9,15 +10,15 @@ SESSIONS_DIR = os.path.join(os.path.dirname(__file__), 'sessions')
 if not os.path.exists(SESSIONS_DIR):
     os.makedirs(SESSIONS_DIR)
 
-# Check if session file is older than 24 hours
+# Check if session file is older than the configured timeout
 def is_session_expired(session_file):
     if os.path.exists(session_file):
         file_time = datetime.fromtimestamp(os.path.getmtime(session_file))
-        if datetime.now() - file_time > timedelta(hours=24):
-            logging.info("Session expired (older than 24 hours).")
+        if datetime.now() - file_time > timedelta(hours=SCRAPER_CONFIG['session_timeout_hours']):
+            logging.info("Session expired (older than configured timeout).")
             return True
         else:
-            logging.info("Using existing session (valid within 24 hours).")
+            logging.info("Using existing session (within configured timeout).")
             return False
     logging.info("Session file not found, creating a new one.")
     return True
@@ -34,7 +35,7 @@ def load_cookies(loader):
 
 # Create a new session or reuse an existing one based on expiry
 def create_instaloader_session(username, password):
-    # Adjusted part to handle valid session filenames better
+    # Ensure the session filename is properly constructed and sanitized
     sanitized_username = username.replace(":", "_").replace("\\", "_").replace("/", "_")
     session_file = os.path.join(SESSIONS_DIR, f'session_{sanitized_username}.instaloader')
 

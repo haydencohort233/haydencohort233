@@ -1,9 +1,9 @@
-# scraper.py
 import os
 import time
 import random
 import signal
 import sys
+import instaloader
 from datetime import datetime
 from config import SCRAPER_CONFIG
 from session_manager import create_instaloader_session
@@ -13,7 +13,7 @@ from metrics import metrics, save_metrics
 from usernames import usernames
 from logger import configure_logger
 from cleanup import cleanup_old_files
-from error_utils import handle_error  # Import the generic error handler
+from error_utils import handle_error
 
 # Configure logging
 logger = configure_logger()
@@ -61,12 +61,20 @@ except Exception as e:
     handle_error(e, "Critical error connecting to the database or checking its integrity")
     sys.exit(1)  # Exit if the database connection fails
 
+# Function to throttle downloads based on speed
+def throttle_download(download_size_kb):
+    speed_in_seconds = download_size_kb / SCRAPER_CONFIG['throttle_speed_kbps']
+    logger.info(f"Throttling download, waiting {speed_in_seconds:.2f} seconds.")
+    time.sleep(speed_in_seconds)
+
 # Function to scrape posts from a specific user
-def scrape_user_posts(username):
+def scrape_user_posts(loader, username):
     logger.info(f"Scraping posts for user: {username}")
     global metrics
     global critical_error_occurred
     start_time = time.time()  # Start timer for this user
+
+    profile = instaloader.Profile.from_username(loader.context, username)
 
     try:
         if check_ip_ban():
@@ -92,9 +100,6 @@ def scrape_user_posts(username):
 
         successful_scrapes = 0  # Track the number of successful scrapes for the vendor
 
-        # Load the Instagram profile
-        profile = instaloader.Profile.from_username(loader.context, username)
-
         # Iterate through posts and save them to the database
         for index, post in enumerate(profile.get_posts()):
             if successful_scrapes >= SCRAPER_CONFIG['max_posts_per_vendor']:
@@ -109,7 +114,6 @@ def scrape_user_posts(username):
 
             # Handle multiple images (carousel)
             if post.typename == "GraphSidecar":
-                # Convert the generator to a list and download the first MAX_PHOTOS
                 resources = list(post.get_sidecar_nodes())
                 media_urls = []
                 for resource_index, resource in enumerate(resources[:SCRAPER_CONFIG['max_photos']]):
@@ -120,32 +124,32 @@ def scrape_user_posts(username):
                         continue
                     media_urls.append(filename)
 
-                # Insert post into the database with comma-separated filenames for multiple images
+                    # Throttle after downloading each media
+                    throttle_download(os.path.getsize(filename) / 1024)
+
                 cursor.execute("""
                     INSERT IGNORE INTO scraped_posts (username, post_id, caption, media_url, timestamp, scrape_date)
                     VALUES (%s, %s, %s, %s, %s, %s)
                 """, (
                     username,
-                    post.shortcode,  # post_id
+                    post.shortcode,
                     post.caption,
-                    ','.join(media_urls),  # Store comma-separated filenames for multiple images
+                    ','.join(media_urls),
                     post.date,
                     datetime.now()
                 ))
                 db.commit()
-                successful_scrapes += 1  # Increment successful scrapes counter
+                successful_scrapes += 1
 
             elif post.is_video:
-                # Download the thumbnail first to the THUMBNAILS_DIR directory
                 thumbnail_filename = download_media(post.url, f"{post.shortcode}_thumbnail", media_type="image", is_thumbnail=True)
-
                 if not thumbnail_filename:
                     logger.info(f"Failed to download thumbnail for {post.shortcode}. Skipping video download.")
                     metrics['errors_encountered'] += 1
                     continue
 
-                # If thumbnail download is successful, download the video
                 video_filename = download_media(post.video_url, post.shortcode, media_type="video")
+                throttle_download(os.path.getsize(video_filename) / 1024)
 
                 if video_filename:
                     cursor.execute("""
@@ -153,56 +157,65 @@ def scrape_user_posts(username):
                         VALUES (%s, %s, %s, %s, %s, %s, %s)
                     """, (
                         username,
-                        post.shortcode,  # post_id
+                        post.shortcode,
                         post.caption,
-                        thumbnail_filename,  # Store the thumbnail filename in media_url
+                        thumbnail_filename,
                         post.date,
                         datetime.now(),
-                        video_filename  # Store the video filename in video_url
+                        video_filename
                     ))
                     db.commit()
-                    successful_scrapes += 1  # Increment successful scrapes counter
+                    successful_scrapes += 1
 
             else:
-                # For single image posts, download the image
                 filename = download_media(post.url, post.shortcode, media_type="image")
+                throttle_download(os.path.getsize(filename) / 1024)
+
                 if not filename:
                     metrics['errors_encountered'] += 1
                     continue
-                # Insert single image post into the database
+
                 cursor.execute("""
                     INSERT IGNORE INTO scraped_posts (username, post_id, caption, media_url, timestamp, scrape_date)
                     VALUES (%s, %s, %s, %s, %s, %s)
                 """, (
                     username,
-                    post.shortcode,  # post_id
+                    post.shortcode,
                     post.caption,
-                    filename,  # Store only the filename
+                    filename,
                     post.date,
                     datetime.now()
                 ))
                 db.commit()
-                successful_scrapes += 1  # Increment successful scrapes counter
+                successful_scrapes += 1
 
             # Handle rate limiting after each post
             handle_rate_limit()
 
         logger.info(f"Finished scraping {username}")
-        metrics['scraping_time'][username] = time.time() - start_time  # Store scraping time for this user
+        metrics['scraping_time'][username] = time.time() - start_time
 
     except Exception as e:
         handle_error(e, f"Critical error while scraping user {username}")
-        critical_error_occurred = True  # Set critical error flag to true
-        graceful_shutdown(signal.SIGTERM, None)  # Gracefully shutdown on critical error
+        critical_error_occurred = True
+        graceful_shutdown(signal.SIGTERM, None)
         metrics['errors_encountered'] += 1
+
+# Scrape user posts with retry logic
+def scrape_with_retry(username):
+    try:
+        scrape_user_posts(loader, username)  # Try the scrape
+    except Exception as e:
+        # Use retry logic from handle_error, passing scrape_user_posts as the operation
+        handle_error(e, lambda: scrape_user_posts(loader, username), "Error during scraping posts")
 
 # Start scraping for each user
 for i, user in enumerate(usernames):
-    scrape_user_posts(user)
-    
+    scrape_with_retry(user)
+
     # Check if more users are left before adding delay
     if i < len(usernames) - 1:
-        delay = random.randint(60, 120)  # Random delay between 1 and 2 minutes
+        delay = random.randint(*SCRAPER_CONFIG['delay_between_requests'])  # Random delay from config
         logger.info(f"Waiting for {delay} seconds before scraping the next user...")
         time.sleep(delay)
 
