@@ -122,7 +122,8 @@ app.use('/api', statusRoutes);
 app.use('/api/instagram', instagramRoutes);
 
 // Instagram Route (Ensure `fetchVendorInstagramPosts` is defined and imported)
-app.get('/api/vendors-instagram-posts', async (req, res) => {
+// Instagram Route: Fetch Instagram posts for selected vendors (callback-based)
+app.get('/api/vendors-instagram-posts', (req, res) => {
   const { selectedVendors } = req.query;
 
   if (!selectedVendors || selectedVendors.length === 0) {
@@ -131,26 +132,41 @@ app.get('/api/vendors-instagram-posts', async (req, res) => {
 
   const vendorIds = selectedVendors.split(',').map(id => parseInt(id, 10));
 
-  try {
-    const vendors = await query(
-      'SELECT id, name, instagram_username FROM vendorshops WHERE id IN (?) AND instagram_username IS NOT NULL AND instagram_username != ""',
-      [vendorIds]
-    );
+  // Use callback-based query for consistency
+  db.query(
+    'SELECT id, name, instagram_username FROM vendorshops WHERE id IN (?) AND instagram_username IS NOT NULL AND instagram_username != ""',
+    [vendorIds],
+    (err, vendors) => {
+      if (err) {
+        console.error('Error fetching vendors:', err);
+        return res.status(500).json({ message: 'Error fetching vendors' });
+      }
 
-    const vendorPostsPromises = vendors.map(async (vendor) => {
-      const posts = await fetchVendorInstagramPosts(vendor.instagram_username);
-      return {
-        vendor: vendor.name,
-        posts: posts || [],
-      };
-    });
+      const vendorPostsPromises = vendors.map((vendor) => {
+        return new Promise((resolve, reject) => {
+          fetchVendorInstagramPosts(vendor.instagram_username)
+            .then((posts) => {
+              resolve({
+                vendor: vendor.name,
+                posts: posts || [],
+              });
+            })
+            .catch((error) => {
+              console.error('Error fetching Instagram posts:', error);
+              reject({ vendor: vendor.name, posts: [] });
+            });
+        });
+      });
 
-    const vendorPosts = await Promise.all(vendorPostsPromises);
-    res.json(vendorPosts);
-  } catch (error) {
-    console.error('Error fetching vendor Instagram posts:', error);
-    res.status(500).json({ message: 'Error fetching vendor Instagram posts' });
-  }
+      // Handle all promises
+      Promise.all(vendorPostsPromises)
+        .then((vendorPosts) => res.json(vendorPosts))
+        .catch((error) => {
+          console.error('Error in vendor posts promises:', error);
+          res.status(500).json({ message: 'Error fetching vendor Instagram posts' });
+        });
+    }
+  );
 });
 
 // Status route
@@ -173,30 +189,27 @@ app.get('/api/status', (req, res) => {
 
     statusData.dbStatus = true;
 
-    query('SELECT SUM(data_length + index_length) AS size FROM information_schema.tables WHERE table_schema = ?', [process.env.DB_NAME])
-      .then(result => {
-        if (result && result[0]) {
-          statusData.dbSize = `${(result[0].size / (1024 * 1024)).toFixed(2)} MB`;
+    db.query('SELECT SUM(data_length + index_length) AS size FROM information_schema.tables WHERE table_schema = ?', [process.env.DB_NAME], (err, result) => {
+      if (err || !result[0]) {
+        return res.status(500).json({ error: 'Failed to retrieve database size' });
+      }
+      statusData.dbSize = `${(result[0].size / (1024 * 1024)).toFixed(2)} MB`;
+
+      db.query('SELECT table_name, data_length + index_length AS size FROM information_schema.tables WHERE table_schema = ? ORDER BY size DESC LIMIT 1', [process.env.DB_NAME], (err, largestTableResult) => {
+        if (err || !largestTableResult[0]) {
+          return res.status(500).json({ error: 'Failed to retrieve largest table' });
         }
-        return query('SELECT table_name, data_length + index_length AS size FROM information_schema.tables WHERE table_schema = ? ORDER BY size DESC LIMIT 1', [process.env.DB_NAME]);
-      })
-      .then(largestTableResult => {
-        if (largestTableResult && largestTableResult[0]) {
-          statusData.largestTable = `${largestTableResult[0].table_name} (${(largestTableResult[0].size / (1024 * 1024)).toFixed(2)} MB)`;
-        }
-        return query('SELECT table_name, update_time FROM information_schema.tables WHERE table_schema = ? ORDER BY update_time DESC LIMIT 1', [process.env.DB_NAME]);
-      })
-      .then(recentEntryResult => {
-        if (recentEntryResult && recentEntryResult[0]) {
+        statusData.largestTable = `${largestTableResult[0].table_name} (${(largestTableResult[0].size / (1024 * 1024)).toFixed(2)} MB)`;
+
+        db.query('SELECT table_name, update_time FROM information_schema.tables WHERE table_schema = ? ORDER BY update_time DESC LIMIT 1', [process.env.DB_NAME], (err, recentEntryResult) => {
+          if (err || !recentEntryResult[0]) {
+            return res.status(500).json({ error: 'Failed to retrieve recent entry' });
+          }
           statusData.mostRecentEntry = `${recentEntryResult[0].table_name} (Last updated: ${recentEntryResult[0].update_time})`;
-        }
-        res.setHeader('Content-Type', 'application/json');
-        return res.status(200).json(statusData);
-      })
-      .catch(err => {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to retrieve database status' });
+          res.json(statusData);
+        });
       });
+    });
   });
 });
 

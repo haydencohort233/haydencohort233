@@ -13,14 +13,13 @@ const ScrapedPosts = () => {
   const [sortOption, setSortOption] = useState('newest');
   const [filterOption, setFilterOption] = useState('all');
 
-  // Fetch scraped posts on component mount
   useEffect(() => {
-    axios.get('http://localhost:5000/api/scraped-posts')
+    axios.get('http://localhost:5000/api/instagram/scraped-posts')
       .then(response => {
         console.log("Fetched posts:", response.data);
         setPosts(response.data);
         const initialIndexes = response.data.reduce((acc, post) => {
-          acc[post.post_id] = 0; // Each post starts with the first image or video
+          acc[post.post_id] = 0;
           return acc;
         }, {});
         setCurrentIndex(initialIndexes);
@@ -32,7 +31,7 @@ const ScrapedPosts = () => {
   }, []);
 
   const showMorePosts = () => {
-    setVisiblePosts(visiblePosts + 9); // Show more posts when clicked
+    setVisiblePosts(visiblePosts + 9);
   };
 
   // Sort posts based on the selected option
