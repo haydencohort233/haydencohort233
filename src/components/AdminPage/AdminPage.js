@@ -64,17 +64,16 @@ const AdminPage = () => {
         </div>
         <div className="admin-content">
           {/* Tools sidebar */}
-          <div className={`tools-sidebar ${isToolsOpen ? 'open' : ''}`}>
+          <div className={`tools-sidebar ${isToolsOpen ? 'open' : 'closed'}`}>
             <Tools />
+            <button className="tools-toggle-button" onClick={toggleTools}>
+              {isToolsOpen ? '←' : '→'}
+            </button>
           </div>
-          {/* Toggle button for tools sidebar */}
-          <button className="tools-toggle-button" onClick={toggleTools}>
-            {isToolsOpen ? '←' : '→'}
-          </button>
           {/* Metrics and Status container */}
           <div className="metrics-status-container">
-            <Metrics />
             <Status />
+            <Metrics />
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 /* Events.css */
 .events {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,7 +32,7 @@
 
 .event-item {
   background-color: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid #000000;
   padding: 20px;
   margin-bottom: 20px;
   transition: box-shadow 0.3s ease;
@@ -46,18 +46,19 @@
 .event-title {
   margin: 0 0 10px;
   font-size: 1.5rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .event-date {
   font-size: 1rem;
-  color: #555;
+  color: #ffffff;
   margin: 0 0 10px;
+  text-decoration: underline;
 }
 
 .event-description {
   font-size: 0.95rem;
-  color: #666;
+  color: #ffffff;
   margin: 0 0 10px;
 }
 

@@ -1,29 +1,31 @@
 .status-container {
-    background: linear-gradient(to top left, purple 0%, green 100%);
-    padding: 10px;
-    color: #fff;
-    max-width: 600px;
-    margin: 0 auto;
-    border: 3px solid #fff;
-    height: 365px;
-    margin-top: 24px;
-  }
-  
-  h2, h3 {
-    color: #fff;
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  
-  .status-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #fff;
-    font-size: 16px;
-  }
-  
-  .status-item span {
-    font-weight: bold;
-  }
-  
+  background: linear-gradient(to top left, #d0f4de, #e2f7a9, #c3c9e8); /* Tie-dye pastel effect */
+  padding: 15px;
+  color: #000000;
+  max-width: 600px;
+  margin: 0 auto;
+  border: 3px solid #000;
+  height: 365px;
+  margin-top: 24px;
+  box-shadow: 5px 5px 0px #333333; /* Shadow for 2000s look */
+}
+
+h2, h3 {
+  color: #fff;
+  text-align: center;
+  text-shadow: 1px 1px 0px #000;
+  margin-bottom: 10px;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #fff;
+  font-size: 16px;
+}
+
+.status-item span {
+  font-weight: bold;
+  text-shadow: 1px 1px 0px #000;
+}

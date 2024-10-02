@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import VendorCard from '../VendorCard/VendorCard';
 import Header from '../Header/Header';
-import ViewVendor from '../ViewVendor/ViewVendor'; // Import ViewVendor component
+import ViewVendor from '../ViewVendor/ViewVendor';
+import VendorMap from '../VendorMap/VendorMap';
 import './VendorList.css';
 
 const VendorList = () => {
@@ -12,6 +13,7 @@ const VendorList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [vendorsPerPage, setVendorsPerPage] = useState(20);
   const [selectedVendorId, setSelectedVendorId] = useState(null);
+  const [showVendorMap, setShowVendorMap] = useState(false);
 
   // Detect viewport size and set vendorsPerPage
   useEffect(() => {
@@ -28,6 +30,7 @@ const VendorList = () => {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true);
     fetch(`http://localhost:5000/api/vendors?sort=${sortOrder}`)
       .then((response) => {
         if (!response.ok) {
@@ -50,9 +53,13 @@ const VendorList = () => {
     setSortOrder(event.target.value);
   };
 
-  const handleVendorClick = (id) => {
-    setSelectedVendorId(id); // Set selectedVendorId
-  };  
+  const handleVendorClick = (vendorId) => {
+    setSelectedVendorId(vendorId); // Set vendor ID to open modal
+  };
+
+  const handleOpenVendorMap = () => {
+    setShowVendorMap(true);
+  };
 
   const parseLocation = (location) => {
     const match = location.match(/(\d+)([A-Z]?)/i);
@@ -117,8 +124,18 @@ const VendorList = () => {
           <option value="location">Location</option>
         </select>
       </div>
+
+      {/* Button to open VendorMap */}
+      <button className="open-map-button" onClick={handleOpenVendorMap}>
+        Open Vendor Map
+      </button>
+
       {isLoading ? (
-        <div className="loading-message">Loading vendor data...</div>
+        <img
+          src={`${process.env.PUBLIC_URL}/images/icons/loading.gif`}
+          alt="Loading"
+          className="loading-gif"
+        />
       ) : error ? (
         <div className="error-message">{error}</div>
       ) : (
@@ -148,8 +165,17 @@ const VendorList = () => {
       {/* Render ViewVendor only when selectedVendorId is set */}
       {selectedVendorId && (
         <ViewVendor
-          vendorId={selectedVendorId}
-          onClose={() => setSelectedVendorId(null)}
+          vendorId={selectedVendorId} // Pass the selected vendorId to ViewVendor
+          onClose={() => setSelectedVendorId(null)} // Close modal handler
+        />
+      )}
+
+      {/* Render VendorMap modal */}
+      {showVendorMap && (
+        <VendorMap 
+          location={null}
+          onVendorClick={handleVendorClick} // Ensure correct handler is passed
+          onClose={() => setShowVendorMap(false)}
         />
       )}
     </div>
