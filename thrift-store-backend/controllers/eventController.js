@@ -21,7 +21,7 @@ exports.getUpcomingEvents = (req, res) => {
 
 exports.getAllEvents = (req, res) => {
   const query = `
-    SELECT id, title AS name, date, time, description
+    SELECT id, title AS name, date, time, description, preview_text, photo_url, title_photo
     FROM chasingevents
     ORDER BY date ASC, time ASC`;
 
@@ -36,15 +36,15 @@ exports.getAllEvents = (req, res) => {
 
 exports.addEvent = (req, res) => {
   const { title, date, time, description, preview_text } = req.body;
-  const photoUrl = req.file ? `/uploads/events/${req.file.filename}` : null;
-  const titlePhoto = req.file ? `/uploads/events/${req.file.filename}` : null;
+  const photoUrl = req.files['photo'] ? `/uploads/events/${req.files['photo'][0].filename}` : null;
+  const titlePhoto = req.files['title_photo'] ? `/uploads/events/${req.files['title_photo'][0].filename}` : null;
 
   const query = `
     INSERT INTO chasingevents (title, date, time, description, preview_text, photo_url, title_photo) 
     VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
   const values = [title, date, time, description, preview_text, photoUrl, titlePhoto];
-  
+
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
   db.query(query, values, (err, results) => {
@@ -61,12 +61,17 @@ exports.addEvent = (req, res) => {
 
 exports.updateEvent = (req, res) => {
   const { id } = req.params;
-  const { name, description, date } = req.body;
-  
+  const { name, description, date, time, preview_text } = req.body;
+  const photoUrl = req.files['photo'] ? `/uploads/events/${req.files['photo'][0].filename}` : req.body.photo_url;
+  const titlePhoto = req.files['title_photo'] ? `/uploads/events/${req.files['title_photo'][0].filename}` : req.body.title_photo;
+
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
-  const query = 'UPDATE chasingevents SET title = ?, description = ?, date = ? WHERE id = ?';
-  const values = [name, description, date, id];
+  const query = `
+    UPDATE chasingevents 
+    SET title = ?, description = ?, date = ?, time = ?, preview_text = ?, title_photo = ?, photo_url = ? 
+    WHERE id = ?`;
+  const values = [name, description, date, time, preview_text, titlePhoto, photoUrl, id];
 
   db.query(query, values, (err, results) => {
     if (err) {
@@ -86,7 +91,7 @@ exports.updateEvent = (req, res) => {
 
 exports.getEventById = (req, res) => {
   const { id } = req.params;
-  const query = 'SELECT id, title AS name, description, date, time FROM chasingevents WHERE id = ?';
+  const query = 'SELECT id, title AS name, description, date, time, photo_url, preview_text, title_photo FROM chasingevents WHERE id = ?';
   
   db.query(query, [id], (err, results) => {
     if (err) {

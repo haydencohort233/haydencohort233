@@ -34,11 +34,18 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 } // File size limit (2MB)
 });
 
+// Use upload.fields to handle multiple file uploads
+const uploadFields = upload.fields([
+  { name: 'photo', maxCount: 1 },        // Handles the 'photo' file
+  { name: 'title_photo', maxCount: 1 }   // Handles the 'title_photo' file
+]);
+
 router.get('/events/upcoming', eventController.getUpcomingEvents);
 router.get('/events', eventController.getAllEvents);
-router.post('/events', upload.single('photo'), eventController.addEvent);
-router.patch('/events/:id', eventController.updateEvent);
-router.get('/events/:id', eventController.getEventById);
 
+// Use the new `uploadFields` middleware for handling both files
+router.post('/events', uploadFields, eventController.addEvent);
+router.patch('/events/:id', uploadFields, eventController.updateEvent);
+router.get('/events/:id', eventController.getEventById);
 
 module.exports = router;

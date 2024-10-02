@@ -9,6 +9,9 @@ const EditEvents = ({ isOpen, onClose }) => {
     name: '',
     description: '',
     date: '',
+    preview_text: '',  // Added preview_text
+    title_photo: '',   // Added title_photo
+    photo_url: '',     // Added photo_url for banner images
   });
   const [error, setError] = useState('');
 
@@ -30,7 +33,6 @@ const EditEvents = ({ isOpen, onClose }) => {
           return response.json();
         })
         .then(data => {
-          console.log('Fetched events:', data); // Log the event data
           if (Array.isArray(data)) {
             setEvents(data.sort((a, b) => new Date(a.date) - new Date(b.date)));
           } else {
@@ -38,7 +40,6 @@ const EditEvents = ({ isOpen, onClose }) => {
           }
         })
         .catch(err => {
-          console.error('Error fetching events:', err.message);
           setError('Failed to load events. Please try again.');
         });
     }
@@ -56,13 +57,19 @@ const EditEvents = ({ isOpen, onClose }) => {
         })
         .then(data => {
           if (data) {
-            setEventData(data);
+            setEventData({
+              name: data.name,
+              description: data.description,
+              date: data.date,
+              preview_text: data.preview_text,  // Load preview_text
+              title_photo: data.title_photo,    // Load title_photo
+              photo_url: data.photo_url         // Load photo_url for banner images
+            });
           } else {
             throw new Error('Event data not found');
           }
         })
         .catch(err => {
-          console.error('Error fetching event data:', err);
           setError('Failed to load event data. Please try again.');
         });
     }
@@ -74,6 +81,7 @@ const EditEvents = ({ isOpen, onClose }) => {
     setEventData({ ...eventData, [name]: value });
   };
 
+  // Handle form submission to update the event
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedEventId) return;
@@ -94,19 +102,17 @@ const EditEvents = ({ isOpen, onClose }) => {
         handleClose(); // Close modal after successful update
       } else {
         const errorData = await response.json();
-        console.error('Error updating event:', errorData);
         setError('Failed to update event. Please try again.');
       }
     } catch (err) {
-      console.error('Error updating event:', err);
       setError('Failed to update event. Please try again.');
     }
-  };  
+  };
 
   // Reset the component state when closing
   const handleClose = () => {
     setSelectedEventId(null);
-    setEventData({ name: '', description: '', date: '' }); // Reset event data
+    setEventData({ name: '', description: '', date: '', preview_text: '', title_photo: '', photo_url: '' }); // Reset event data
     setError(''); // Clear any existing errors
     onClose(); // Call parent onClose
   };
@@ -165,6 +171,35 @@ const EditEvents = ({ isOpen, onClose }) => {
                 value={formatDateForInput(eventData.date)}
                 onChange={handleInputChange}
                 required
+              />
+            </label>
+            <label className="edit-event-label">
+              Preview Text:
+              <textarea
+                name="preview_text"
+                className="edit-event-textarea"
+                value={eventData.preview_text || ''}
+                onChange={handleInputChange}
+              />
+            </label>
+            <label className="edit-event-label">
+              Title Photo URL:
+              <input
+                type="text"
+                name="title_photo"
+                className="edit-event-input"
+                value={eventData.title_photo || ''}
+                onChange={handleInputChange}
+              />
+            </label>
+            <label className="edit-event-label">
+              Photo URL:
+              <input
+                type="text"
+                name="photo_url"
+                className="edit-event-input"
+                value={eventData.photo_url || ''}
+                onChange={handleInputChange}
               />
             </label>
             <div className="edit-event-buttons">
