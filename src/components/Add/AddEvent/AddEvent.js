@@ -8,7 +8,9 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
     date: '',
     time: '',
     description: '',
+    preview_text: '',
     photo: null,
+    title_photo: null, // For the title photo field
   });
   const [error, setError] = useState(null);
 
@@ -18,6 +20,7 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
   };
 
   const handleFileChange = (e) => {
+    const { name } = e.target;
     const file = e.target.files[0];
     if (file) {
       const validTypes = ['image/jpeg', 'image/png'];
@@ -25,7 +28,7 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
         setError('Please upload a .jpg or .png file.');
         return;
       }
-      setEvent({ ...event, photo: file });
+      setEvent({ ...event, [name]: file });
       setError(null);
     }
   };
@@ -37,12 +40,16 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
     formData.append('date', event.date);
     formData.append('time', event.time);
     formData.append('description', event.description);
+    formData.append('preview_text', event.preview_text); // Add preview text
     if (event.photo) {
       formData.append('photo', event.photo);
     }
-  
+    if (event.title_photo) {
+      formData.append('title_photo', event.title_photo); // Add title photo
+    }
+
     const adminUsername = Cookies.get('adminUsername'); // Get the admin username from cookies
-  
+
     fetch('http://localhost:5000/api/events', {
       method: 'POST',
       body: formData,
@@ -59,8 +66,8 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
         console.error('Error adding event:', error);
         setError('An error occurred while adding the event.');
       });
-  };  
-  
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -112,8 +119,18 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
               className="add-event-textarea"
               value={event.description}
               onChange={handleChange}
-              placeholder="Event Description (Displays up to 1,000 words)"
+              placeholder="Event Description"
               required
+            />
+          </label>
+          <label className="add-event-label">
+            Preview Text:
+            <textarea
+              name="preview_text"
+              className="add-event-textarea"
+              value={event.preview_text}
+              onChange={handleChange}
+              placeholder="Preview Text (up to 150 characters)"
             />
           </label>
           <label className="add-event-label">
@@ -125,9 +142,16 @@ const AddEvent = forwardRef(({ isOpen, onClose }, ref) => {
               accept=".jpg,.jpeg,.png"
               onChange={handleFileChange}
             />
-            <p className="add-event-file-info">
-              Size limit: 2MB. Accepted formats: .jpg, .jpeg, .png
-            </p>
+          </label>
+          <label className="add-event-label">
+            Title Photo:
+            <input
+              type="file"
+              name="title_photo"
+              className="add-event-input"
+              accept=".jpg,.jpeg,.png"
+              onChange={handleFileChange}
+            />
           </label>
           {error && <p className="add-event-error">{error}</p>}
           <div className="add-event-buttons">

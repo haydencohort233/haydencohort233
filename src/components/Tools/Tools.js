@@ -1,37 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import VendorMap from '../VendorMap/VendorMap';
+import './Tools.css';
+import axios from 'axios';
 import Survey from '../Survey/Survey';
-import AddVendor from '../Add/AddVendor/AddVendor';
+import AddBlog from '../Add/AddBlog/AddBlog';
+import VendorMap from '../VendorMap/VendorMap';
 import AddEvent from '../Add/AddEvent/AddEvent';
 import AddGuest from '../Add/AddGuest/AddGuest';
-import AddBlog from '../Add/AddBlog/AddBlog';
-import EditVendor from '../Edit/EditVendor/EditVendor';
-import EditGuestVendor from '../Edit/EditGuestVendor/EditGuestVendor';
-import EditEvents from '../Edit/EditEvents/EditEvents';
+import ViewVendor from '../ViewVendor/ViewVendor';
+import React, { useState, useEffect } from 'react';
+import AddVendor from '../Add/AddVendor/AddVendor';
 import EditBlog from '../Edit/EditBlogs/EditBlogs';
-import ViewVendor from '../ViewVendor/ViewVendor'; // Import ViewVendor component
-import axios from 'axios';
-import './Tools.css';
+import EditVendor from '../Edit/EditVendor/EditVendor';
+import EditEvents from '../Edit/EditEvents/EditEvents';
+import EditGuestVendor from '../Edit/EditGuestVendor/EditGuestVendor';
 
 const Tools = () => {
-  const [isVendorModalOpen, setVendorModalOpen] = useState(false);
-  const [isSurveyOpen, setIsSurveyOpen] = useState(false);
   const [isMapOpen, setMapOpen] = useState(false);
-  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
-  const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
-  const [isAddBlogModalOpen, setIsAddBlogModalOpen] = useState(false);
-  const [isEditVendorOpen, setEditVendorOpen] = useState(false);
-  const [isEditGuestOpen, setEditGuestOpen] = useState(false);
-  const [isEditEventOpen, setEditEventOpen] = useState(false);
-  const [isEditBlogModalOpen, setIsEditBlogModalOpen] = useState(false);
-  const [selectedBlogId, setSelectedBlogId] = useState(null);
-  const [selectedVendorId, setSelectedVendorId] = useState(null);
-  const [isViewVendorOpen, setViewVendorOpen] = useState(false); // Track ViewVendor state
-  const [selectedGuestId, setSelectedGuestId] = useState(null);
   const [scrapeStatus, setScrapeStatus] = useState('');
   const [backupStatus, setBackupStatus] = useState('');
+  const [isSurveyOpen, setIsSurveyOpen] = useState(false);
+  const [selectedBlogId, setSelectedBlogId] = useState(null);
+  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
+  const [isEditGuestOpen, setEditGuestOpen] = useState(false);
+  const [isEditEventOpen, setEditEventOpen] = useState(false);
+  const [selectedGuestId, setSelectedGuestId] = useState(null);
+  const [isViewVendorOpen, setViewVendorOpen] = useState(false);
+  const [isEditVendorOpen, setEditVendorOpen] = useState(false);
+  const [selectedVendorId, setSelectedVendorId] = useState(null);
+  const [isVendorModalOpen, setVendorModalOpen] = useState(false);
+  const [isAddBlogModalOpen, setIsAddBlogModalOpen] = useState(false);
+  const [isEditBlogModalOpen, setIsEditBlogModalOpen] = useState(false);
 
-  // Function to handle scraping
   const handleScrape = () => {
     setScrapeStatus('Scraping in progress...');
     axios.get('http://localhost:5000/api/scrape')
@@ -84,7 +83,7 @@ const Tools = () => {
     setEditEventOpen(false);
     setIsAddBlogModalOpen(false);
     setIsEditBlogModalOpen(false);
-    setViewVendorOpen(false); // Close ViewVendor when all modals are closed
+    setViewVendorOpen(false);
   };
 
   useEffect(() => {
@@ -101,11 +100,11 @@ const Tools = () => {
     };
   }, []);
 
-  // Handle vendor click for VendorMap
+  // For VendorMap
   const handleVendorClick = (vendorId) => {
     setSelectedVendorId(vendorId);
-    setMapOpen(false); // Optionally close map when a vendor is selected
-    setViewVendorOpen(true); // Open ViewVendor when a vendor is clicked
+    setMapOpen(false);
+    setViewVendorOpen(true);
   };
 
   return (
@@ -137,10 +136,9 @@ const Tools = () => {
             Edit Blogs
           </button>
           
-          {/* Divider */}
           <div className="tools-divider" />
 
-          {/* Bottom Section - Tools */}
+          {/* Dev Tools Section */}
           <button className="view-map-button" onClick={() => setMapOpen(true)}>
             View Vendor Map
           </button>
@@ -162,7 +160,7 @@ const Tools = () => {
       {isMapOpen && (
         <VendorMap
           onClose={() => setMapOpen(false)}
-          onVendorClick={handleVendorClick} // Pass the handleVendorClick function to VendorMap
+          onVendorClick={handleVendorClick}
         />
       )}
       <AddEvent isOpen={isAddEventOpen} onClose={() => setIsAddEventOpen(false)} />
@@ -172,7 +170,7 @@ const Tools = () => {
       <EditVendor
         isOpen={isEditVendorOpen}
         onClose={() => setEditVendorOpen(false)}
-        vendorId={selectedVendorId} // Pass selected vendor ID to EditVendor
+        vendorId={selectedVendorId}
       />
 
       <EditGuestVendor
@@ -189,8 +187,8 @@ const Tools = () => {
 
       {isViewVendorOpen && (
         <ViewVendor
-          vendorId={selectedVendorId} // Pass the selected vendorId to ViewVendor
-          onClose={() => setViewVendorOpen(false)} // Close ViewVendor when finished
+          vendorId={selectedVendorId}
+          onClose={() => setViewVendorOpen(false)}
         />
       )}
     </div>

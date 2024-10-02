@@ -116,6 +116,85 @@
   border: 3px solid #fff;
 }
 
+/* For the login page container */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #ffebcd, #f0e68c, #bdb76b); /* retro gradient */
+  font-family: 'Verdana', sans-serif; /* 2000s font style */
+}
+
+/* Login form styling */
+.login-form {
+  background: linear-gradient(145deg, #fffacd, #ffe4b5); /* slight gradient for the box */
+  padding: 30px;
+  border: 3px solid #000000;
+  box-shadow: 6px 6px 0px #8b4513; /* 2000s shadow effect */
+  width: 350px;
+  text-align: center;
+  border-radius: 10px; /* Adds rounded corners for a softer look */
+}
+
+/* Header for the form */
+.login-form h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #00008b; /* Dark blue */
+  font-weight: bold;
+  text-shadow: 1px 1px 0px #fff;
+}
+
+/* Labels for the input fields */
+.login-form label {
+  display: block;
+  margin: 15px 0 5px;
+  color: #000080;
+  font-size: 14px;
+}
+
+/* Input fields styling */
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #696969;
+  border-radius: 3px;
+  background: linear-gradient(145deg, #f0e68c, #fffacd);
+  color: #000;
+  margin-bottom: 10px;
+}
+
+/* Error message styling */
+.error-message {
+  color: #ff4500;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Action buttons styling */
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.back-to-home-button, .login-button {
+  background: linear-gradient(145deg, #d2691e, #cd853f);
+  color: #ffffff;
+  border: 2px solid #000000;
+  padding: 10px;
+  font-size: 16px;
+  margin: 10px 0;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 5px; /* Rounded buttons */
+}
+
+.back-to-home-button:hover, .login-button:hover {
+  background: linear-gradient(145deg, #a0522d, #8b4513);
+}
+
 /* Responsive layout for Status and Metrics */
 @media (max-width: 768px) {
   .metrics-status-container {
@@ -126,3 +205,4 @@
     width: 100%;
   }
 }
+
