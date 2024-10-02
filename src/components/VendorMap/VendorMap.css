@@ -73,9 +73,34 @@
   z-index: 9999;
 }
 
+.vendor-map-loading {
+  width: 50px;
+  height: 50px;
+  display: block;
+  margin: 100px auto;
+}
+
+.vendor-search-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+/* New Styles for Empty Locations */
+.empty-location {
+  background-color: rgba(0, 255, 0, 0.2); /* Light green for available spots */
+  border-color: rgba(0, 255, 0, 0.5); /* Border to indicate availability */
+  cursor: not-allowed; /* Show that it's not clickable */
+}
+
+.empty-location:hover .vendor-name {
+  display: block; /* Show 'Available' on hover */
+}
+
 @media (min-width: 768px) {
   .vendor-location:hover .vendor-name {
-    display: block; /* Show vendor name on hover for desktop */
+    display: block;
   }
 
   .vendor-location.hovered {

@@ -42,7 +42,7 @@ const VendorCard = ({ vendor, onCardClick }) => { // Add onCardClick prop
     <>
       <div className="vendor-card" onClick={handleCardClick}> {/* Call handleCardClick on click */}
         {isNewVendor() && (
-          <div className="new-badge">NEW</div>
+          <div className="new-badge">NEW VENDOR</div>
         )}
         <img
           src={avatarUrl}

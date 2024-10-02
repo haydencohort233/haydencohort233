@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './ViewInstagram.css';
 
 const ViewInstagram = ({ post, onClose }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   if (!post) {
     return null;
   }
 
-  const { username, caption, media_url, timestamp } = post;
+  const { username, caption, media_url, timestamp, additional_media_urls = '' } = post;
+
+  const mediaFiles = [media_url, ...additional_media_urls.split(',')];
 
   const getMediaPath = (filename) => {
     if (!filename) return '';
@@ -19,7 +23,6 @@ const ViewInstagram = ({ post, onClose }) => {
     }
   };
 
-  // Function to separate hashtags from caption
   const separateHashtags = (caption) => {
     const words = caption.split(' ');
     const mainCaption = words.filter(word => !word.startsWith('#')).join(' ');
@@ -29,17 +32,27 @@ const ViewInstagram = ({ post, onClose }) => {
 
   const { mainCaption, hashtags } = separateHashtags(caption || '');
 
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % mediaFiles.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + mediaFiles.length) % mediaFiles.length);
+  };
+
+  const currentMedia = mediaFiles[currentIndex];
+
   return (
     <div className="view-instagram-modal">
       <div className="view-instagram-content">
         <button className="view-instagram-close-button" onClick={onClose}>X</button>
         <h2 className="view-instagram-username">@{username}</h2>
-        
+
         <div className="view-instagram-media">
-          {media_url.endsWith('.mp4') ? (
+          {currentMedia.endsWith('.mp4') ? (
             <video
               controls
-              src={getMediaPath(media_url)}
+              src={getMediaPath(currentMedia)}
               className="view-instagram-video"
               onError={(e) => console.error('Error loading video:', e)}
             >
@@ -47,11 +60,22 @@ const ViewInstagram = ({ post, onClose }) => {
             </video>
           ) : (
             <img
-              src={getMediaPath(media_url)}
+              src={getMediaPath(currentMedia)}
               alt={caption}
               className="view-instagram-image"
-              onError={(e) => console.error('Error loading image:', e)}
+              onError={(e) => {
+                e.target.src = `${process.env.PUBLIC_URL}/images/placeholders/thumbnail-placeholder.png`;
+              }}
             />
+          )}
+        </div>
+
+        <div className="view-instagram-carousel-controls">
+          {mediaFiles.length > 1 && (
+            <>
+              <button onClick={handlePrev} className="view-instagram-carousel-button left">&lt;</button>
+              <button onClick={handleNext} className="view-instagram-carousel-button right">&gt;</button>
+            </>
           )}
         </div>
 

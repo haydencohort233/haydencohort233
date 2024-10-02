@@ -1,7 +1,6 @@
 .tools {
   display: flex;
   justify-content: space-between;
-  padding: 20px;
   gap: 20px;
 }
 
@@ -158,4 +157,9 @@
   height: 2px;
   background-color: #ccc;
   margin: 6px 0;
+}
+
+.tools-sidebar.open {
+  width: 226px;
+  height: 630px;
 }

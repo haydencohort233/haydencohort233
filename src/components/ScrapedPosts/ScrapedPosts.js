@@ -264,7 +264,7 @@ const ScrapedPosts = () => {
                   )}
                 </div>
                 <p className="scraped-posts-caption">
-                  {mainCaption.length > 500 ? mainCaption.slice(0, 500) + '...' : mainCaption}
+                  {mainCaption.length > 150 ? mainCaption.slice(0, 150) + '...' : mainCaption}
                 </p>
                 <hr className="scraped-posts-divider" />
                 <p className="scraped-posts-hashtags">

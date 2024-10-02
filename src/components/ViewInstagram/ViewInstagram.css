@@ -14,12 +14,12 @@
   }
   
   .view-instagram-content {
-    background: #fff;
+    background: linear-gradient(to top left, purple 0%, rgb(48, 236, 250) 100%);
     padding: 20px;
     max-width: 600px;
     width: 100%;
-    border-radius: 8px;
     position: relative;
+    border: 3px solid #fff;
   }
   
   .view-instagram-close-button {

@@ -1,17 +1,16 @@
 .guest-card {
     display: flex;
     align-items: center;
-    background-color: #f3f3f3;
-    border: 1px solid #ccc;
-    padding: 16px;
+    background: linear-gradient(135deg, #FFDF44, #D979FF);
+    border: 2px solid #ccc;
+    padding: 12px;
     margin: 12px 0;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
   }
   
   .guest-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
   }
   
   .guest-thumbnail img {
@@ -29,18 +28,20 @@
     font-size: 1.2rem;
     margin: 0 0 8px;
     font-weight: bold;
-    color: #333;
+    color: #ffffff;
   }
   
   .guest-description {
     font-size: 0.9rem;
-    color: #666;
+    color: #ffffff !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     margin: 0 0 8px;
   }
   
   .guest-schedule {
     font-size: 0.9rem;
-    color: #555;
+    color: #ffffff !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     margin: 0 0 8px;
   }
   
@@ -62,5 +63,9 @@
     color: #dc3545;
     background-color: #f8d7da;
     border: 1px solid #dc3545;
+  }
+
+  .guest-modal {
+    background-color: #000;
   }
   

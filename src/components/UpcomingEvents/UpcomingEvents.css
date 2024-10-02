@@ -21,8 +21,8 @@
   justify-content: center;
   margin-bottom: 10px;
   padding: 10px;
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
+  border: 3px solid #ffffff !important;
+  background: linear-gradient(145deg, #a1c51c, #85104a);
   transition: box-shadow 0.3s;
   cursor: pointer;
 }
@@ -55,20 +55,21 @@
 .event-details h3 {
   margin: 0;
   font-size: 24px;
-  color: #333;
+  color: #ffffff;
 }
 
 .event-datetime {
   font-size: 15px;
-  color: #444;
+  color: #ffffff !important;
   font-weight: 500;
   margin-top: 2px;
   margin-bottom: 5px;
+  text-decoration: underline;
 }
 
 .preview-text {
   font-size: 16px;
-  color: #000;
+  color: #ffffff;
 }
 
 .error-message {

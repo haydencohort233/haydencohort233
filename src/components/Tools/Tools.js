@@ -1,4 +1,3 @@
-// Tools.js
 import React, { useState, useEffect } from 'react';
 import VendorMap from '../VendorMap/VendorMap';
 import Survey from '../Survey/Survey';
@@ -10,7 +9,8 @@ import EditVendor from '../Edit/EditVendor/EditVendor';
 import EditGuestVendor from '../Edit/EditGuestVendor/EditGuestVendor';
 import EditEvents from '../Edit/EditEvents/EditEvents';
 import EditBlog from '../Edit/EditBlogs/EditBlogs';
-import axios from 'axios'; // Import axios for API requests
+import ViewVendor from '../ViewVendor/ViewVendor'; // Import ViewVendor component
+import axios from 'axios';
 import './Tools.css';
 
 const Tools = () => {
@@ -26,15 +26,15 @@ const Tools = () => {
   const [isEditBlogModalOpen, setIsEditBlogModalOpen] = useState(false);
   const [selectedBlogId, setSelectedBlogId] = useState(null);
   const [selectedVendorId, setSelectedVendorId] = useState(null);
+  const [isViewVendorOpen, setViewVendorOpen] = useState(false); // Track ViewVendor state
   const [selectedGuestId, setSelectedGuestId] = useState(null);
-  const [scrapeStatus, setScrapeStatus] = useState(''); // State for scraping status
-  const [backupStatus, setBackupStatus] = useState(''); // State for backup status
+  const [scrapeStatus, setScrapeStatus] = useState('');
+  const [backupStatus, setBackupStatus] = useState('');
 
   // Function to handle scraping
   const handleScrape = () => {
     setScrapeStatus('Scraping in progress...');
-
-    axios.get('http://localhost:5000/api/scrape') // This endpoint should trigger the Python script
+    axios.get('http://localhost:5000/api/scrape')
       .then(response => {
         setScrapeStatus('Scraping completed successfully!');
       })
@@ -47,7 +47,7 @@ const Tools = () => {
   // Function to perform a manual backup
   const performBackup = () => {
     setBackupStatus('Backup in progress...');
-    axios.get('http://localhost:5000/api/backup') // This endpoint should trigger the backup
+    axios.get('http://localhost:5000/api/backup')
       .then(response => {
         setBackupStatus('Backup completed successfully!');
       })
@@ -84,6 +84,7 @@ const Tools = () => {
     setEditEventOpen(false);
     setIsAddBlogModalOpen(false);
     setIsEditBlogModalOpen(false);
+    setViewVendorOpen(false); // Close ViewVendor when all modals are closed
   };
 
   useEffect(() => {
@@ -99,6 +100,13 @@ const Tools = () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  // Handle vendor click for VendorMap
+  const handleVendorClick = (vendorId) => {
+    setSelectedVendorId(vendorId);
+    setMapOpen(false); // Optionally close map when a vendor is selected
+    setViewVendorOpen(true); // Open ViewVendor when a vendor is clicked
+  };
 
   return (
     <div className="tools">
@@ -146,12 +154,17 @@ const Tools = () => {
             Perform Backup
           </button>
         </div>
-        {scrapeStatus && <p className="scrape-status">{scrapeStatus}</p>} {/* Display Scraping Status */}
-        {backupStatus && <p className="backup-status">{backupStatus}</p>} {/* Display Backup Status */}
+        {scrapeStatus && <p className="scrape-status">{scrapeStatus}</p>}
+        {backupStatus && <p className="backup-status">{backupStatus}</p>}
       </div>
 
       <AddVendor isOpen={isVendorModalOpen} onClose={() => setVendorModalOpen(false)} />
-      {isMapOpen && <VendorMap onClose={() => setMapOpen(false)} />}
+      {isMapOpen && (
+        <VendorMap
+          onClose={() => setMapOpen(false)}
+          onVendorClick={handleVendorClick} // Pass the handleVendorClick function to VendorMap
+        />
+      )}
       <AddEvent isOpen={isAddEventOpen} onClose={() => setIsAddEventOpen(false)} />
       <AddGuest isOpen={isAddGuestOpen} onClose={() => setIsAddGuestOpen(false)} />
       <Survey isOpen={isSurveyOpen} onClose={() => setIsSurveyOpen(false)} />
@@ -159,7 +172,7 @@ const Tools = () => {
       <EditVendor
         isOpen={isEditVendorOpen}
         onClose={() => setEditVendorOpen(false)}
-        vendorId={selectedVendorId}
+        vendorId={selectedVendorId} // Pass selected vendor ID to EditVendor
       />
 
       <EditGuestVendor
@@ -173,6 +186,13 @@ const Tools = () => {
       <AddBlog isOpen={isAddBlogModalOpen} onClose={closeAddBlogModal} />
 
       <EditBlog isOpen={isEditBlogModalOpen} onClose={closeEditBlogModal} />
+
+      {isViewVendorOpen && (
+        <ViewVendor
+          vendorId={selectedVendorId} // Pass the selected vendorId to ViewVendor
+          onClose={() => setViewVendorOpen(false)} // Close ViewVendor when finished
+        />
+      )}
     </div>
   );
 };

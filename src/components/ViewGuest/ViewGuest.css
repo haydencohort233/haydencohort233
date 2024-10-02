@@ -12,7 +12,7 @@
 }
 
 .guest-modal {
-  background: white;
+  background: linear-gradient(135deg, #FF7E79, #FFDF44, #79D4FF);
   padding: 20px;
   border-radius: 8px;
   width: 400px;

@@ -1,68 +1,78 @@
 import React, { useEffect, useRef, useState, forwardRef } from 'react';
 import './VendorMap.css';
+import vendorCoordinates from './vendorCoordinates.json';
 
-const VendorMap = forwardRef(({ location, onClose }, ref) => {
+const VendorMap = forwardRef(({ location, onClose, onVendorClick }, ref) => {
   const mapRef = useRef(null);
   const [vendors, setVendors] = useState([]);
-  const [hoveredVendor, setHoveredVendor] = useState(null); // Track the hovered vendor
+  const [filteredVendors, setFilteredVendors] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [hoveredVendor, setHoveredVendor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Mapping locations to specific coordinates
-  const locationCoordinates = {
-    // Main Building
-    "FRONT": { top: '520px', left: '240px' },
-    "1A": { top: '15px', left: '20px' },
-    "2A": { top: '75px', left: '20px' },
-    "3A": { top: '135px', left: '20px' },
-    "4A": { top: '195px', left: '20px' },
-    "5A": { top: '255px', left: '20px' },
-    "6A": { top: '312px', left: '20px' },
-    "7A": { top: '135px', left: '300px' },
-    "8A": { top: '195px', left: '300px' },
-    "9A": { top: '255px', left: '300px' },
-    "10A": { top: '320px', left: '300px' },
-    "11A": { top: '380px', left: '300px' },
+  const getCoordinates = () => {
+    return isMobile ? vendorCoordinates.smallMapCoordinates : vendorCoordinates.largeMapCoordinates;
   };
 
-  // Fetch vendors data from backend
   useEffect(() => {
-    fetch('http://localhost:5000/api/vendors')
-      .then(response => response.json())
-      .then(data => setVendors(data))
-      .catch(err => console.error('Error fetching vendors:', err));
-  }, []);
-
-  // Highlight location on initial render
-  useEffect(() => {
-    const highlightLocation = () => {
-      if (!mapRef.current) return;
-
-      const selectedSquare = mapRef.current.querySelector(
-        `.vendor-location[data-location="${location}"]`
-      );
-
-      if (selectedSquare) {
-        selectedSquare.classList.add('flashing');
-      }
-
-      // Clean up the flashing effect when the component unmounts
-      return () => {
-        if (selectedSquare) {
-          selectedSquare.classList.remove('flashing');
-        }
-      };
+    const updateSize = () => {
+      setIsMobile(window.innerWidth <= 768);
     };
 
-    highlightLocation();
-  }, [location]);
+    window.addEventListener('resize', updateSize);
+    updateSize(); // Initial check
 
-  // Handle hover state change
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('http://localhost:5000/api/vendors')
+      .then((response) => response.json())
+      .then((data) => {
+        setVendors(data);
+        setFilteredVendors(data); // Initially show all vendors
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching vendors:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  const getVendorByLocation = (location) => {
+    return vendors.find((vendor) => vendor.location === location);
+  };
+
   const handleMouseEnter = (loc) => {
     setHoveredVendor(loc);
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (loc) => {
     setHoveredVendor(null);
   };
+
+  const handleSearchChange = (e) => {
+    const searchValue = e.target.value;
+    setSearchTerm(searchValue);
+
+    const filtered = vendors.filter((vendor) =>
+      vendor.name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredVendors(filtered);
+  };
+
+  // Ensure onVendorClick is defined before calling it
+  const handleVendorClick = (vendorId) => {
+    if (typeof onVendorClick === 'function') {
+      onVendorClick(vendorId);
+    } else {
+      console.error('onVendorClick is not a function');
+    }
+  };
+
+  const coordinates = getCoordinates();
 
   return (
     <div className="vendor-map-modal" ref={ref}>
@@ -71,30 +81,58 @@ const VendorMap = forwardRef(({ location, onClose }, ref) => {
         <button className="close-map-button" onClick={onClose}>
           X
         </button>
-        <img
-          src={process.env.PUBLIC_URL + '/images/vendor-layout.png'}
-          alt="Vendor Layout Map"
-          className="vendor-map-image"
-        />
-        {/* Dynamically add squares based on the location mapping */}
-        {vendors.map(vendor => {
-          const coordinates = locationCoordinates[vendor.location];
-          if (!coordinates) return null; // Skip if no coordinates found for location
+        {loading ? (
+          <img
+            src={process.env.PUBLIC_URL + '/images/icons/loading.gif'}
+            alt="Loading"
+            className="vendor-map-loading"
+          />
+        ) : (
+          <>
+            <input
+              type="text"
+              className="vendor-search-input"
+              placeholder="Search Vendor"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <img
+              src={process.env.PUBLIC_URL + '/images/vendor-layout.png'}
+              alt="Vendor Layout Map"
+              className="vendor-map-image"
+            />
+            {Object.keys(coordinates).map((locationKey) => {
+              const vendor = getVendorByLocation(locationKey);
+              const coords = coordinates[locationKey];
+              
+              // Determine if vendor should flash
+              const isFlashing = vendor && (!location || location === locationKey);
 
-          return (
-            <div
-              key={vendor.id}
-              className={`vendor-location ${hoveredVendor === vendor.location ? 'hovered' : ''}`}
-              data-location={vendor.location}
-              style={{ top: coordinates.top, left: coordinates.left }}
-              onMouseEnter={() => handleMouseEnter(vendor.location)}
-              onMouseLeave={handleMouseLeave}
-            >
-              {/* Display vendor name above the square */}
-              <div className="vendor-name">{vendor.name}</div>
-            </div>
-          );
-        })}
+              return (
+                <div
+                  key={locationKey}
+                  className={`vendor-location ${vendor ? (hoveredVendor === locationKey ? 'hovered' : '') : 'empty-location'} ${isFlashing ? 'flashing' : ''}`}  
+                  data-location={locationKey}
+                  style={{ 
+                    top: coords.top, 
+                    left: coords.left, 
+                    width: coords.width || '90px',
+                    height: coords.height || '50px'
+                  }}
+                  onMouseEnter={() => handleMouseEnter(locationKey)}
+                  onMouseLeave={() => handleMouseLeave(locationKey)}
+                  onClick={() => vendor && handleVendorClick(vendor.id)} // Only clickable if a vendor exists
+                >
+                  {vendor ? (
+                    <div className="vendor-name">{vendor.name}</div>
+                  ) : (
+                    <div className="vendor-name">Available Slot</div>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        )}
       </div>
     </div>
   );

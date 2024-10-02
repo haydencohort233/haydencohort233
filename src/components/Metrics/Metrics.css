@@ -1,16 +1,18 @@
 .metrics-container {
-  background: linear-gradient(to top left, purple 0%, green 100%);
-  padding: 10px;
+  background: linear-gradient(to top left, #fbc2eb, #a6c1ee); /* Soft tie-dye for Metrics */
+  padding: 15px;
   color: #fff;
   max-width: 600px;
   margin: 0 auto;
-  border: 3px solid #fff;
+  border: 3px solid #000;
   margin-top: 24px; /* Aligns with the same margin as Status */
+  box-shadow: 5px 5px 0px #333333; /* Shadow for the retro effect */
 }
 
 .metrics-container h2 {
   color: #fff;
   text-align: center;
+  text-shadow: 1px 1px 0px #000;
   margin-bottom: 10px;
 }
 
@@ -24,4 +26,5 @@
 
 .metric-item span {
   font-weight: bold;
+  text-shadow: 1px 1px 0px #000;
 }

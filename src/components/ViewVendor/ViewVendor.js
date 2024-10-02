@@ -7,7 +7,7 @@ import './ViewVendor.css';
 
 const ViewVendor = ({ vendorId, onClose }) => {
   const [vendor, setVendor] = useState(null);
-  const [showVendorMap, setShowVendorMap] = useState(false);
+  const [showVendorMap, setShowVendorMap] = useState(false); // Controls showing the map
   const [socialMediaPosts, setSocialMediaPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const modalRef = useRef(null);
@@ -18,7 +18,7 @@ const ViewVendor = ({ vendorId, onClose }) => {
       axios.get(`http://localhost:5000/api/vendors/${vendorId}`)
         .then(response => {
           if (response.status === 200) {
-            setVendor(response.data); // Vendor data includes the Instagram username
+            setVendor(response.data); // Vendor data includes Instagram username (if available)
           }
         })
         .catch(error => {
@@ -31,14 +31,14 @@ const ViewVendor = ({ vendorId, onClose }) => {
   useEffect(() => {
     if (vendor && vendor.instagram_username) {
       axios.get(`http://localhost:5000/api/instagram/scraped-posts/${vendor.instagram_username}`)
-      .then(response => {
-        if (response.status === 200) {
-          setSocialMediaPosts(response.data);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching social media posts:', error);
-      });    
+        .then(response => {
+          if (response.status === 200) {
+            setSocialMediaPosts(response.data);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching social media posts:', error);
+        });
     }
   }, [vendor]);
 
@@ -78,33 +78,10 @@ const ViewVendor = ({ vendorId, onClose }) => {
 
   const { name, description, category, location, vendorphoto } = vendor;
 
-  const vendorPhoto = vendorphoto ? `http://localhost:5000${vendorphoto}` : `${process.env.PUBLIC_URL}/images/banner-placeholder.png`;
-
-  const getMediaPath = (filename) => {
-    if (!filename) return '';
-    if (filename.endsWith('.mp4')) {
-      return `http://localhost:5000/downloads/videos/${filename}`;
-    } else if (filename.includes('thumbnail')) {
-      return `http://localhost:5000/downloads/videos/thumbnails/${filename}`;
-    } else {
-      return `http://localhost:5000/downloads/photos/${filename}`;
-    }
-  };
-
-  const getFirstHashtag = (caption) => {
-    if (!caption) return '';
-    const hashtags = caption.match(/#[\w]+/g);
-    return hashtags ? hashtags[0] : '';
-  };
-
-  const renderDescriptionWithLineBreaks = (text) => {
-    return text.split('\n').map((line, index) => (
-      <React.Fragment key={index}>
-        {line}
-        <br />
-      </React.Fragment>
-    ));
-  };
+  // Correct handling for vendor-uploaded banners
+  const vendorPhoto = vendorphoto 
+    ? `http://localhost:5000${vendorphoto}` // No need to prepend /uploads/vendors/, it's already in the database
+    : `${process.env.PUBLIC_URL}/images/placeholders/banner-placeholder-2.png`; // Placeholder for missing vendor photo
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -120,7 +97,7 @@ const ViewVendor = ({ vendorId, onClose }) => {
           alt={name}
           className="view-vendor-photo"
           onError={(e) => {
-            e.target.src = `${process.env.PUBLIC_URL}/images/placeholder.png`;
+            e.target.src = `${process.env.PUBLIC_URL}/images/placeholders/banner-placeholder.png`;
           }}
         />
         <p className="view-vendor-category">
@@ -130,18 +107,27 @@ const ViewVendor = ({ vendorId, onClose }) => {
           </span>
         </p>
         <div className="view-vendor-description">
-          {renderDescriptionWithLineBreaks(description)}
+          {description.split('\n').map((line, index) => (
+            <React.Fragment key={index}>
+              {line}
+              <br />
+            </React.Fragment>
+          ))}
         </div>
 
         {socialMediaPosts.length > 0 ? (
           <div className="view-vendor-social-media">
-            <h3>Last 3 Instagram Posts</h3>
+            <h3>- - - === Latest 3 Instagram Posts === - - -</h3>
             <div className="view-vendor-posts-grid">
               {socialMediaPosts.slice(0, 3).map((post, index) => {
+                // Split media_url by commas
                 const mediaFiles = post.media_url.split(',');
                 if (post.additional_media_urls) {
                   mediaFiles.push(...post.additional_media_urls.split(','));
                 }
+
+                // Only show the first media file in the preview
+                const firstMediaFile = mediaFiles[0];
 
                 return (
                   <div
@@ -149,32 +135,39 @@ const ViewVendor = ({ vendorId, onClose }) => {
                     className="view-vendor-post-card"
                     onClick={() => handlePostClick(post)}
                   >
-                    {mediaFiles.map((filename, mediaIndex) => (
-                      <div key={mediaIndex} className="view-vendor-media-container">
-                        {filename.endsWith('.mp4') ? (
-                          <video
-                            controls
-                            src={getMediaPath(filename)}
-                            className="view-vendor-post-video"
-                            onError={(e) => console.error('Error loading video:', e)}
-                          >
-                            Your browser does not support the video tag.
-                          </video>
-                        ) : (
-                          <img
-                            src={getMediaPath(filename)}
-                            alt={post.caption}
-                            className="view-vendor-post-image"
-                            onError={(e) => console.error('Error loading image:', e)}
-                          />
-                        )}
-                      </div>
-                    ))}
+                    {firstMediaFile.endsWith('.mp4') ? (
+                      <video
+                        controls
+                        src={`http://localhost:5000/downloads/videos/${firstMediaFile}`} // Corrected video path
+                        className="view-vendor-post-video"
+                        onError={(e) => console.error('Error loading video:', e)}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : firstMediaFile.includes('thumbnail') ? (
+                      <img
+                        src={`http://localhost:5000/downloads/videos/thumbnails/${firstMediaFile}`} // Corrected video thumbnail path
+                        alt={post.caption}
+                        className="view-vendor-post-image"
+                        onError={(e) => {
+                          e.target.src = `${process.env.PUBLIC_URL}/images/placeholders/thumbnail-placeholder.png`; // Thumbnail fallback
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={`http://localhost:5000/downloads/photos/${firstMediaFile}`} // Corrected photo path
+                        alt={post.caption}
+                        className="view-vendor-post-image"
+                        onError={(e) => {
+                          e.target.src = `${process.env.PUBLIC_URL}/images/placeholders/thumbnail-placeholder.png`; // Thumbnail fallback
+                        }}
+                      />
+                    )}
                     <p className="view-vendor-post-caption">
                       {post.caption ? post.caption.slice(0, 100) + '...' : ''}
                     </p>
                     <p className="view-vendor-post-hashtag">
-                      {getFirstHashtag(post.caption)}
+                      {post.caption.match(/#[\w]+/) ? post.caption.match(/#[\w]+/)[0] : ''}
                     </p>
                     <p className="view-vendor-post-timestamp">
                       <span className="view-vendor-click-to-view">Click to view</span>
@@ -184,10 +177,39 @@ const ViewVendor = ({ vendorId, onClose }) => {
                   </div>
                 );
               })}
+
+              {/* If there are less than 3 posts, show placeholders */}
+              {socialMediaPosts.length < 3 &&
+                Array.from({ length: 3 - socialMediaPosts.length }).map((_, index) => (
+                  <div key={index} className="view-vendor-post-card">
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/placeholders/post-placeholder.png`}
+                      alt="Post Placeholder"
+                      className="view-vendor-post-image"
+                    />
+                    <p className="view-vendor-post-caption">Placeholder Post</p>
+                  </div>
+                ))
+              }
             </div>
           </div>
         ) : (
-          <p>No social media posts available.</p>
+          <div className="view-vendor-social-media">
+            <h3>Last 3 Instagram Posts</h3>
+            <div className="view-vendor-posts-grid">
+              {/* Show 3 placeholders if no posts are available */}
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="view-vendor-post-card">
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/placeholders/post-placeholder.png`}
+                    alt="Post Placeholder"
+                    className="view-vendor-post-image"
+                  />
+                  <p className="view-vendor-post-caption">No Social Media Posts</p>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 

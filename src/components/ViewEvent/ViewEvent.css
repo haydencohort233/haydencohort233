@@ -12,11 +12,12 @@
   }
   
   .modal-content {
-    background: #fff;
+    background: linear-gradient(to top left, #fbc2eb, #a6c1ee);
     padding: 20px;
     border-radius: 8px;
-    width: 400px;
+    width: 600px;
     max-width: 90%;
+    max-height: 90%;
     text-align: center;
     position: relative;
   }
@@ -32,7 +33,7 @@
   }
   
   .event-image {
-    max-width: 100%;
+    max-width: 60%;
     border-radius: 2px;
     margin-top: 10px;
   }
@@ -45,7 +46,7 @@
 
   .divider {
     border: none;
-    border-top: 4px solid #ccc;
+    border-top: 4px solid #000000;
     margin: 10px 0;
     width: 100%;
   }
