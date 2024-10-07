@@ -21,7 +21,7 @@ exports.getUpcomingEvents = (req, res) => {
 
 exports.getAllEvents = (req, res) => {
   const query = `
-    SELECT id, title AS name, date, time, description, preview_text, photo_url, title_photo
+    SELECT id, title, date, time, description, preview_text, photo_url, title_photo
     FROM chasingevents
     ORDER BY date ASC, time ASC`;
 
@@ -62,8 +62,9 @@ exports.addEvent = (req, res) => {
 exports.updateEvent = (req, res) => {
   const { id } = req.params;
   const { name, description, date, time, preview_text } = req.body;
-  const photoUrl = req.files['photo'] ? `/uploads/events/${req.files['photo'][0].filename}` : req.body.photo_url;
-  const titlePhoto = req.files['title_photo'] ? `/uploads/events/${req.files['title_photo'][0].filename}` : req.body.title_photo;
+
+  const photoUrl = req.files && req.files['photo'] ? `/uploads/events/${req.files['photo'][0].filename}` : req.body.photo_url;
+  const titlePhoto = req.files && req.files['title_photo'] ? `/uploads/events/${req.files['title_photo'][0].filename}` : req.body.title_photo;
 
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
@@ -71,6 +72,7 @@ exports.updateEvent = (req, res) => {
     UPDATE chasingevents 
     SET title = ?, description = ?, date = ?, time = ?, preview_text = ?, title_photo = ?, photo_url = ? 
     WHERE id = ?`;
+
   const values = [name, description, date, time, preview_text, titlePhoto, photoUrl, id];
 
   db.query(query, values, (err, results) => {

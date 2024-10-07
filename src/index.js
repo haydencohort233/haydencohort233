@@ -7,6 +7,8 @@ import VendorList from './components/VendorList/VendorList';
 import Blog from './components/Blog/Blog';
 import AdminPage from './components/AdminPage/AdminPage';
 import ScrapedPosts from './components/ScrapedPosts/ScrapedPosts';
+import Shop from './components/Shop/Shop';
+import PaymentComplete from './components/Shop/PaymentComplete';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -20,6 +22,8 @@ root.render(
         <Route path="/blogs" element={<Blog />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/scraped-posts" element={<ScrapedPosts />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/payment-complete" component={<PaymentComplete />} />
       </Routes>
     </Router>
   </React.StrictMode>

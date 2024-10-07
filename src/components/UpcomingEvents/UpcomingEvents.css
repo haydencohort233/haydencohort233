@@ -1,6 +1,6 @@
 .upcoming-events {
-  min-width: 350px;
-  margin: 0;
+  max-width: 400px;
+  margin: 0 auto;
   padding: 10px;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .event-photo {
-  width: 300px;
+  width: 350px;
   height: 140px;
   background-size: cover;
   background-position: center;

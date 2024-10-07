@@ -1,0 +1,130 @@
+/* Shop-specific layout */
+.shop-page {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.shop-page h1 {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    color: #ffffff;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.shop-page > p {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    color: #ffffff;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    font-size: 1.2em;
+}
+
+.shop-page .event-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.shop-page .event-item {
+    width: 280px;
+    padding: 15px;
+    margin: 15px;
+    background-color: #f9f9f9;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.shop-page .event-item h3 {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.5em;
+    color: #ffffff;
+}
+
+.shop-page .event-item p {
+    color: #ffffff;
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.shop-page .ticket-purchase-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shop-page .quantity-controls {
+    display: flex;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Normal button styling */
+.shop-page .quantity-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect when button is enabled */
+.shop-page .quantity-btn:not(:disabled):hover {
+    background-color: #e05353;
+}
+
+/* Disabled button styling */
+.shop-page .quantity-btn:disabled {
+    color: #adacac;
+    background-color: #727272;
+    cursor: not-allowed; /* Add 'not-allowed' cursor for disabled buttons */
+}
+
+/* Prevent hover styling when disabled */
+.shop-page .quantity-btn:disabled:hover {
+    color: #adacac;
+    background-color: #727272; /* Ensure no color change on hover */
+}
+
+.shop-page .quantity-btn:hover {
+    background-color: #e05353;
+}
+
+.shop-page .quantity {
+    font-size: 1.2em;
+    padding: 0 10px;
+    color: #fff;
+}
+
+.shop-page .buy-ticket-btn {
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.shop-page .buy-ticket-btn:hover {
+    background-color: #16a085;
+}
+
+.shop-page .sold-out-label {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 1.2em;
+}

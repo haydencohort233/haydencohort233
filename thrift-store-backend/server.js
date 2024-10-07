@@ -99,18 +99,19 @@ app.get('/api/metrics', (req, res) => {
         lastScrapingError: metrics.last_scraping_error || 'None'
       });
     } catch (parseError) {
-      console.error('Error parsing metrics file:', parseError); // Log parse error
+      console.error('Error parsing metrics file:', parseError);
       res.status(500).json({ error: 'Failed to parse metrics file' });
     }
   });
 });
 
 // Routes
-const vendorRoutes = require('./routes/vendorRoutes');
-const eventRoutes = require('./routes/eventRoutes');
+const ticketRoutes = require('./routes/ticketRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 const guestRoutes = require('./routes/guestRoutes');
 const statusRoutes = require('./routes/statusRoutes');
+const vendorRoutes = require('./routes/vendorRoutes');
 const instagramRoutes = require('./routes/instagramRoutes');
 
 // Route integrations
@@ -120,14 +121,14 @@ app.use('/api', blogRoutes);
 app.use('/api', guestRoutes);
 app.use('/api', statusRoutes);
 app.use('/api/instagram', instagramRoutes);
+app.use('/api/tickets', ticketRoutes);
 
 // Instagram Route (Ensure `fetchVendorInstagramPosts` is defined and imported)
-// Instagram Route: Fetch Instagram posts for selected vendors (callback-based)
 app.get('/api/vendors-instagram-posts', (req, res) => {
   const { selectedVendors } = req.query;
 
   if (!selectedVendors || selectedVendors.length === 0) {
-    return res.json([]); // Return an empty array if no vendors are selected
+    return res.json([]);
   }
 
   const vendorIds = selectedVendors.split(',').map(id => parseInt(id, 10));
