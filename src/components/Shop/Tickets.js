@@ -1,66 +1,97 @@
 import React, { useState, useEffect } from 'react';
-import BuyTicket from './BuyTicket';  // Import the BuyTicket modal
+import BuyTicket from './BuyTicket';
 import './Tickets.css';
 
-const Tickets = ({ eventId, eventName }) => {
-    const [availableTickets, setAvailableTickets] = useState(0);
+const Tickets = ({ eventId, eventName, eventDate }) => {
+    const [ticketTypes, setTicketTypes] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
-    const [showModal, setShowModal] = useState(false);  // Modal state
+    const [selectedTicketType, setSelectedTicketType] = useState(null);
+    const [showDetails, setShowDetails] = useState(false);
 
-    // Fetch available tickets for the event
+    // Fetch ticket types for the event
     useEffect(() => {
-        const fetchAvailableTickets = async () => {
-            console.log(`Fetching available tickets for event ID: ${eventId}`);
+        console.log('Fetching ticket types for eventId:', eventId); // Debugging statement
 
+        const fetchTicketTypes = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/tickets/availability?eventId=${eventId}&t=${new Date().getTime()}`);
-                console.log('Raw response:', response);  // Log the raw response
-
+                const response = await fetch(`http://localhost:5000/api/tickets/ticket-types?eventId=${eventId}`);
                 const result = await response.json();
-                console.log('Parsed response:', result);  // Log the parsed JSON result
 
-                if (response.ok) {
-                    setAvailableTickets(result.availableTickets);
-                    console.log(`Available tickets: ${result.availableTickets}`);  // Log the number of available tickets
+                console.log('API response:', result); // Debugging statement to log the full response
+
+                if (response.ok && result.tickets) {
+                    setTicketTypes(result.tickets); // Ensure this line uses the correct property name
                 } else {
-                    setErrorMessage(result.message || 'Failed to fetch ticket availability.');
-                    console.log(`Error: ${result.message}`);  // Log the error message
+                    setErrorMessage(result.message || 'Failed to fetch ticket types.');
                 }
+                
             } catch (error) {
-                console.error('Error fetching ticket availability:', error);  // Log any errors
-                setErrorMessage('Error fetching ticket availability.');
+                setErrorMessage('Error fetching ticket types.');
+                console.error('Error fetching ticket types:', error); // Log the error message
             }
         };
 
-        fetchAvailableTickets();
+        if (eventId) {
+            fetchTicketTypes();
+        }
     }, [eventId]);
 
-    // Handle opening the BuyTicket modal
-    const handleBuyTicketsClick = () => {
-        setShowModal(true);
+    const handleTicketClick = (ticketType) => {
+        setSelectedTicketType(ticketType);
+        setShowDetails(true);
     };
 
-    // Handle closing the modal
-    const closeModal = () => {
-        setShowModal(false);
+    const closeDetails = () => {
+        setShowDetails(false);
+        setSelectedTicketType(null);
+    };
+
+    const isPresaleAvailable = (ticketType) => {
+        const currentDate = new Date();
+        const eventDateObj = new Date(eventDate);
+        return ticketType.ticketType.toLowerCase().includes('presale') && currentDate < eventDateObj;
     };
 
     return (
         <div className="ticket-purchase">
-            <h2>Buy Tickets</h2>
+            <h2>{eventName} - {new Date(eventDate).toLocaleDateString()}</h2> {/* Debugging display */}
             {errorMessage ? (
                 <p className="error-message">{errorMessage}</p>
             ) : (
-                <>
-                    <p>{availableTickets} Tickets remaining</p>
-                    <button onClick={handleBuyTicketsClick}>Buy Tickets</button>
-                </>
+                <div className="ticket-list">
+                    {ticketTypes.length > 0 ? (
+                        ticketTypes.map((ticketType) => (
+                            (isPresaleAvailable(ticketType) || !ticketType.ticketType.toLowerCase().includes('presale')) && (
+                                <div key={ticketType.id} className="ticket-bubble" onClick={() => handleTicketClick(ticketType)}>
+                                    <p className="ticket-name">{ticketType.ticketType}</p>
+                                    <p className="ticket-price">${ticketType.price}</p>
+                                </div>
+                            )
+                        ))
+                    ) : (
+                        <p>No ticket types available for this event.</p>
+                    )}
+                </div>
             )}
-            {showModal && (
+
+            {showDetails && selectedTicketType && (
+                <div className={`ticket-details-slide ${showDetails ? 'slide-in' : 'slide-out'}`}>
+                    <div className="event-details">
+                        <h3>{selectedTicketType.ticketType} - ${selectedTicketType.price}</h3>
+                        <p>Available Tickets: {selectedTicketType.availableTickets}</p>
+                        <button className="proceed-button" onClick={() => setShowDetails(false)}>Proceed to Buy</button>
+                        <button className="close-details" onClick={closeDetails}>Close</button>
+                    </div>
+                </div>
+            )}
+
+            {showDetails && selectedTicketType && (
                 <BuyTicket
                     eventId={eventId}
-                    eventName={eventName}  // Pass event name to the modal
-                    onClose={closeModal}  // Pass close handler
+                    eventName={eventName}
+                    ticketType={selectedTicketType}
+                    selectedQuantity={1}
+                    onClose={closeDetails}
                 />
             )}
         </div>

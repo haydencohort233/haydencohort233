@@ -3,6 +3,8 @@ import Cookies from 'js-cookie';
 import Tools from '../Tools/Tools';
 import Status from '../Status/Status';
 import Metrics from '../Metrics/Metrics';
+import Header from '../Header/Header';
+import AddVendor from '../Add/AddVendor/AddVendor';
 import './AdminPage.css';
 
 const AdminPage = () => {
@@ -10,7 +12,8 @@ const AdminPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isToolsOpen, setIsToolsOpen] = useState(false); // State to manage Tools sidebar visibility
+  const [isToolsOpen, setIsToolsOpen] = useState(true);
+  const [isAddVendorOpen, setIsAddVendorOpen] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -44,39 +47,51 @@ const AdminPage = () => {
   };
 
   const handleBackToHome = () => {
-    window.location.href = '/'; // Homepage
+    window.location.href = '/';
   };
 
   const toggleTools = () => {
     setIsToolsOpen(!isToolsOpen);
   };
 
+  const openAddVendorModal = () => {
+    setIsAddVendorOpen(true);
+  };
+
+  const closeAddVendorModal = () => {
+    setIsAddVendorOpen(false);
+  };
+
   if (isAuthenticated) {
     return (
-      <div className="admin-page">
-        <div className="admin-actions">
-          <button className="back-to-home-button" onClick={handleBackToHome}>
-            <span className="arrow">&larr;</span> Back to Home
-          </button>
-          <button className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-        <div className="admin-content">
-          {/* Tools sidebar */}
-          <div className={`tools-sidebar ${isToolsOpen ? 'open' : 'closed'}`}>
-            <Tools />
-            <button className="tools-toggle-button" onClick={toggleTools}>
-              {isToolsOpen ? '←' : '→'}
+      <>
+        <Header />
+        <div className="admin-page">
+          <div className="admin-actions">
+            <button className="back-to-home-button" onClick={handleBackToHome}>
+              <span className="arrow">&larr;</span> Back to Home
+            </button>
+            <button className="logout-button" onClick={handleLogout}>
+              Logout
             </button>
           </div>
-          {/* Metrics and Status container */}
-          <div className="metrics-status-container">
-            <Status />
-            <Metrics />
+          <div className="admin-content">
+            <div className={`tools-sidebar ${isToolsOpen ? 'open' : 'closed'}`}>
+              <Tools openAddVendor={openAddVendorModal} /> {/* Pass the open function to Tools */}
+              <button className="tools-toggle-button" onClick={toggleTools}>
+                {isToolsOpen ? '←' : '→'}
+              </button>
+            </div>
+            <div className="metrics-status-container">
+              <Status />
+              <Metrics />
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* AddVendor Modal */}
+        <AddVendor isOpen={isAddVendorOpen} onClose={closeAddVendorModal} />
+      </>
     );
   }
 

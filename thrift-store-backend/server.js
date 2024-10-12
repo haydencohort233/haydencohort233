@@ -113,6 +113,7 @@ const guestRoutes = require('./routes/guestRoutes');
 const statusRoutes = require('./routes/statusRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
 const instagramRoutes = require('./routes/instagramRoutes');
+const discountRoutes = require('./routes/discountRoutes');
 
 // Route integrations
 app.use('/api', vendorRoutes);
@@ -122,6 +123,7 @@ app.use('/api', guestRoutes);
 app.use('/api', statusRoutes);
 app.use('/api/instagram', instagramRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/discounts', discountRoutes);
 
 // Instagram Route (Ensure `fetchVendorInstagramPosts` is defined and imported)
 app.get('/api/vendors-instagram-posts', (req, res) => {

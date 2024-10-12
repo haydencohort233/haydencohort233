@@ -74,7 +74,7 @@
 }
 
 /* Mobile Design */
-@media (max-width: 900px) {
+@media (max-width: 700px) {
   .header nav {
     display: none;
   }

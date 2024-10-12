@@ -1,0 +1,87 @@
+/* AddTicket.css */
+.add-ticket-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.add-ticket-modal-content {
+    background: linear-gradient(to top left, purple 0%, green 100%);
+    color: #fff;
+    border: 3px solid white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+}
+
+.add-ticket-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+.add-ticket-close-modal {
+    cursor: pointer;
+    font-size: 1.5em;
+    color: red;
+}
+
+.add-ticket-error-message {
+    color: red;
+    margin-bottom: 15px;
+}
+
+.add-ticket-event-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.add-ticket-event-list li {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 5px 0;
+    transition: background-color 0.3s ease;
+}
+
+.add-ticket-event-list li:hover {
+    background-color: #f0f0f0;
+}
+
+.add-ticket-form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.add-ticket-label {
+    margin-bottom: 10px;
+}
+
+.add-ticket-save-button,
+.add-ticket-back-button {
+    padding: 10px 15px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #4caf50;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.add-ticket-save-button:hover,
+.add-ticket-back-button:hover {
+    background-color: #45a049;
+}

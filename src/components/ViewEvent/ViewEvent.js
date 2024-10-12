@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ViewEvent.css';
 
 const ViewEvent = ({ event, onClose }) => {
+  const navigate = useNavigate();
+
   // Function to format time to 10:00AM or 1:00PM
   const formatTime = (time) => {
     const [hours, minutes] = time.split(':');
@@ -40,6 +43,20 @@ const ViewEvent = ({ event, onClose }) => {
     e.target.src = '/images/placeholder.png';
   };
 
+  const handleViewTicketsClick = () => {
+    // Redirect to ViewTickets page with event data
+    navigate('/view-tickets', {
+      state: {
+        eventId: event.id,
+        eventName: event.title,
+        eventDate: event.date,
+        eventTime: event.time,
+        eventDescription: event.description,
+        eventPhoto: event.photo_url,
+      },
+    });
+  };
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -50,7 +67,6 @@ const ViewEvent = ({ event, onClose }) => {
         <p className="event-datetime">
           {new Date(event.date).toLocaleDateString()} at {formatTime(event.time)}
         </p>
-        {/* Divider to separate date/time from description */}
         <hr className="divider" />
         <p>{event.description}</p>
         <img
@@ -59,6 +75,14 @@ const ViewEvent = ({ event, onClose }) => {
           className="event-image"
           onError={handleImageError}
         />
+
+        {event.tickets_enabled === 1 && (
+          <div className="view-tickets-button-container">
+            <button className="view-tickets-button" onClick={handleViewTicketsClick}>
+              View Tickets
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

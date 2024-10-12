@@ -1,10 +1,9 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { db, query } = require('../config/db');
 
-// Fetch all events, including sold-out events but excluding ones without tickets
 exports.getEventsWithTickets = async (req, res) => {
     try {
-        // Using the db.query wrapped in a Promise
+        // Wrap db.query in a Promise
         const queryPromise = (sql, params) => {
             return new Promise((resolve, reject) => {
                 db.query(sql, params, (err, results) => {
@@ -16,61 +15,93 @@ exports.getEventsWithTickets = async (req, res) => {
             });
         };
 
-        // Fetch events from the database where tickets are greater than or equal to 0 (excluding NULL)
-        const rows = await queryPromise(
-            'SELECT id, title, date, time, description, preview_text, tickets FROM chasingevents WHERE tickets IS NOT NULL AND tickets >= 0'
+        // Fetch events that have tickets enabled
+        const events = await queryPromise(
+            'SELECT id, title, date, time, description, preview_text, title_photo, photo_url FROM chasingevents WHERE tickets_enabled = true'
         );
 
-        if (!rows || rows.length === 0) {
-            return res.status(404).json({ message: 'No events with tickets found' });
+
+        if (!events || events.length === 0) {
+            return res.status(404).json({ message: 'No events with tickets enabled found' });
         }
 
-        // Send the rows (events) back as JSON
-        res.status(200).json(rows);
+        // Fetch ticket types for each event
+        for (const event of events) {
+            const ticketTypes = await queryPromise(
+                'SELECT id, ticket_type, ticket_description, price, available_tickets FROM event_ticket_types WHERE event_id = ? AND available_tickets > 0',
+                [event.id]
+            );
+            event.ticketTypes = ticketTypes;
+        }
+
+        res.status(200).json(events);
     } catch (error) {
         console.error('Error fetching events with tickets:', error.message);
         res.status(500).json({ message: `Error fetching events: ${error.message}` });
     }
 };
 
-// Check ticket availability
 exports.checkAvailability = async (req, res) => {
-    const { eventId } = req.query;
+    const { eventId, ticketTypeId } = req.query;
 
-    console.log(`Checking availability for event ID: ${eventId}`);
+    console.log(`Checking availability for event ID: ${eventId}, Ticket Type ID: ${ticketTypeId}`);
 
     try {
-        // Use the custom query function from db.js
-        const rows = await query('SELECT title, tickets FROM chasingevents WHERE id = ?', [eventId]);
+        let availabilityQuery;
+        let queryParams;
+
+        // If a ticket type ID is provided, check availability at the ticket type level
+        if (ticketTypeId) {
+            availabilityQuery = 'SELECT ticket_type, price, available_tickets FROM event_ticket_types WHERE id = ?';
+            queryParams = [ticketTypeId];
+        } else {
+            // If only an event ID is provided, check availability at the event level
+            availabilityQuery = 'SELECT title, tickets_enabled FROM chasingevents WHERE id = ?';
+            queryParams = [eventId];
+        }
+
+        const rows = await query(availabilityQuery, queryParams);
 
         console.log('Rows:', rows);
 
         // If no rows are returned, return a 404
         if (!rows || rows.length === 0) {
-            console.log(`No event found for event ID: ${eventId}`);
-            return res.status(404).json({ message: 'Event not found' });
+            console.log(`No event or ticket type found for the provided ID`);
+            return res.status(404).json({ message: 'Event or ticket type not found' });
         }
 
-        const eventName = rows[0].title;
-        const availableTickets = rows[0].tickets;
-
-        console.log(`Event found: ${eventName}, Tickets available: ${availableTickets}`);
-
-        // Return the event name and available tickets
-        res.status(200).json({ eventName, availableTickets });
+        // Return the event or ticket type name and tickets status
+        res.status(200).json({ ticketsEnabled: rows[0].tickets_enabled, details: rows[0] });
     } catch (error) {
         console.error('Error checking ticket availability:', error.message);
         res.status(500).json({ message: 'Error checking ticket availability', error: error.message });
     }
 };
 
-// Get a specific ticket
+// Get a specific ticket (placeholder)
 exports.getTicket = (req, res) => {
     const { ticketId } = req.params;
     res.status(200).json({ ticketId, message: 'Ticket fetched successfully' });
 };
 
-// Get all tickets
+// Get all tickets (placeholder)
 exports.getAllTickets = (req, res) => {
     res.status(200).json({ message: 'All tickets fetched successfully' });
+};
+
+exports.getTicketsByEventId = async (req, res) => {
+    const { eventId } = req.params;
+    try {
+        const tickets = await query(
+            'SELECT id, ticket_type, ticket_description, price, available_tickets FROM event_ticket_types WHERE event_id = ? AND available_tickets > 0',
+            [eventId]
+        );
+        if (!tickets || tickets.length === 0) {
+            return res.status(404).json({ message: 'No tickets found for the specified event' });
+        }
+        res.status(200).json(tickets);  // Return the array of tickets
+    } catch (error) {
+        console.error('Error fetching tickets by event ID:', error.message);
+        res.status(500).json({ message: 'Error fetching tickets', error: error.message });
+    }
 };

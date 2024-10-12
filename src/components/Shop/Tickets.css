@@ -53,3 +53,39 @@
     font-size: 14px;
     margin-bottom: 10px;
 }
+
+/* Align ticket bubbles to the right */
+.shop-page .event-item {
+    display: flex;
+    justify-content: flex-end; /* Aligns bubbles to the right */
+    position: relative; /* Required for the sliding animation */
+}
+
+.shop-page .ticket-type-item {
+    width: 100%;
+    max-width: 250px;
+    cursor: pointer;
+    transition: transform 0.4s ease-in-out; /* Smooth sliding effect */
+}
+
+/* Add styles for when the event details are visible */
+.shop-page .ticket-type-item.expanded {
+    transform: translateX(-100%); /* Slide the bubble to the left when expanded */
+}
+
+/* Styles for event details when sliding out */
+.shop-page .event-details {
+    display: none; /* Hide by default */
+    width: 100%;
+    max-width: 400px;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin-left: 15px;
+    transition: display 0.4s ease-in-out;
+}
+
+.shop-page .ticket-type-item.expanded + .event-details {
+    display: block; /* Show details when expanded */
+}

@@ -1,127 +1,119 @@
-/* Modal background */
-.buy-ticket-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-}
-
-/* Modal content */
-.buy-ticket-content {
-    background: linear-gradient(to top left, rgba(251, 194, 235, 0.7), rgba(166, 193, 238, 0.8));
-    padding: 30px;
+/* General styling for the checkout page with tie-dye background */
+.buy-ticket-page {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 201, 71, 0.9), /* Warm yellow */
+        rgba(251, 154, 153, 0.9), /* Light pink */
+        rgba(156, 220, 245, 0.9), /* Light blue */
+        rgba(204, 151, 242, 0.9)  /* Soft purple */
+    );
+    background-size: 200% 200%;
+    animation: gradient-animation 15s ease infinite;
     border-radius: 10px;
-    width: 400px;
+    padding: 30px;
+    max-width: 500px;
+    margin: 40px auto;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
-}
-
-.buy-ticket-content h2 {
-    font-family: 'Arial', sans-serif;
-    color: #000000;
-    font-size: 1.8em;
-    margin-bottom: 20px;
-}
-
-.buy-ticket-content p {
     color: #333;
-    font-size: 1.1em;
-    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* Scoped ticket availability text */
-.buy-ticket-content .available-tickets {
-    font-size: 1.2em;
-    margin-bottom: 20px;
-    font-weight: bold;
+/* Smooth animation for a dynamic gradient */
+@keyframes gradient-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
-/* Dynamic ticket colors */
-.buy-ticket-content .tickets-available {
-    color: #2ecc71;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
-}
-
-.buy-ticket-content .tickets-warning {
-    color: #f39c12;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
-}
-
-.buy-ticket-content .tickets-critical {
-    color: #e74c3c;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
-}
-
-/* Input fields */
-.buy-ticket-content .buy-ticket-input {
-    width: 95%;
-    padding: 10px;
-    margin: 10px 0;
+/* Updated layout for ticket items */
+.ticket-item {
+    width: 90%;
+    max-width: 300px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f8f8;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 1.1em;
-    font-family: 'Arial', sans-serif;
+    margin: 5px 0;
 }
 
-/* Stripe CardElement wrapper */
-.buy-ticket-content .card-element {
-    width: 95%;
-    padding: 10px;
-    margin: 15px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    font-family: 'Arial', sans-serif;
+/* Form fields styling aligned vertically */
+.buy-ticket-page .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    margin-top: 20px;
 }
 
-.buy-ticket-content .StripeElement--focus {
-    border-color: #1abc9c;
-}
-
-.buy-ticket-content .StripeElement--invalid {
-    border-color: #e74c3c;
-}
-
-.buy-ticket-content .StripeElement {
+/* Styling for individual input fields */
+.buy-ticket-page input[type="text"],
+.buy-ticket-page input[type="email"],
+.buy-ticket-page input[type="tel"] {
+    width: 80%;
     padding: 12px;
-    font-size: 1.1em;
-    background-color: #fff;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
 }
 
-.buy-ticket-content .buy-ticket-btn {
+/* Credit Card section styling */
+.card-element-container {
+    margin: 15px 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 80%;
+    margin: 20px auto;
+}
+
+/* Buttons styling */
+.buy-ticket-btn {
     background-color: #1abc9c;
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 12px 20px;
     border-radius: 5px;
-    font-size: 1.1em;
+    font-size: 1.2em;
     cursor: pointer;
+    margin: 15px 5px;
     transition: background-color 0.3s ease;
 }
 
-.buy-ticket-content .buy-ticket-btn:hover {
+.buy-ticket-btn:hover {
     background-color: #16a085;
 }
 
-/* Close modal button */
+/* Remove ticket from checkout page */
+.remove-ticket-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.remove-ticket-btn:hover {
+    color: darkred;
+}
+
 .close-modal {
     background-color: #e74c3c;
     color: white;
-    position: absolute;
-    top: 10px;
-    right: 10px;
     border: none;
+    padding: 12px 20px;
     border-radius: 5px;
-    padding: 5px 10px;
-    font-size: 1em;
+    font-size: 1.2em;
     cursor: pointer;
+    margin: 15px 5px;
     transition: background-color 0.3s ease;
 }
 
@@ -129,8 +121,10 @@
     background-color: #c0392b;
 }
 
-.error-message {
-    color: #e74c3c;
-    font-size: 1.1em;
-    margin-bottom: 15px;
+/* Container for action buttons */
+.buy-ticket-page .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
 }

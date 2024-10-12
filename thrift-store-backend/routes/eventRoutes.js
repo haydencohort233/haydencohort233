@@ -1,8 +1,8 @@
 const express = require('express');
-const router = express.Router();
+const eventController = require('../controllers/eventController');
 const multer = require('multer');
 const path = require('path');
-const eventController = require('../controllers/eventController');
+const router = express.Router();
 
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -40,12 +40,15 @@ const uploadFields = upload.fields([
   { name: 'title_photo', maxCount: 1 }   // Handles the 'title_photo' file
 ]);
 
+// Define event routes
 router.get('/events/upcoming', eventController.getUpcomingEvents);
 router.get('/events', eventController.getAllEvents);
+router.get('/events/tickets-enabled', eventController.getEventsWithTicketsEnabled);
+router.get('/events/:id/tickets', eventController.getEventTicketsById);
+router.get('/events/:id', eventController.getEventById);
 
-// Use the new `uploadFields` middleware for handling both files
+// Use the new `uploadFields` middleware for handling both files in add and update event routes
 router.post('/events', uploadFields, eventController.addEvent);
 router.patch('/events/:id', uploadFields, eventController.updateEvent);
-router.get('/events/:id', eventController.getEventById);
 
 module.exports = router;

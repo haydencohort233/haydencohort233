@@ -9,6 +9,9 @@
 # production
 /build
 
+# Exclude environment variable files
+.env
+
 # Ignore Python bytecode and cache
 __pycache__/
 *.pyc

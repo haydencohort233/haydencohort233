@@ -63,14 +63,16 @@ const Header = () => {
         </a>
       </div>
 
-      {guest && <GuestStatus guest={guest} />}
+      {/* {guest && <GuestStatus guest={guest} />} */}
 
       <nav className={`nav ${isMenuOpen ? 'open' : ''}`} ref={menuRef}>
         <ul>
           <li><a href="/haydencohort233/#/">Home</a></li>
-          <li><a href="/haydencohort233/#/blogs">Blogs</a></li>
+          <li><a href="/haydencohort233/#/shop">Shop</a></li>
           <li><a href="/haydencohort233/#/events">Events</a></li>
           <li><a href="/haydencohort233/#/vendors">Vendors</a></li>
+          <li><a href="/haydencohort233/#/blogs">Blogs</a></li>
+          <li><a href="/haydencohort233/#/admin">Admin</a></li>
         </ul>
       </nav>
       <div className="menu-icon" onClick={toggleMenu}>

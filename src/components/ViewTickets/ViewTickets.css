@@ -1,0 +1,72 @@
+/* Smooth animation for a dynamic gradient */
+@keyframes gradient-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.view-tickets-container p {
+    color: #fff;
+}
+
+.view-tickets-container {
+    padding: 20px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 194, 52, 0.9),
+        rgba(24, 121, 21, 0.9),
+        rgba(83, 161, 192, 0.9),
+        rgba(163, 112, 199, 0.9)
+    );
+    background-size: 200% 200%;
+    animation: gradient-animation 15s ease infinite;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.event-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.event-photo {
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+    margin: 10px auto;
+}
+
+.ticket-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.ticket-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.ticket-item:hover {
+    background-color: #e0e0e0;
+}
+
+.ticket-details-slide {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #fff;
+    border-top: 2px solid #ddd;
+    padding: 20px;
+}
+
+.proceed-button, .close-details {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}

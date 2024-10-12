@@ -4,7 +4,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,14 +13,14 @@
 
 .edit-guest-modal-content {
   background: linear-gradient(to top left, purple 0%, green 100%);
+  color: #fff;
+  border: 3px solid white;
   padding: 20px;
   border-radius: 8px;
   width: 400px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  color: #fff;
-  border: 3px solid white;
 }
 
 .edit-guest-title {
@@ -55,8 +55,8 @@
   font-weight: bold;
 }
 
-.edit-guest-modal-content h3 {
-  color: #000;
+.edit-guest-h3 {
+  color: #d12525;
 }
 
 .edit-guest-input,
@@ -130,8 +130,9 @@
   margin-bottom: 20px;
   border: 1px solid #ccc;
   padding: 10px;
-  background-color: #f9f9f9;
-  color: #000;
+  background: linear-gradient(to top left, purple 0%, green 100%);
+  color: #ffffff;
+  font-weight: bold;
 }
 
 .edit-guest-list ul {
@@ -142,12 +143,12 @@
 .edit-guest-list li {
   padding: 10px;
   cursor: pointer;
-  color: #000;
+  color: #ffffff;
   border-bottom: 1px solid #ddd;
 }
 
 .edit-guest-list li:hover {
-  background-color: #eee;
+  background-color: #eeeeee4f;
 }
 
 .edit-guest-error-message {

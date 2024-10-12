@@ -22,7 +22,7 @@ const VendorList = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    handleResize(); // Set initial value
+    handleResize();
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -54,7 +54,7 @@ const VendorList = () => {
   };
 
   const handleVendorClick = (vendorId) => {
-    setSelectedVendorId(vendorId); // Set vendor ID to open modal
+    setSelectedVendorId(vendorId);
   };
 
   const handleOpenVendorMap = () => {
@@ -111,11 +111,12 @@ const VendorList = () => {
   };
 
   return (
+    <>
+    <Header />
     <div className="vendor-list">
-      <Header />
       {renderPaginationButtons()}
       <div className="vendor-sort-options">
-        <label htmlFor="sort">Sort by:</label>
+        <label className='vendor-list-sort' htmlFor="sort">Sort by:</label>
         <select id="sort" value={sortOrder} onChange={handleSortChange}>
           <option value="asc">Name: Ascending</option>
           <option value="desc">Name: Descending</option>
@@ -154,7 +155,7 @@ const VendorList = () => {
                   vendorphoto: vendor.vendorphoto,
                   datecreated: vendor.datecreated,
                 }}
-                onCardClick={handleVendorClick} // Pass handleVendorClick to VendorCard
+                onCardClick={handleVendorClick}
               />
             ))}
           </div>
@@ -165,8 +166,8 @@ const VendorList = () => {
       {/* Render ViewVendor only when selectedVendorId is set */}
       {selectedVendorId && (
         <ViewVendor
-          vendorId={selectedVendorId} // Pass the selected vendorId to ViewVendor
-          onClose={() => setSelectedVendorId(null)} // Close modal handler
+          vendorId={selectedVendorId}
+          onClose={() => setSelectedVendorId(null)}
         />
       )}
 
@@ -174,11 +175,12 @@ const VendorList = () => {
       {showVendorMap && (
         <VendorMap 
           location={null}
-          onVendorClick={handleVendorClick} // Ensure correct handler is passed
+          onVendorClick={handleVendorClick}
           onClose={() => setShowVendorMap(false)}
         />
       )}
     </div>
+    </>
   );
 };
 

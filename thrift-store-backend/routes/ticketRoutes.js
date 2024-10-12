@@ -3,19 +3,22 @@ const ticketController = require('../controllers/ticketController');
 const purchaseController = require('../controllers/purchaseController');
 const router = express.Router();
 
-// Route to fetch events with available tickets and sold-out ones
+// Route to fetch events with available tickets (only those with tickets enabled)
 router.get('/events-with-tickets', ticketController.getEventsWithTickets);
 
-// Route to check ticket availability
-router.get('/availability', ticketController.checkAvailability);  // Move this route before the dynamic route
+// Route to check the availability of tickets for specific events or ticket types
+router.get('/availability', ticketController.checkAvailability);
 
-// Other ticket-related routes
+// Route to handle ticket purchases
 router.post('/buy', purchaseController.buyTicket);
 
-// Fetch all tickets
+// Route to fetch all tickets (admin or user interface purpose)
 router.get('/', ticketController.getAllTickets);
 
-// Dynamic route to fetch a specific ticket by ID
-router.get('/:ticketId', ticketController.getTicket);  // This must come after all specific routes
+// Route to fetch tickets by event ID
+router.get('/events/:eventId/tickets', ticketController.getTicketsByEventId);
+
+// Dynamic route to fetch a specific ticket by its ID
+router.get('/:ticketId', ticketController.getTicket);
 
 module.exports = router;

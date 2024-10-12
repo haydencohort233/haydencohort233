@@ -1,7 +1,13 @@
+/* Smooth animation for a dynamic gradient */
+@keyframes gradient-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 /* Shop-specific layout */
 .shop-page {
-    padding: 20px;
-    max-width: 1200px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
@@ -22,49 +28,235 @@
     font-size: 1.2em;
 }
 
-.shop-page .event-list {
+/* Updated event list to display events in a single column */
+.shop-page-event-list {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
-.shop-page .event-item {
-    width: 280px;
-    padding: 15px;
-    margin: 15px;
+.shop-page-event-item {
+    width: 80%;
+    max-width: 500px;
+    max-height: 300px;
+    padding: 5px;
     background-color: #f9f9f9;
-    border: 2px solid #ccc;
+    border: 3px solid #000000;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
 }
 
-.shop-page .event-item h3 {
+.shop-page-event-item:hover {
+    transform: scale(1.02);
+}
+
+.shop-page-event-title {
     font-family: 'Arial', sans-serif;
     font-size: 1.5em;
-    color: #ffffff;
+    color: #333;
+    cursor: pointer;
+    margin: 10px 0;
 }
 
-.shop-page .event-item p {
-    color: #ffffff;
+.shop-page-event-title:hover {
+    color: #ff6f61;
+}
+
+.shop-page-event-date,
+.shop-page-event-preview-text,
+.shop-page-ticket-type-name,
+.shop-page-tickets-left,
+.shop-page-no-tickets-message {
+    color: #333;
     font-size: 1em;
     margin-bottom: 10px;
 }
 
-.shop-page .ticket-purchase-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Styling for the event title photo */
+.shop-page-event-title-photo {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.shop-page .quantity-controls {
+/* Modal overlay for darkening background */
+.shop-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Darken the background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top of other content */
+}
+
+/* Modal content styling */
+.shop-modal-content {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 194, 52, 0.9),
+        rgba(25, 121, 21, 0.7),
+        rgba(83, 161, 192, 0.9),
+        rgba(163, 112, 199, 0.9)
+    );
+    background-size: 200% 200%;
+    animation: gradient-animation 15s ease infinite;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.shop-modal-event-details {
+    display: flex;
+    flex-direction: row-reverse; /* Keep the image on the right side */
+    align-items: flex-start; /* Align content at the top */
+    gap: 15px; /* Space between the image and the description */
+}
+
+.shop-modal-photo-container {
+    display: flex;
+    flex-direction: column; /* Stack image and zoom text vertically */
+    align-items: center; /* Center the zoom text under the image */
+}
+
+.shop-modal-event-photo {
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.shop-modal-photo-zoom-text {
+    font-size: 0.85em;
+    color: #ffffff;
+    background-color: #0366a8a4;
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 2px;
+    text-align: center;
+}
+
+.shop-modal-eye-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* Fullscreen styles for the photo */
+.shop-modal-event-photo-fullscreen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+    background: rgba(0, 0, 0, 0.9); /* Dark background */
+    z-index: 2000;
+    cursor: pointer;
+}
+
+/* Fullscreen overlay styling */
+.fullscreen-overlay {
+    background: rgba(0, 0, 0, 0.9); /* Darker background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+
+/* Styling for the modal event title */
+.shop-h2 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    color: #ffffff;
+    text-align: center; /* Center the event title for a clean look */
+    text-decoration: underline;
     font-family: 'Arial', sans-serif;
 }
 
-/* Normal button styling */
-.shop-page .quantity-btn {
+/* Styling for the event date in the modal */
+.shop-event-date {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    color: #ffffff;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Styling for the event description in the modal */
+.shop-description {
+    margin-bottom: 15px;
+    font-size: 1em;
+    color: #ffffff;
+    text-align: left;
+    line-height: 1.5; /* Improved readability with line spacing */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Close button styling */
+.close-modal-button {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.close-modal-button:hover {
+    background-color: #e05353;
+}
+
+/* Ensure the shop page content is still visible behind the modal */
+.shop-page {
+    position: relative;
+    z-index: 0;
+    transition: opacity 0.3s ease;
+}
+
+.shop-page.dimmed {
+    opacity: 0.5; /* Dim the shop page when modal is open */
+}
+
+/* Ticket type item styling */
+.shop-page-ticket-type-item {
+    margin-bottom: 15px;
+}
+
+/* Quantity controls styling */
+.shop-page-quantity-controls {
+    display: flex;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    margin: 10px 0;
+}
+
+.shop-page-quantity-btn {
     background-color: #ff6b6b;
     color: white;
     border: none;
@@ -80,51 +272,170 @@
     transition: background-color 0.3s ease;
 }
 
-/* Hover effect when button is enabled */
-.shop-page .quantity-btn:not(:disabled):hover {
+.shop-page-quantity-btn:hover {
     background-color: #e05353;
 }
 
-/* Disabled button styling */
-.shop-page .quantity-btn:disabled {
+.shop-page-quantity-btn:disabled {
     color: #adacac;
     background-color: #727272;
-    cursor: not-allowed; /* Add 'not-allowed' cursor for disabled buttons */
+    cursor: not-allowed;
 }
 
-/* Prevent hover styling when disabled */
-.shop-page .quantity-btn:disabled:hover {
-    color: #adacac;
-    background-color: #727272; /* Ensure no color change on hover */
-}
-
-.shop-page .quantity-btn:hover {
-    background-color: #e05353;
-}
-
-.shop-page .quantity {
+.shop-page-quantity {
     font-size: 1.2em;
     padding: 0 10px;
-    color: #fff;
+    color: #333;
 }
 
-.shop-page .buy-ticket-btn {
+/* Styling for the Buy Ticket(s) button */
+.shop-modal-buy-ticket-btn {
     background-color: #1abc9c;
     color: white;
     border: none;
-    padding: 4px 8px;
+    padding: 6px 12px;
     border-radius: 5px;
-    font-size: 1.2em;
+    font-size: 1em;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    text-align: left;
+    margin-top: 10px;
 }
 
-.shop-page .buy-ticket-btn:hover {
+.shop-modal-buy-ticket-btn:hover {
     background-color: #16a085;
 }
 
-.shop-page .sold-out-label {
+/* Disabled state styling for the Buy Ticket(s) button */
+.shop-modal-buy-ticket-btn.disabled {
+    background-color: #bcbcbc;
+    color: #666;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.shop-modal-buy-ticket-btn.disabled:hover {
+    background-color: #bcbcbc;
+    color: #666;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.shop-modal-buy-ticket-btn.disabled:hover::after {
+    content: "Please add an item to continue";
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+/* Sold-out label styling */
+.shop-page-sold-out-label {
     color: #e74c3c;
     font-weight: bold;
     font-size: 1.2em;
+}
+
+.shop-page-no-tickets-message,
+.shop-page-no-events-message {
+    color: #999;
+    font-size: 1.1em;
+}
+
+/* Align ticket type information to the left */
+.shop-modal-ticket-type-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Ticket Type / Name aligned to the left */
+.shop-modal-ticket-type-name {
+    font-weight: bold;
+    color: #ffffff;
+    text-align: left;
+    flex: 1; /* Ensure it takes up available space */
+    margin-right: 10px;
+    text-wrap: nowrap;
+}
+
+/* Tickets left information aligned to the left */
+.shop-modal-tickets-left {
+    color: #ffffff;
+    text-align: left;
+    flex: 1; /* Ensure it takes up available space */
+}
+
+/* Additional ticket information (aligned to the right) */
+.shop-modal-ticket-info {
+    color: #ffffff;
+    flex: 2; /* This will control the width of the right-side content */
+}
+
+/* Container to right-align the Buy Ticket(s) button */
+.shop-modal-buy-ticket-btn-container {
+    display: flex;
+    justify-content: flex-end; /* Aligns the button to the right */
+    margin-top: 10px;
+}
+
+/* Buy Ticket(s) button aligned to the left */
+.shop-modal-buy-ticket-btn {
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: left;
+    margin-top: 10px;
+}
+
+.shop-modal-buy-ticket-btn:hover {
+    background-color: #16a085;
+}
+
+.shop-modal-quantity-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+}
+
+.shop-modal-quantity-btn:hover {
+    background-color: #e05353;
+}
+
+.shop-modal-quantity-btn:disabled {
+    color: #adacac;
+    background-color: #727272;
+    cursor: not-allowed;
+}
+
+/* Align the quantity controls */
+.shop-modal-quantity-controls {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
 }

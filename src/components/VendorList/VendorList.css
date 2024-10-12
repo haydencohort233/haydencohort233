@@ -20,6 +20,10 @@ body {
   box-sizing: border-box;
 }
 
+.vendor-list-sort {
+  color: rgb(255, 255, 255);
+}
+
 .vendor-sort-options {
   margin-bottom: 1em;
   display: flex;

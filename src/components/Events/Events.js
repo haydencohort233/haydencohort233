@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
 import './Events.css';
 import Header from '../Header/Header';
-import GuestCard from '../GuestCard/GuestCard';
-import ViewEvent from '../ViewEvent/ViewEvent'; // Import ViewEvent
-import EventCalendar from '../EventCalendar/EventCalendar'; // Import EventCalendar
+import ViewEvent from '../ViewEvent/ViewEvent';
+import React, { useEffect, useState } from 'react';
+import EventCalendar from '../EventCalendar/EventCalendar';
 
 const Events = () => {
   const [events, setEvents] = useState([]);
   const [guestVendors, setGuestVendors] = useState([]);
   const [eventError, setEventError] = useState('');
   const [guestVendorError, setGuestVendorError] = useState('');
-  const [selectedEvent, setSelectedEvent] = useState(null); // Add state for selected event
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     // Fetch events within the next 3 months
@@ -47,15 +46,12 @@ const Events = () => {
   };
 
   const handleEventClick = (event) => {
-    setSelectedEvent(event); // Set the selected event on click
+    setSelectedEvent(event);
   };
 
   const handleCloseModal = () => {
-    setSelectedEvent(null); // Reset the selected event to close modal
+    setSelectedEvent(null);
   };
-
-  // Filter out guest vendors that are on break
-  const filteredGuestVendors = guestVendors.filter((guest) => !guest.break);
 
   return (
     <>
@@ -66,15 +62,7 @@ const Events = () => {
           {guestVendorError && <div className="guest-vendor-error">{guestVendorError}</div>}
         </div>
         <div className="events-layout">
-          <div className="guest-vendors-section">
-            {guestVendorError ? (
-              <div className="error-message">{guestVendorError}</div>
-            ) : filteredGuestVendors.length === 0 ? (
-              <div className="no-guests-message">Currently no guest vendor</div>
-            ) : (
-              filteredGuestVendors.map((guest) => <GuestCard key={guest.id} guest={guest} />)
-            )}
-          </div>
+
           <div className="calendar-section">
             <EventCalendar />
           </div>

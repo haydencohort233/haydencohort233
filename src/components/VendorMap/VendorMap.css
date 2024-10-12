@@ -1,14 +1,15 @@
 .vendor-map-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  position: fixed; /* Keep the modal fixed to the viewport */
+  top: 50%; /* Center vertically */
+  left: 182%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Translate by 50% to perfectly center the modal */
+  width: 100vw; /* Full width of the viewport */
+  height: 100vh; /* Full height of the viewport */
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 4000;
+  z-index: 4000; /* Ensure it appears above other elements */
 }
 
 .vendor-map-overlay {
@@ -98,15 +99,16 @@
   display: block; /* Show 'Available' on hover */
 }
 
-@media (min-width: 768px) {
-  .vendor-location:hover .vendor-name {
-    display: block;
+@media (max-width: 768px) {
+  .vendor-map-modal {
+    max-width: 95vw; /* Slightly reduced width for mobile */
+    max-height: 95vh; /* Slightly reduced height for mobile */
   }
 
-  .vendor-location.hovered {
-    border-color: rgba(255, 0, 0, 0.5);
-    background-color: rgba(255, 0, 0, 0.2);
-    z-index: 2;
+  .vendor-map-content {
+    width: 100%;
+    height: 90%;
+    overflow-y: auto; /* Add vertical scrolling if content overflows */
   }
 }
 

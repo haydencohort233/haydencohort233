@@ -1,165 +1,141 @@
-.tools {
+/* Individual Button Containers */
+.vendor-button-container,
+.guest-button-container,
+.event-button-container,
+.blog-button-container,
+.ticket-button-container,
+.discount-button-container {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-}
-
-.edit-section {
-  max-width: 600px;
-}
-
-.admin-tools {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  background: rgba(255, 255, 255, 0.8);
-  border: 3px solid #000;
-  color: #000;
-  padding: 10px;
-  max-width: 300px;
+  margin-bottom: 10px;
+  width: 100%;
 }
 
-.tools-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
-}
-
-.tool-button,
-.add-event-button,
-.add-guest-button,
-.add-vendor-button,
-.view-map-button,
-.add-survey-button,
-.add-blog-button,
-.edit-vendor-button,
-.edit-guest-button,
-.edit-event-button,
-.edit-blogs-button,
-.scrape-button,
-.perform-backup-button {
-  width: 200px;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
+/* Add and Edit Button Styles */
+.vendor-add-button,
+.guest-add-button,
+.event-add-button,
+.blog-add-button,
+.ticket-add-button,
+.discount-add-button,
+.vendor-edit-button,
+.guest-edit-button,
+.event-edit-button,
+.blog-edit-button,
+.ticket-edit-button,
+.discount-edit-button {
+  padding: 6px 12px;
   border: none;
-  transition: background-color 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px; /* Fixed width for consistent button sizing */
+  border-radius: 4px;
 }
 
-.tool-button {
-  background-color: #2196F3;
+/* Add Button Colors */
+.vendor-add-button,
+.guest-add-button,
+.event-add-button,
+.blog-add-button,
+.ticket-add-button,
+.discount-add-button {
+  background-color: #28a745; /* Green color for Add buttons */
+  color: white;
 }
 
-.tool-button:hover {
-  background-color: #1E88E5;
+.vendor-add-button:hover,
+.guest-add-button:hover,
+.event-add-button:hover,
+.blog-add-button:hover,
+.ticket-add-button:hover,
+.discount-add-button:hover {
+  background-color: #218838; /* Darker green on hover */
 }
 
-.add-event-button {
-  background-color: #4CAF50;
-}
-
-.add-event-button:hover {
-  background-color: #218526;
-}
-
-.add-guest-button {
-  background-color: #FF9800;
-}
-
-.add-guest-button:hover {
-  background-color: #c26b02;
-}
-
-.add-vendor-button {
-  background-color: #b00fd8;
-}
-
-.add-vendor-button:hover {
-  background-color: #59076d;
-}
-
-.view-map-button {
-  background-color: #fbff00;
+/* Edit Button Colors */
+.vendor-edit-button,
+.guest-edit-button,
+.event-edit-button,
+.blog-edit-button,
+.ticket-edit-button,
+.discount-edit-button {
+  background-color: #ffc107; /* Yellow color for Edit buttons */
   color: black;
 }
 
+.vendor-edit-button:hover,
+.guest-edit-button:hover,
+.event-edit-button:hover,
+.blog-edit-button:hover,
+.ticket-edit-button:hover,
+.discount-edit-button:hover {
+  background-color: #e0a800; /* Darker yellow on hover */
+}
+
+/* Utility Buttons Container */
+.utility-button-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Utility Buttons Styles */
+.view-map-button,
+.add-survey-button,
+.scrape-button,
+.perform-backup-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+/* Individual Utility Button Colors */
+.view-map-button {
+  background-color: #4CAF50;
+}
+
 .view-map-button:hover {
-  background-color: #af9e01;
+  background-color: #45a049;
 }
 
 .add-survey-button {
-  background-color: #ee5ac2;
+  background-color: #FF9800;
 }
 
 .add-survey-button:hover {
-  background-color: #cf2b9e;
-}
-
-.add-blog-button {
-  background-color: #007bff;
-}
-
-.add-blog-button:hover {
-  background-color: #0056b3;
-}
-
-.edit-vendor-button {
-  background-color: #4d4d4d;
-}
-
-.edit-vendor-button:hover {
-  background-color: #2b2b2b;
-}
-
-.edit-guest-button {
-  background-color: #32ce24;
-}
-
-.edit-guest-button:hover {
-  background-color: #077503;
-}
-
-.edit-event-button {
-  background-color: #5bd0ff;
-}
-
-.edit-event-button:hover {
-  background-color: #248596;
-}
-
-.edit-blogs-button {
-  background-color: #fd3636;
-}
-
-.edit-blogs-button:hover {
-  background-color: #880707;
+  background-color: #fb8c00;
 }
 
 .scrape-button {
-  background-color: #720788;
+  background-color: #3f51b5;
 }
 
 .scrape-button:hover {
-  background-color: #a717c4;
+  background-color: #3949ab;
 }
 
 .perform-backup-button {
-  background-color: #00ffaa;
+  background-color: #009688;
 }
 
 .perform-backup-button:hover {
-  background-color: #00b377;
+  background-color: #00796b;
 }
 
+/* Divider between button sections */
 .tools-divider {
   width: 100%;
   height: 2px;
-  background-color: #ccc;
-  margin: 6px 0;
-}
-
-.tools-sidebar.open {
-  width: 226px;
-  height: 860px;
+  background-color: #000000;
+  margin: 20px 0;
 }
