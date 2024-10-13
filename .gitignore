@@ -33,3 +33,9 @@ __pycache__/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Exclude the BFG JAR file
+bfg-1.14.0.jar
+
+# Exclude log files
+/thrift-store-backend/logs/*

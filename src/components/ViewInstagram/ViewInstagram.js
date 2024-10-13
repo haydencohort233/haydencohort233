@@ -1,58 +1,64 @@
-import React, { useState } from 'react';
+import React, { useRef, useEffect, useState, forwardRef } from 'react';
 import './ViewInstagram.css';
 
-const ViewInstagram = ({ post, onClose }) => {
+const ViewInstagram = forwardRef(({ post, onClose }, ref) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const internalRef = useRef(null);
+  const instagramModalRef = ref || internalRef;
 
   if (!post) {
+    console.log('No post data available.');
     return null;
   }
 
-  const { username, caption, media_url, timestamp, additional_media_urls = '' } = post;
+  const { username, caption, media_url, timestamp, additional_media_urls = '', video_url } = post;
 
-  const mediaFiles = [media_url, ...additional_media_urls.split(',')];
+  // Handle the case where there's a video (only one thumbnail)
+  const hasVideo = video_url && video_url.endsWith('.mp4');
+
+  // Split media files (images) for the carousel
+  const mediaFiles = hasVideo
+    ? [media_url]  // Only one thumbnail for video
+    : [...media_url.split(','), ...additional_media_urls.split(',').filter(Boolean)]; // Multiple photos
 
   const getMediaPath = (filename) => {
     if (!filename) return '';
-    if (filename.endsWith('.mp4')) {
-      return `http://localhost:5000/downloads/videos/${filename}`;
+    if (hasVideo) {
+      console.log(`Loading video: ${video_url}`);
+      return `http://localhost:5000/downloads/videos/${video_url}`;  // Video URL
     } else if (filename.includes('thumbnail')) {
-      return `http://localhost:5000/downloads/videos/thumbnails/${filename}`;
+      console.log(`Loading thumbnail: ${filename}`);
+      return `http://localhost:5000/downloads/videos/thumbnails/${filename}`;  // Load video thumbnail
     } else {
-      return `http://localhost:5000/downloads/photos/${filename}`;
+      console.log(`Loading image: ${filename}`);
+      return `http://localhost:5000/downloads/photos/${filename}`;  // Photo URL for images
     }
   };
 
-  const separateHashtags = (caption) => {
-    const words = caption.split(' ');
-    const mainCaption = words.filter(word => !word.startsWith('#')).join(' ');
-    const hashtags = words.filter(word => word.startsWith('#')).join(' ');
-    return { mainCaption, hashtags };
-  };
-
-  const { mainCaption, hashtags } = separateHashtags(caption || '');
-
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % mediaFiles.length);
+    console.log(`Next media index: ${currentIndex}`);
   };
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + mediaFiles.length) % mediaFiles.length);
+    console.log(`Previous media index: ${currentIndex}`);
   };
 
-  const currentMedia = mediaFiles[currentIndex];
+  const currentMedia = mediaFiles[currentIndex].trim(); // Handle spaces and clean the filename
+  console.log(`Current media file: ${currentMedia}`);
 
   return (
     <div className="view-instagram-modal">
-      <div className="view-instagram-content">
+      <div className="view-instagram-content" ref={instagramModalRef}>
         <button className="view-instagram-close-button" onClick={onClose}>X</button>
         <h2 className="view-instagram-username">@{username}</h2>
 
         <div className="view-instagram-media">
-          {currentMedia.endsWith('.mp4') ? (
+          {hasVideo ? (
             <video
               controls
-              src={getMediaPath(currentMedia)}
+              src={getMediaPath(video_url)} // Load video path here
               className="view-instagram-video"
               onError={(e) => console.error('Error loading video:', e)}
             >
@@ -70,23 +76,20 @@ const ViewInstagram = ({ post, onClose }) => {
           )}
         </div>
 
-        <div className="view-instagram-carousel-controls">
-          {mediaFiles.length > 1 && (
-            <>
-              <button onClick={handlePrev} className="view-instagram-carousel-button left">&lt;</button>
-              <button onClick={handleNext} className="view-instagram-carousel-button right">&gt;</button>
-            </>
-          )}
-        </div>
+        {!hasVideo && mediaFiles.length > 1 && (
+          <div className="view-instagram-carousel-controls">
+            <button onClick={handlePrev} className="view-instagram-carousel-button left">&lt;</button>
+            <button onClick={handleNext} className="view-instagram-carousel-button right">&gt;</button>
+          </div>
+        )}
 
-        <p className="view-instagram-caption">{mainCaption}</p>
-        <p className="view-instagram-hashtags">{hashtags}</p>
+        <p className="view-instagram-caption">{caption}</p>
         <p className="view-instagram-timestamp">
           {new Date(timestamp).toLocaleDateString()}
         </p>
       </div>
     </div>
   );
-};
+});
 
 export default ViewInstagram;

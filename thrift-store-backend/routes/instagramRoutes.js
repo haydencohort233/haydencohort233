@@ -1,24 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { query } = require('../config/db');
-const instagramController = require('../controllers/instagramController');
+const { getInstagramPosts, getAllInstagramPosts, getInstagramPostById } = require('../controllers/instagramController');
 
-// Route for fetching all scraped Instagram posts
-router.get('/scraped-posts', (req, res) => {
-  const sqlQuery = 'SELECT * FROM scraped_posts ORDER BY timestamp DESC';
+// Route to fetch the latest posts for a specific Instagram user
+router.get('/scraped-posts/:username', getInstagramPosts);
 
-  query(sqlQuery, [], (err, results) => {
-    if (err) {
-      console.error('Error fetching scraped posts:', err);
-      return res.status(500).json({
-        error: 'Failed to fetch scraped posts',
-        details: err.message
-      });
-    }
-    res.json(results);
-  });
-});
+// Route to fetch all scraped posts
+router.get('/scraped-posts', getAllInstagramPosts);
 
-router.get('/scraped-posts/:username', instagramController.getScrapedPostsByUsername);
+// Route to fetch a specific Instagram post by post_id
+router.get('/scraped-post/:post_id', getInstagramPostById);
 
 module.exports = router;

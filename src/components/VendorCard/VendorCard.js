@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import './VendorCard.css';
 import ViewVendor from '../ViewVendor/ViewVendor';
 
-const VendorCard = ({ vendor, onCardClick }) => { // Add onCardClick prop
+const VendorCard = ({ vendor, onCardClick }) => {
   const [showModal, setShowModal] = useState(false);
 
   const avatarUrl = vendor.avatar ? `http://localhost:5000${vendor.avatar}` : '/images/avatar.png';
 
   const handleCardClick = () => {
-    if (vendor.id) { // Ensure that vendor has an id before opening the modal
-      onCardClick(vendor.id); // Call the onCardClick prop with vendor id
+    if (vendor.id) {
+      onCardClick(vendor.id);
       setShowModal(true);
     } else {
       console.error('Vendor ID is missing. Cannot open the modal.');
@@ -38,12 +38,23 @@ const VendorCard = ({ vendor, onCardClick }) => { // Add onCardClick prop
     return diffDays <= 100;
   };
 
+  // Check if the vendor has an active sale
+  const hasActiveSale = () => {
+    return vendor.sale === 1; // Ensure vendor.sale is either 1 (true) or 0 (false)
+  };
+
   return (
     <>
-      <div className="vendor-card" onClick={handleCardClick}> {/* Call handleCardClick on click */}
+      <div className="vendor-card" onClick={handleCardClick}>
         {isNewVendor() && (
           <div className="new-badge">NEW VENDOR</div>
         )}
+        
+        {/* Display SALE badge if vendor has an active sale */}
+        {hasActiveSale() && (
+          <div className="sale-badge">SALE!</div>
+        )}
+
         <img
           src={avatarUrl}
           alt={`${vendor.name} avatar`}
@@ -67,7 +78,7 @@ const VendorCard = ({ vendor, onCardClick }) => { // Add onCardClick prop
       </div>
       {showModal && (
         <ViewVendor
-          vendorId={vendor.id} // Pass vendor.id here
+          vendorId={vendor.id}
           onClose={() => setShowModal(false)}
         />
       )}

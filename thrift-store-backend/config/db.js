@@ -8,7 +8,7 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
   connectTimeout: 10000, // 10 seconds
   acquireTimeout: 10000,  // 10 seconds
-  charset: 'utf8mb4',
+  charset: 'utf8mb4', // Support emojis in captions
 });
 
 db.connect((err) => {
@@ -41,12 +41,12 @@ function handleDisconnect() {
 
 function query(sql, params) {
   return new Promise((resolve, reject) => {
-      db.query(sql, params, (err, results) => {
-          if (err) {
-              return reject(err);
-          }
-          resolve(results);
-      });
+    db.query(sql, params, (err, results) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(results);
+    });
   });
 }
 

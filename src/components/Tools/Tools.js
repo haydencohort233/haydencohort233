@@ -56,28 +56,36 @@ const Tools = () => {
   };
 
   const handleScrape = () => {
-    setScrapeStatus('Scraping in progress...');
-    axios.get('http://localhost:5000/api/scrape')
-      .then(() => {
-        setScrapeStatus('Scraping completed successfully!');
-      })
-      .catch(error => {
-        console.error('Error during scraping:', error);
-        setScrapeStatus('Error occurred during scraping. Please try again.');
-      });
-  };
+    const userConfirmed = window.confirm('Are you sure you wish to scrape the latest Instagram posts?');
+  
+    if (userConfirmed) {
+      setScrapeStatus('Scraping in progress...');
+  
+      axios.get('http://localhost:5000/api/scrape')
+        .then(() => {
+          alert('Scraping successful!');
+        })
+        .catch(error => {
+          console.error('Error during scraping:', error);
+          alert('Error occurred during scraping. Please try again.');
+        });
+    }
+  };  
 
   const performBackup = () => {
-    setBackupStatus('Backup in progress...');
-    axios.get('http://localhost:5000/api/backup')
-      .then(() => {
-        setBackupStatus('Backup completed successfully!');
-      })
-      .catch(error => {
-        console.error('Error during backup:', error);
-        setBackupStatus('Error occurred during backup. Please try again.');
-      });
-  };
+    const userConfirmed = window.confirm('Are you sure you wish to backup the MySQL Database?');
+    
+    if (userConfirmed) {
+      axios.get('http://localhost:5000/api/backup')
+        .then(() => {
+          alert('Backup successful!');
+        })
+        .catch(error => {
+          console.error('Error during backup:', error);
+          alert('Error occurred during backup. Please try again.');
+        });
+    }
+  };  
 
   const handleVendorButtonClick = (action) => {
     switch (action) {

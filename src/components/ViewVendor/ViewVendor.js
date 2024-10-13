@@ -10,7 +10,9 @@ const ViewVendor = ({ vendorId, onClose }) => {
   const [showVendorMap, setShowVendorMap] = useState(false); // Controls showing the map
   const [socialMediaPosts, setSocialMediaPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
-  const modalRef = useRef(null);
+  const [activeModal, setActiveModal] = useState('vendor'); // Tracks the active modal (either 'vendor' or 'instagram')
+  const modalRef = useRef(null); // Vendor modal reference
+  const instagramModalRef = useRef(null); // Instagram modal reference
 
   // Fetch vendor data by ID
   useEffect(() => {
@@ -45,16 +47,23 @@ const ViewVendor = ({ vendorId, onClose }) => {
   // Handle closing the modal on outside click or Escape key press
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        onClose();
+      // Close only the currently active modal
+      if (activeModal === 'instagram' && instagramModalRef.current && !instagramModalRef.current.contains(event.target)) {
+        setSelectedPost(null); // Close Instagram modal
+        setActiveModal('vendor'); // Return focus to Vendor modal
+      } else if (activeModal === 'vendor' && modalRef.current && !modalRef.current.contains(event.target)) {
+        onClose(); // Close Vendor modal
       }
     };
 
     const handleEscKey = (event) => {
-      if (event.key === 'Escape' && !selectedPost) {
-        onClose();
-      } else if (event.key === 'Escape' && selectedPost) {
-        setSelectedPost(null);
+      if (event.key === 'Escape') {
+        if (activeModal === 'instagram') {
+          setSelectedPost(null); // Close Instagram modal
+          setActiveModal('vendor'); // Return focus to Vendor modal
+        } else if (activeModal === 'vendor') {
+          onClose(); // Close Vendor modal
+        }
       }
     };
 
@@ -65,7 +74,7 @@ const ViewVendor = ({ vendorId, onClose }) => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscKey);
     };
-  }, [onClose, selectedPost]);
+  }, [onClose, selectedPost, activeModal]);
 
   if (!vendorId) {
     return <div>Error: No vendor ID provided.</div>;
@@ -83,8 +92,19 @@ const ViewVendor = ({ vendorId, onClose }) => {
     ? `http://localhost:5000${vendorphoto}` // No need to prepend /uploads/vendors/, it's already in the database
     : `${process.env.PUBLIC_URL}/images/placeholders/banner-placeholder-2.png`; // Placeholder for missing vendor photo
 
-  const handlePostClick = (post) => {
-    setSelectedPost(post);
+  const handlePostClick = (post_id) => {
+    axios.get(`http://localhost:5000/api/instagram/scraped-post/${post_id}`)
+      .then(response => {
+        if (response.status === 200) {
+          setSelectedPost(response.data); // Set the specific post as the selected post
+          setActiveModal('instagram'); // Set Instagram modal as the active modal
+        } else {
+          console.error('Post not found:', response);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching specific Instagram post:', error);
+      });
   };
 
   const modalContent = (
@@ -120,34 +140,19 @@ const ViewVendor = ({ vendorId, onClose }) => {
             <h3>- - - === Latest 3 Instagram Posts === - - -</h3>
             <div className="view-vendor-posts-grid">
               {socialMediaPosts.slice(0, 3).map((post, index) => {
-                // Split media_url by commas
-                const mediaFiles = post.media_url.split(',');
-                if (post.additional_media_urls) {
-                  mediaFiles.push(...post.additional_media_urls.split(','));
-                }
-
-                // Only show the first media file in the preview
-                const firstMediaFile = mediaFiles[0];
+                const { video_url, media_url, caption, post_id } = post;
+                const thumbnailFile = media_url; // This should be the thumbnail file
 
                 return (
                   <div
                     key={index}
                     className="view-vendor-post-card"
-                    onClick={() => handlePostClick(post)}
+                    onClick={() => handlePostClick(post_id)} // Fetch specific post on click
                   >
-                    {firstMediaFile.endsWith('.mp4') ? (
-                      <video
-                        controls
-                        src={`http://localhost:5000/downloads/videos/${firstMediaFile}`} // Corrected video path
-                        className="view-vendor-post-video"
-                        onError={(e) => console.error('Error loading video:', e)}
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : firstMediaFile.includes('thumbnail') ? (
+                    {thumbnailFile ? (
                       <img
-                        src={`http://localhost:5000/downloads/videos/thumbnails/${firstMediaFile}`} // Corrected video thumbnail path
-                        alt={post.caption}
+                        src={`http://localhost:5000/downloads/videos/thumbnails/${thumbnailFile}`} // Load thumbnail
+                        alt={caption}
                         className="view-vendor-post-image"
                         onError={(e) => {
                           e.target.src = `${process.env.PUBLIC_URL}/images/placeholders/thumbnail-placeholder.png`; // Thumbnail fallback
@@ -155,42 +160,25 @@ const ViewVendor = ({ vendorId, onClose }) => {
                       />
                     ) : (
                       <img
-                        src={`http://localhost:5000/downloads/photos/${firstMediaFile}`} // Corrected photo path
-                        alt={post.caption}
+                        src={`${process.env.PUBLIC_URL}/images/placeholders/post-placeholder.png`} // Fallback image for missing content
+                        alt={caption}
                         className="view-vendor-post-image"
-                        onError={(e) => {
-                          e.target.src = `${process.env.PUBLIC_URL}/images/placeholders/thumbnail-placeholder.png`; // Thumbnail fallback
-                        }}
                       />
                     )}
                     <p className="view-vendor-post-caption">
-                      {post.caption ? post.caption.slice(0, 100) + '...' : ''}
+                      {caption ? caption.slice(0, 100) + '...' : ''}
                     </p>
                     <p className="view-vendor-post-hashtag">
-                      {post.caption.match(/#[\w]+/) ? post.caption.match(/#[\w]+/)[0] : ''}
+                      {caption.match(/#[\w]+/) ? caption.match(/#[\w]+/)[0] : ''}
                     </p>
                     <p className="view-vendor-post-timestamp">
-                      <span className="view-vendor-click-to-view">Click to view</span>
+                      <span className="view-vendor-click-to-view">Click to view more</span>
                       {' '}
                       {new Date(post.timestamp).toLocaleDateString()}
                     </p>
                   </div>
                 );
               })}
-
-              {/* If there are less than 3 posts, show placeholders */}
-              {socialMediaPosts.length < 3 &&
-                Array.from({ length: 3 - socialMediaPosts.length }).map((_, index) => (
-                  <div key={index} className="view-vendor-post-card">
-                    <img
-                      src={`${process.env.PUBLIC_URL}/images/placeholders/post-placeholder.png`}
-                      alt="Post Placeholder"
-                      className="view-vendor-post-image"
-                    />
-                    <p className="view-vendor-post-caption">Placeholder Post</p>
-                  </div>
-                ))
-              }
             </div>
           </div>
         ) : (
@@ -224,11 +212,16 @@ const ViewVendor = ({ vendorId, onClose }) => {
 
   return ReactDOM.createPortal(
     <>
+      <div className="modal-overlay"></div> {/* Black transparent background */}
       {modalContent}
       {selectedPost && (
         <ViewInstagram
           post={selectedPost}
-          onClose={() => setSelectedPost(null)}
+          onClose={() => {
+            setSelectedPost(null); // Close Instagram modal
+            setActiveModal('vendor'); // Return focus to Vendor modal
+          }}
+          ref={instagramModalRef} // Attach Instagram modal reference here
         />
       )}
     </>,

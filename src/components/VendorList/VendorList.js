@@ -154,6 +154,7 @@ const VendorList = () => {
                   avatar: vendor.avatar,
                   vendorphoto: vendor.vendorphoto,
                   datecreated: vendor.datecreated,
+                  sale: vendor.sale
                 }}
                 onCardClick={handleVendorClick}
               />

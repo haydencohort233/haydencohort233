@@ -27,7 +27,7 @@ const getAllVendors = async (req, res) => {
       orderByClause = 'name ASC';
   }
 
-  const sqlQuery = `SELECT id, name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated FROM vendorshops ORDER BY ${orderByClause}`;
+  const sqlQuery = `SELECT id, name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated, sale FROM vendorshops ORDER BY ${orderByClause}`;
 
   try {
     const results = await query(sqlQuery);
@@ -63,14 +63,14 @@ const getFeaturedVendors = async (req, res) => {
 
 // 3. Add Vendor
 const addVendor = async (req, res) => {
-  const { name, description, location, category, instagram_username, website_url } = req.body;
+  const { name, description, location, category, instagram_username, website_url, sale } = req.body;
 
   const avatarPath = req.files && req.files.avatar ? `/uploads/vendors/${req.files.avatar[0].filename}` : '/public/images/avatar.png';
   const vendorPhoto = req.files && req.files.vendorphoto ? `/uploads/vendors/${req.files.vendorphoto[0].filename}` : '/public/images/avatar.png';
 
   const dateCreated = new Date();
-  const sqlQuery = 'INSERT INTO vendorshops (name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-  const values = [name, description, location, category, avatarPath, vendorPhoto, instagram_username, website_url, dateCreated];
+  const sqlQuery = 'INSERT INTO vendorshops (name, description, location, category, avatar, vendorphoto, instagram_username, website_url, datecreated, sale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  const values = [name, description, location, category, avatarPath, vendorPhoto, instagram_username, website_url, dateCreated, sale || 0];
 
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
@@ -116,14 +116,14 @@ const deleteVendor = (req, res) => {
 // 5. Update Vendor
 const updateVendor = (req, res) => {
   const vendorId = req.params.id;
-  const { name, description, location, category, instagram_username, website_url } = req.body;
+  const { name, description, location, category, instagram_username, website_url, sale } = req.body;
   const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
 
   const avatarPath = req.files && req.files.avatar ? `/uploads/vendors/${req.files.avatar[0].filename}` : null;
   const vendorPhotoPath = req.files && req.files.vendorphoto ? `/uploads/vendors/${req.files.vendorphoto[0].filename}` : null;
 
-  let sqlQuery = `UPDATE vendorshops SET name = ?, description = ?, location = ?, category = ?, instagram_username = ?, website_url = ?`;
-  const values = [name, description, location, category, instagram_username, website_url];
+  let sqlQuery = `UPDATE vendorshops SET name = ?, description = ?, location = ?, category = ?, instagram_username = ?, website_url = ?, sale = ?`;
+  const values = [name, description, location, category, instagram_username, website_url, sale];
 
   if (avatarPath) {
     sqlQuery += `, avatar = ?`;

@@ -15,7 +15,7 @@
 .view-vendor-content {
   background: linear-gradient(to top left, yellow 0%, teal 100%);
   padding: 20px;
-  max-width: 800px; /* Increased width to accommodate more posts */
+  max-width: 800px; /* Adjusted for larger width */
   width: 100%;
   overflow-y: auto;
   max-height: 80%;
@@ -89,14 +89,14 @@
 }
 
 .view-vendor-post-card {
-  width: 100%; /* Take full width of the grid cell */
+  width: 100%;
   max-width: 250px;
   border: 3px solid #000;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
   background-color: #f9f9f9;
-  cursor: pointer; /* Indicate that the card is clickable */
+  cursor: pointer;
 }
 
 .view-vendor-post-card:hover {
@@ -104,17 +104,18 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.view-vendor-post-image {
+.view-vendor-post-image,
+.view-vendor-post-video {
   width: 250px;
   height: 250px;
-  object-fit: cover;
+  object-fit: fill; /* Ensures videos and images are displayed similarly */
 }
 
 .view-vendor-post-caption {
   font-size: 0.9em;
-  padding: 10px;
+  padding: 5px;
   color: #333;
-  max-height: 60px; /* Limit caption height */
+  max-height: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -123,8 +124,8 @@
 .view-vendor-post-hashtag {
   font-size: 0.9em;
   padding: 0 10px 10px;
-  color: #007bff; /* Blue color for hashtag */
-  font-weight: bold; /* Make hashtag stand out */
+  color: #007bff;
+  font-weight: bold;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -135,15 +136,15 @@
   font-size: 0.8em;
   color: #666;
   padding: 5px 10px;
-  display: flex; /* Flex to align "Click to view" and timestamp */
-  justify-content: space-between; /* Space between items */
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   background-color: #f0f0f0;
 }
 
 .view-vendor-click-to-view {
-  color: #007bff; /* Blue color for the clickable text */
-  font-weight: bold; /* Make it stand out */
+  color: #007bff;
+  font-weight: bold;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -182,11 +183,12 @@
   }
 
   .view-vendor-post-card {
-    max-width: 200px; /* Smaller card width for medium screens */
+    max-width: 250px !important;
   }
 
-  .view-vendor-post-image {
-    height: 120px; /* Reduced height for images */
+  .view-vendor-post-image,
+  .view-vendor-post-video {
+    height: 120px; /* Reduced height for images/videos on medium screens */
   }
 }
 
@@ -205,11 +207,12 @@
   }
 
   .view-vendor-post-card {
-    width: 100%; /* Full width on mobile */
-    max-width: none; /* No max-width on mobile */
+    width: 100%;
+    max-width: none;
   }
 
-  .view-vendor-post-image {
+  .view-vendor-post-image,
+  .view-vendor-post-video {
     height: 150px; /* Reduced height for smaller screens */
   }
 }
