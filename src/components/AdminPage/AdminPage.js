@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import Tools from '../Tools/Tools';
 import Status from '../Status/Status';
@@ -8,23 +9,24 @@ import AddVendor from '../Add/AddVendor/AddVendor';
 import './AdminPage.css';
 
 const AdminPage = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isToolsOpen, setIsToolsOpen] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAddVendorOpen, setIsAddVendorOpen] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // Credentials
-    const validUsername = 'admin';
-    const validPassword = 'pass';
+    /* Credentials */
+    const validUsername = process.env.REACT_APP_ADMIN_USERNAME;
+    const validPassword = process.env.REACT_APP_ADMIN_PASSWORD;
 
     if (username === validUsername && password === validPassword) {
-      Cookies.set('adminAuthenticated', 'true', { expires: 1 }); // Cookie expires in 1 day
-      Cookies.set('adminUsername', username, { expires: 1 }); // Store the username in a cookie
+      Cookies.set('adminAuthenticated', 'true', { expires: 1 }); // 1 Day
+      Cookies.set('adminUsername', username, { expires: 1 }); // 1 Day
       setIsAuthenticated(true);
       setError('');
     } else {
@@ -35,19 +37,21 @@ const AdminPage = () => {
   // Check if user is authenticated
   React.useEffect(() => {
     const authCookie = Cookies.get('adminAuthenticated');
-    if (authCookie) {
+    if (authCookie === 'true') {
       setIsAuthenticated(true);
     }
   }, []);
   
   const handleLogout = () => {
+    console.log('Logout button clicked');
     Cookies.remove('adminAuthenticated');
     Cookies.remove('adminUsername');
     setIsAuthenticated(false);
+    window.location.reload(); // Force re-render after logout
   };
 
   const handleBackToHome = () => {
-    window.location.href = '/';
+    navigate('/');
   };
 
   const toggleTools = () => {
@@ -76,20 +80,18 @@ const AdminPage = () => {
             </button>
           </div>
           <div className="admin-content">
-            <div className={`tools-sidebar ${isToolsOpen ? 'open' : 'closed'}`}>
-              <Tools openAddVendor={openAddVendorModal} /> {/* Pass the open function to Tools */}
+            <div className={`tools-sidebar ${isToolsOpen ? 'open' : 'closed'}`}> 
+              <Tools openAddVendor={openAddVendorModal} />
               <button className="tools-toggle-button" onClick={toggleTools}>
                 {isToolsOpen ? '←' : '→'}
               </button>
             </div>
             <div className="metrics-status-container">
               <Status />
-              <Metrics />
             </div>
           </div>
         </div>
 
-        {/* AddVendor Modal */}
         <AddVendor isOpen={isAddVendorOpen} onClose={closeAddVendorModal} />
       </>
     );
@@ -102,6 +104,7 @@ const AdminPage = () => {
         <label>
           Username:
           <input
+          className="admin-page-user-input"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -111,6 +114,7 @@ const AdminPage = () => {
         <label>
           Password:
           <input
+            className="admin-page-pass-input"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

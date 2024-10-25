@@ -1,5 +1,16 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const winston = require('winston');
 const { db, query } = require('../config/db');
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
+    ),
+    transports: [
+      new winston.transports.Console(),
+    ],
+  });
 
 exports.getEventsWithTickets = async (req, res) => {
     try {
@@ -78,30 +89,105 @@ exports.checkAvailability = async (req, res) => {
     }
 };
 
-// Get a specific ticket (placeholder)
-exports.getTicket = (req, res) => {
+exports.getTicket = async (req, res) => {
     const { ticketId } = req.params;
-    res.status(200).json({ ticketId, message: 'Ticket fetched successfully' });
+
+    try {
+        const ticket = await query('SELECT * FROM event_ticket_types WHERE id = ?', [ticketId]);
+
+        if (!ticket || ticket.length === 0) {
+            return res.status(404).json({ message: 'Ticket not found' });
+        }
+
+        res.status(200).json({ ticket: ticket[0], message: 'Ticket fetched successfully' });
+    } catch (error) {
+        console.error('Error fetching ticket:', error.message);
+        res.status(500).json({ message: 'Error fetching ticket', error: error.message });
+    }
 };
 
-// Get all tickets (placeholder)
-exports.getAllTickets = (req, res) => {
-    res.status(200).json({ message: 'All tickets fetched successfully' });
+exports.getAllTickets = async (req, res) => {
+    try {
+        const tickets = await query('SELECT * FROM event_ticket_types');
+
+        if (!tickets || tickets.length === 0) {
+            return res.status(404).json({ message: 'No tickets found' });
+        }
+
+        res.status(200).json({ tickets, message: 'All tickets fetched successfully' });
+    } catch (error) {
+        console.error('Error fetching tickets:', error.message);
+        res.status(500).json({ message: 'Error fetching tickets', error: error.message });
+    }
 };
 
 exports.getTicketsByEventId = async (req, res) => {
     const { eventId } = req.params;
     try {
         const tickets = await query(
-            'SELECT id, ticket_type, ticket_description, price, available_tickets FROM event_ticket_types WHERE event_id = ? AND available_tickets > 0',
+            'SELECT id AS ticketTypeId, ticket_type AS ticketType, ticket_description AS ticketDescription, price, available_tickets AS availableTickets FROM event_ticket_types WHERE event_id = ? AND available_tickets > 0',
             [eventId]
         );
         if (!tickets || tickets.length === 0) {
             return res.status(404).json({ message: 'No tickets found for the specified event' });
         }
-        res.status(200).json(tickets);  // Return the array of tickets
+        res.status(200).json({ tickets });  // Return the array of tickets as "tickets"
     } catch (error) {
         console.error('Error fetching tickets by event ID:', error.message);
         res.status(500).json({ message: 'Error fetching tickets', error: error.message });
     }
 };
+
+exports.getTicketByEventAndTicketId = async (req, res) => {
+    const { eventId, ticketId } = req.params;
+  
+    try {
+      const ticket = await query(
+        'SELECT * FROM event_ticket_types WHERE event_id = ? AND id = ?', 
+        [eventId, ticketId]
+      );
+  
+      if (!ticket || ticket.length === 0) {
+        return res.status(404).json({ message: 'Ticket not found for the specified event' });
+      }
+  
+      res.status(200).json({ ticket: ticket[0], message: 'Ticket fetched successfully' });
+    } catch (error) {
+      console.error('Error fetching ticket:', error.message);
+      res.status(500).json({ message: 'Error fetching ticket', error: error.message });
+    }
+  };
+
+  exports.deleteTicket = (req, res) => {
+    const ticketId = req.params.id;
+    const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+  
+    // Query to get the ticket information
+    const getTicketQuery = 'SELECT ticket_type FROM event_ticket_types WHERE id = ?';
+    db.query(getTicketQuery, [ticketId], (err, ticketResults) => {
+      if (err || ticketResults.length === 0) {
+        return res.status(404).json({ error: 'Ticket not found' });
+      }
+  
+      const ticketType = ticketResults[0].ticket_type;
+      const deleteQuery = 'DELETE FROM event_ticket_types WHERE id = ?';
+      db.query(deleteQuery, [ticketId], (err, deleteResults) => {
+        if (err) {
+          logger.error('Error deleting ticket:', err);
+          return res.status(500).json({ error: 'Failed to delete ticket' });
+        }
+  
+        if (deleteResults.affectedRows === 0) {
+          return res.status(404).json({ error: 'Ticket not found' });
+        }
+  
+        logAction('Ticket Deleted', ticketType, ticketId, adminUsername);
+        res.json({ message: `Ticket ${ticketType} (ID: ${ticketId}) deleted successfully` });
+      });
+    });
+  };
+  
+  // Helper function to log actions (placeholder)
+  const logAction = (action, itemType, itemId, adminUsername) => {
+    logger.info(`${action} - ${itemType} (ID: ${itemId}) by ${adminUsername}`);
+  };  

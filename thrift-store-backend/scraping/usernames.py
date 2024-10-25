@@ -1,6 +1,7 @@
 # usernames.py
 usernames = [
     "lovemorgue",
-    "chasingnostalgia__"
+    "chasingnostalgia__",
+    "gamerb0yz"
     # Add more usernames as needed
 ]

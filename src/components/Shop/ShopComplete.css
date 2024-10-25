@@ -1,0 +1,70 @@
+.shop-complete-container {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 194, 52, 1),
+      rgba(25, 121, 21, 0.9),
+      rgba(83, 161, 192, 1),
+      rgba(163, 112, 199, 0.9)
+  );
+  background-size: 200% 200%;
+  animation: gradient-animation 30s ease infinite;
+  text-align: center;
+  padding: 40px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border: 3px solid #000000;
+  border-top: 0;
+}
+
+.shop-complete-container h1 {
+  color: #000000;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.shop-complete-message {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.shop-complete-info {
+  font-size: 0.7em;
+  color: #ffffff;
+  font-style: italic;
+}
+
+.shop-complete-footer {
+  font-size: 1.3em;
+  margin-top: 20px;
+  color: #333;
+}
+
+.return-to-shop-btn,
+.return-home-btn {
+  margin-top: 30px;
+  padding: 10px 20px;
+  background-color: #0d98ba;
+  color: white;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.return-to-shop-btn:hover,
+.return-home-btn:hover {
+  background-color: #097ca0;
+}
+
+.shop-complete-loading {
+  text-align: center;
+  padding: 50px;
+}
+
+.shop-complete-loading img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+}

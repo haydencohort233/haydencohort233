@@ -1,9 +1,7 @@
-// index.js
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
+import NotificationSystem from './components/NotificationSystem/NotificationSystem';
 import Home from './components/Home/Home';
 import Events from './components/Events/Events';
 import VendorList from './components/VendorList/VendorList';
@@ -13,15 +11,14 @@ import ScrapedPosts from './components/ScrapedPosts/ScrapedPosts';
 import Shop from './components/Shop/Shop';
 import BuyTicket from './components/Shop/BuyTicket';
 import ViewTickets from './components/ViewTickets/ViewTickets';
-
-// Load Stripe using the publishable key from the environment variable
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'your-fallback-key');
+import ShopComplete from './components/Shop/ShopComplete';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <React.StrictMode>
-    <Router basename="/">
+  <Router basename="/">
+    <>
+      <NotificationSystem />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<Events />} />
@@ -31,15 +28,9 @@ root.render(
         <Route path="/scraped-posts" element={<ScrapedPosts />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/view-tickets" element={<ViewTickets />} />
-        <Route 
-          path="/buy-ticket" 
-          element={
-            <Elements stripe={stripePromise}>
-              <BuyTicket />
-            </Elements>
-          } 
-        />
+        <Route path="/buy-ticket" element={<BuyTicket />} />
+        <Route path="/payment-complete" element={<ShopComplete />} />
       </Routes>
-    </Router>
-  </React.StrictMode>
+    </>
+  </Router>
 );

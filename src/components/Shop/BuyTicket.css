@@ -1,130 +1,202 @@
-/* General styling for the checkout page with tie-dye background */
+body {
+  font-family: 'Verdana', sans-serif;
+}
+
 .buy-ticket-page {
     background: linear-gradient(
-        135deg,
-        rgba(255, 201, 71, 0.9), /* Warm yellow */
-        rgba(251, 154, 153, 0.9), /* Light pink */
-        rgba(156, 220, 245, 0.9), /* Light blue */
-        rgba(204, 151, 242, 0.9)  /* Soft purple */
+      135deg,
+      rgba(255, 201, 71, 0.9),
+      rgba(251, 154, 153, 0.9),
+      rgba(156, 220, 245, 0.9),
+      rgba(204, 151, 242, 0.9)
     );
     background-size: 200% 200%;
-    animation: gradient-animation 15s ease infinite;
-    border-radius: 10px;
-    padding: 30px;
-    max-width: 500px;
-    margin: 40px auto;
+    animation: gradient-animation 10s ease infinite;
+    max-width: 1000px;
+    margin: 0px auto;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    text-align: center;
     color: #333;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-/* Smooth animation for a dynamic gradient */
-@keyframes gradient-animation {
+    text-align: center;
+  }
+  
+  @keyframes gradient-animation {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+  }
+  
+/* Style for radio button group (checkout options) */
+.checkout-options {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 90%;
+  align-items: center;
 }
 
-/* Updated layout for ticket items */
-.ticket-item {
-    width: 90%;
-    max-width: 300px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f8f8f8;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin: 5px 0;
+/* Styling for the ticket selection summary */
+.selected-tickets-summary {
+  margin-bottom: 20px;
+  max-width: 90%;
+  background-color: #fff;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: left;
 }
-
-/* Form fields styling aligned vertically */
-.buy-ticket-page .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-    margin-top: 20px;
+  
+.selected-tickets-summary h3 {
+  margin-bottom: 10px;
+  color: #1abc9c;
 }
-
-/* Styling for individual input fields */
-.buy-ticket-page input[type="text"],
-.buy-ticket-page input[type="email"],
-.buy-ticket-page input[type="tel"] {
-    width: 80%;
-    padding: 12px;
-    margin: 5px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1em;
+  
+.event-summary h4 {
+  margin-bottom: 5px;
+  color: #333;
 }
-
-/* Credit Card section styling */
-.card-element-container {
-    margin: 15px 0;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    width: 80%;
-    margin: 20px auto;
+  
+.ticket-summary {
+  padding: 10px;
+  background: #f9f9f9;
+  border: 2px solid #ddd;
+  text-align: center;
 }
-
-/* Buttons styling */
-.buy-ticket-btn {
-    background-color: #1abc9c;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    font-size: 1.2em;
-    cursor: pointer;
-    margin: 15px 5px;
-    transition: background-color 0.3s ease;
+  
+.ticket-summary p {
+  margin: 5px 0;
 }
-
-.buy-ticket-btn:hover {
-    background-color: #16a085;
-}
-
-/* Remove ticket from checkout page */
+  
 .remove-ticket-btn {
-    background: none;
-    border: none;
-    color: red;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: 10px;
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-weight: bold;
+  cursor: pointer;
 }
-
+  
 .remove-ticket-btn:hover {
-    color: darkred;
+  color: darkred;
 }
 
-.close-modal {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    font-size: 1.2em;
-    cursor: pointer;
-    margin: 15px 5px;
-    transition: background-color 0.3s ease;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin: 20px 0;
+  align-items: center;
 }
 
-.close-modal:hover {
-    background-color: #c0392b;
+
+.buy-ticket-input {
+  padding: 15px;
+  font-size: 1.1em;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, border 0.3s ease;
 }
 
-/* Container for action buttons */
-.buy-ticket-page .action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
+.buy-ticket-input:focus {
+  border-color:#09f1c3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
+.card-element-container {
+  margin-bottom: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 5px;
+  min-width: 75%;
+  max-width: 80%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, border 0.3s ease;
+}
+
+.card-element-container:focus-within {
+  border-color: #09f1c3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.buy-ticket-discount-btn {
+  color: #000000;
+  min-width: 300px;
+  font-size: 1.1em;
+  margin-top: 20px;
+  border-radius: 0px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+  
+.buy-ticket-btn {
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+  
+.buy-ticket-btn:hover {
+  background-color: #16a085;
+}
+  
+.cancel-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+  
+.cancel-btn:hover {
+  background-color: #c0392b;
+}
+  
+.total-amount {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Styling for the total amount heading (independent h3) */
+.total-amount-heading {
+  font-size: 2.0em;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+  margin-bottom: 5px;
+}
+
+.input-error {
+  border: 2px solid red !important;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
+}
+
+#card-container {
+  width: 100%;
+  height: 48px;
+  position: relative;
+  display: block;
+  margin-bottom: 5px;
+}
+
+#card-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: transparent;
 }
