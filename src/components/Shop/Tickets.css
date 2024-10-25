@@ -13,7 +13,6 @@
     text-align: center;
 }
 
-/* Ticket purchase title */
 .ticket-purchase-title {
     font-size: 28px;
     margin-bottom: 20px;
@@ -57,25 +56,25 @@
 /* Align ticket bubbles to the right */
 .shop-page .event-item {
     display: flex;
-    justify-content: flex-end; /* Aligns bubbles to the right */
-    position: relative; /* Required for the sliding animation */
+    justify-content: flex-end;
+    position: relative;
 }
 
 .shop-page .ticket-type-item {
     width: 100%;
     max-width: 250px;
     cursor: pointer;
-    transition: transform 0.4s ease-in-out; /* Smooth sliding effect */
+    transition: transform 0.4s ease-in-out;
 }
 
 /* Add styles for when the event details are visible */
 .shop-page .ticket-type-item.expanded {
-    transform: translateX(-100%); /* Slide the bubble to the left when expanded */
+    transform: translateX(-100%);
 }
 
 /* Styles for event details when sliding out */
 .shop-page .event-details {
-    display: none; /* Hide by default */
+    display: none;
     width: 100%;
     max-width: 400px;
     padding: 15px;
@@ -87,5 +86,5 @@
 }
 
 .shop-page .ticket-type-item.expanded + .event-details {
-    display: block; /* Show details when expanded */
+    display: block;
 }

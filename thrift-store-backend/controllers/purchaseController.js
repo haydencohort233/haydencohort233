@@ -1,156 +1,186 @@
 const sendConfirmationEmail = require('../utils/emailService');
 const { generateTicketPurchaseEmail } = require('../utils/emailTemplates');
 const generateConfirmationCode = require('../utils/emailConfirmCode');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { db } = require('../config/db');
+const { v4: uuidv4 } = require('uuid'); // For generating idempotency keys
+const { Client, Environment } = require('square');
+const { promisify } = require('util');
+const logger = require('../utils/logger'); // Import Winston logger
+require('dotenv').config();
 
-// Modified buyTicket function with support for ticket types
+// Initialize Square client
+const client = new Client({
+    accessToken: process.env.SQUARE_SANDBOX_ACCESS_TOKEN,
+    environment: Environment.Sandbox, // Use Sandbox for testing
+});
+
+const { paymentsApi } = client;
+const query = promisify(db.query).bind(db);
+
 exports.buyTicket = async (req, res) => {
-    const { firstName, lastName, email, phoneNumber, eventId, quantity, paymentMethodId, discountCode, ticketTypeId } = req.body;
+    const { firstName, lastName, email, phoneNumber, eventId, selectedTickets, sourceId, discountCode } = req.body;
+
+    logger.info('Received buyTicket request:', req.body);
+
+    // Start a database transaction
+    await query('START TRANSACTION');
 
     try {
-        // Fetch the ticket type details, including the price and available tickets
-        const ticketTypeQueryResult = await new Promise((resolve, reject) => {
-            db.query(
-                'SELECT price, available_tickets, ticket_type FROM event_ticket_types WHERE id = ? AND event_id = ?',
-                [ticketTypeId, eventId],
-                (err, results) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(results);
-                    }
-                }
+        let totalCost = 0;
+        let firstTicketPrice = 0; // Store the first ticket price for email
+
+        // Loop through each selected ticket and process it
+        for (const selectedTicket of selectedTickets) {
+            const { ticketTypeId, quantity } = selectedTicket; // Update to use ticketTypeId
+
+            logger.info(`Processing ticketTypeId: ${ticketTypeId}, quantity: ${quantity}`);
+
+            // Fetch ticket details from the event_ticket_types table
+const ticketTypeQueryResult = await query(
+    'SELECT id, ticket_type, price FROM event_ticket_types WHERE id = ?',
+    [selectedTickets[0].eventTickets[0].ticketTypeId] // Ensure ticketTypeId is passed correctly
+  );
+  const ticketResult = ticketTypeQueryResult[0];  // Get the first result
+  
+  if (!ticketResult) {
+    logger.error('Ticket type not found for ticketTypeId:', selectedTickets[0].eventTickets[0].ticketTypeId);
+    return res.status(404).json({ message: 'Ticket type not found' });
+  }
+  
+  const ticketType = ticketResult.ticket_type;  // Ensure this contains the ticket_type field  
+
+            // Log current available tickets before update
+            const currentTickets = ticketTypeData.available_tickets;
+            logger.info(`Current available tickets for ticketTypeId: ${ticketTypeId}: ${currentTickets}`);
+
+            if (ticketTypeData.available_tickets < quantity) {
+                logger.warn(`Not enough tickets available for ticketTypeId: ${ticketTypeId}. Requested: ${quantity}, Available: ${ticketTypeData.available_tickets}`);
+                await query('ROLLBACK');
+                return res.status(400).json({ message: 'Not enough tickets available for the selected ticket type' });
+            }
+
+            // Calculate total cost
+            const ticketPrice = parseFloat(ticketTypeData.price) || 0;  // Ensure it's a valid number
+            totalCost += ticketPrice * quantity;
+
+            if (firstTicketPrice === 0) {
+                firstTicketPrice = ticketPrice; // Store the first ticket price for the email
+            }
+
+            // Update the available_tickets in event_ticket_types table
+            logger.info(`Updating available tickets for ticketTypeId: ${ticketTypeId}, reducing by quantity: ${quantity}`);
+            const updateResult = await query(
+                `UPDATE event_ticket_types 
+                SET available_tickets = available_tickets - ? 
+                WHERE id = ? AND event_id = ? AND available_tickets >= ?`,
+                [quantity, ticketTypeId, eventId, quantity]
             );
+
+            if (updateResult.affectedRows === 0) {
+                logger.error(`Failed to update available tickets for ticketTypeId: ${ticketTypeId}`);
+                await query('ROLLBACK');
+                return res.status(400).json({ message: 'Failed to update available tickets' });
+            }
+
+            // Fetch the updated available tickets
+            const updatedTicketTypeQueryResult = await query(
+                'SELECT available_tickets FROM event_ticket_types WHERE id = ? AND event_id = ?',
+                [ticketTypeId, eventId]
+            );
+            const updatedTickets = updatedTicketTypeQueryResult[0].available_tickets;
+            logger.info(`Updated available tickets for ticketTypeId: ${ticketTypeId}: ${updatedTickets}`);
+        }
+
+        logger.info(`Total cost for all tickets: $${totalCost}`);
+
+        // Process payment with Square
+        logger.info('Processing payment with Square...');
+        const idempotencyKey = uuidv4();
+        const totalAmountInCents = Math.round(totalCost * 100);  // Convert total cost to cents
+        const paymentResponse = await paymentsApi.createPayment({
+            sourceId,
+            idempotencyKey,
+            amountMoney: {
+                amount: totalAmountInCents,
+                currency: 'USD',
+            },
+            autocomplete: true,
         });
 
-        const ticketType = ticketTypeQueryResult[0]; // Ensure we are accessing the first row properly
-
-        // Check if the ticket type exists and has enough tickets available
-        if (!ticketType || ticketType.available_tickets < quantity) {
-            console.log('Not enough tickets available for the selected ticket type');
-            return res.status(400).json({ message: 'Not enough tickets available for the selected ticket type' });
+        if (!paymentResponse.result || paymentResponse.result.payment.status !== 'COMPLETED') {
+            logger.error('Payment failed with Square.');
+            await query('ROLLBACK');
+            return res.status(400).json({ message: 'Payment failed' });
         }
 
-        const ticketPrice = parseFloat(ticketType.price) || 0; // Ensure ticketPrice is a valid number
-        const ticketTypeName = ticketType.ticket_type;
+        logger.info('Payment successful:', paymentResponse.result);
+        const payment = paymentResponse.result.payment;
+        const confirmationCode = generateConfirmationCode();
 
-        // Initialize discount variables
-        let discountAmount = 0;
-        let discountCodeId = null;
+        // Insert purchase record into shop_purchases
+        logger.info('Inserting purchase record into shop_purchases...');
+        const insertPurchaseQuery = `
+            INSERT INTO shop_purchases 
+            (first_name, last_name, email, phone_number, event_id, quantity, total_amount, confirmation_code, discount_code) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        const [purchaseResult] = await query(insertPurchaseQuery, [
+            firstName, lastName, email, phoneNumber, eventId, 
+            selectedTickets.reduce((sum, ticket) => sum + ticket.quantity, 0), 
+            totalCost, confirmationCode, discountCode || null
+        ]);
 
-        // Validate discount code if provided
-        if (discountCode) {
-            const discountQueryResult = await new Promise((resolve, reject) => {
-                db.query(
-                    'SELECT * FROM discount_codes WHERE code = ? AND is_active = true AND (expires_at IS NULL OR expires_at > NOW())',
-                    [discountCode],
-                    (err, results) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(results);
-                        }
-                    }
-                );
-            });
+        const purchaseId = purchaseResult.insertId;
 
-            const discount = discountQueryResult[0]; // Ensure we are accessing the first row properly
+        // Insert each ticket into ticket_sales with the purchase ID
+        for (const selectedTicket of selectedTickets) {
+            const { ticketTypeId, quantity } = selectedTicket; // Use ticketTypeId
+            const ticketPrice = parseFloat(ticketTypeData.price) * quantity;  // Ensure price is correctly formatted
 
-            if (discount) {
-                discountAmount = discount.discount_percentage * 0.01 * (ticketPrice * quantity);
-                discountCodeId = discount.id;
-                console.log(`Discount applied: ${discount.discount_percentage}%`);
-            } else {
-                console.log('Invalid or expired discount code');
-                return res.status(400).json({ message: 'Invalid or expired discount code.' });
-            }
+            await query(
+                `INSERT INTO ticket_sales (event_id, ticket_type_id, purchaser_email, purchaser_first_name, purchaser_last_name, phone_number, quantity, total_price, purchase_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [eventId, ticketTypeId, email, firstName, lastName, phoneNumber, quantity, ticketPrice, purchaseId]
+            );
         }
 
-        let confirmationCode = generateConfirmationCode();
-        let isUnique = false;
-
-        // Ensure that the confirmation code is unique in the database
-        while (!isUnique) {
-            const confirmationCodeQueryResult = await new Promise((resolve, reject) => {
-                db.query('SELECT * FROM ticket_purchases WHERE confirmation_code = ?', [confirmationCode], (err, results) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(results);
-                    }
-                });
-            });
-
-            if (confirmationCodeQueryResult.length === 0) {
-                isUnique = true; // Code is unique, exit the loop
-            } else {
-                confirmationCode = generateConfirmationCode(); // Generate a new code if there's a conflict
-            }
-        }
-
-        // Calculate the final amount to be charged after applying the discount
-        const amountToCharge = (ticketPrice * quantity) - discountAmount;
-
-        // Process payment with Stripe
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(amountToCharge * 100), // Stripe requires the amount in cents
-            currency: 'usd',
-            payment_method: paymentMethodId,
-            confirm: true,
-            return_url: 'http://localhost:3000/payment-complete'
-        });
-
-        const totalPaid = paymentIntent.amount / 100; // Total paid (Stripe amounts are in cents)
-
-        // Update available tickets for the specific ticket type in the database
-        const newTicketCount = ticketType.available_tickets - quantity;
-        await db.query('UPDATE event_ticket_types SET available_tickets = ? WHERE id = ?', [newTicketCount, ticketTypeId]);
-
-        // Initialize emailSent variable before using it
-        let emailSent = false;
+        // Commit the transaction
+        await query('COMMIT');
+        logger.info('Transaction committed successfully.');
 
         // Send confirmation email
         try {
-            const { subject, text, html } = generateTicketPurchaseEmail(firstName, lastName, ticketTypeName, quantity, confirmationCode, ticketTypeName, ticketPrice);
-            await sendConfirmationEmail(email, subject, text, html);
-            emailSent = true;
+            const ticketTypeName = selectedTickets[0].ticketType.ticket_type; // Ensure you access `ticket_type` correctly
+            await sendConfirmationEmail({
+                to: email,
+                subject: 'Your Ticket Purchase Confirmation',
+                html: generateTicketPurchaseEmail({
+                    firstName,
+                    lastName,
+                    eventName: selectedTickets[0].event.name, // Ensure correct event name
+                    quantity: selectedTickets.reduce((sum, ticket) => sum + ticket.quantity, 0),
+                    confirmationCode,
+                    ticket_type: ticketTypeName,  // Pass the ticket type name
+                    ticketPrice: firstTicketPrice.toFixed(2),  // Ensure ticketPrice is passed correctly
+                    totalCost: totalCost.toFixed(2),  // Pass the total cost correctly
+                }).html,
+            });            
+            logger.info(`Confirmation email sent to ${email}`);
         } catch (emailError) {
-            console.error('Error sending confirmation email:', emailError.message);
+            logger.error(`Failed to send confirmation email to ${email}: ${emailError.message}`);
         }
 
-        // Insert purchase information into the `ticket_purchases` table and get the inserted ticket ID
-        const purchaseInsertResult = await new Promise((resolve, reject) => {
-            db.query(
-                `INSERT INTO ticket_purchases 
-                (first_name, last_name, email, phone_number, event_id, event_name, quantity, total_paid, confirm_email, confirmation_code) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [firstName, lastName, email, phoneNumber, eventId, ticketTypeName, quantity, totalPaid, emailSent, confirmationCode],
-                (err, results) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(results);
-                    }
-                }
-            );
+        // Respond to frontend
+        res.status(200).json({
+            message: 'Purchase successful',
+            totalCost,
+            paymentId: payment.id,
+            result: paymentResponse.result,
         });
 
-        const ticketPurchaseId = purchaseInsertResult.insertId; // Get the ticket purchase ID
-
-        // Track discount code usage if applicable
-        if (discountCodeId) {
-            await db.query(
-                'INSERT INTO discount_code_usages (discount_code_id, ticket_purchase_id, user_email, used_at) VALUES (?, ?, ?, NOW())',
-                [discountCodeId, ticketPurchaseId, email]
-            );
-            console.log('Discount code usage recorded successfully.');
-        }
-
-        // Respond to client
-        res.status(200).json({ message: 'Purchase successful', paymentIntent, confirmationCode });
     } catch (error) {
-        console.error('Error processing ticket purchase:', error.message);
-        return res.status(500).json({ message: 'Purchase failed', error: error.message });
+        await query('ROLLBACK');
+        logger.error('Error during ticket purchase:', error.message);
+        res.status(500).json({ message: 'Purchase failed', error: error.message });
     }
 };

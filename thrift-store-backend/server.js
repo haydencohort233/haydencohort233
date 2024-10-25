@@ -3,17 +3,23 @@ const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
 const morgan = require('morgan');
-const { db, query } = require('./config/db'); // Import db and query
+const { db, query } = require('./config/db');
 const express = require('express');
 const fs = require('fs');
 const { promisify } = require('util');
+const { Client, Environment } = require('square');
+const { v4: uuidv4 } = require('uuid');
+const JSONbig = require('json-bigint');
+const { sendConfirmationEmail } = require('./utils/emailService');
+const { generateTicketPurchaseEmail } = require('./utils/emailTemplates');
+const logger = require('./utils/logger');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Ensure this matches the frontend URL
+  origin: 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'X-Admin-Username', 'Authorization'],
   credentials: true,
@@ -30,82 +36,260 @@ app.get('/downloads/:filename', (req, res) => {
   const filePath = path.join(__dirname, 'downloads', req.params.filename);
   const fileExtension = path.extname(filePath).toLowerCase();
 
-  let contentType = 'application/octet-stream'; // Default MIME type
-  if (fileExtension === '.mp4') {
-    contentType = 'video/mp4';
-  } else if (fileExtension === '.jpg' || fileExtension === '.jpeg') {
-    contentType = 'image/jpeg';
-  } else if (fileExtension === '.png') {
-    contentType = 'image/png';
-  }
+  let contentType = 'application/octet-stream';
+  if (fileExtension === '.mp4') contentType = 'video/mp4';
+  else if (fileExtension === '.jpg' || fileExtension === '.jpeg') contentType = 'image/jpeg';
+  else if (fileExtension === '.png') contentType = 'image/png';
 
   fs.exists(filePath, (exists) => {
     if (exists) {
       res.setHeader('Content-Type', contentType);
       res.sendFile(filePath);
+      logger.info(`File sent: ${req.params.filename}`);
     } else {
       res.status(404).send('File not found');
+      logger.error(`File not found: ${req.params.filename}`);
     }
   });
 });
 
-// Serve image files from the "downloads/photos" directory
-app.get('/downloads/photos/:filename', (req, res) => {
-  const filePath = path.join(__dirname, 'downloads/photos', req.params.filename);
-  const fileExtension = path.extname(filePath).toLowerCase();
+// Initialize Square client
+const client = new Client({
+  environment: Environment.Sandbox,
+  accessToken: process.env.SQUARE_SANDBOX_ACCESS_TOKEN,
+});
 
-  let contentType = 'application/octet-stream'; // Default MIME type
-  if (fileExtension === '.jpg' || fileExtension === '.jpeg') {
-    contentType = 'image/jpeg';
-  } else if (fileExtension === '.png') {
-    contentType = 'image/png';
+// Helper functions for customer lookup
+async function findCustomerByEmail(email) {
+  try {
+    const searchResponse = await client.customersApi.searchCustomers({
+      query: {
+        filter: {
+          emailAddress: {
+            exact: email,
+          },
+        },
+      },
+    });
+
+    if (searchResponse.result.customers && searchResponse.result.customers.length > 0) {
+      logger.info(`Customer found by email: ${email}`);
+      return searchResponse.result.customers[0];
+    } else {
+      logger.warn(`No customer found with email: ${email}, creating new customer...`);
+      return null;
+    }
+  } catch (error) {
+    logger.error(`Error searching customer by email: ${email} - ${error.message}`);
+    return null;
   }
+}
 
-  // Check if file exists and serve it with the correct MIME type
-  fs.exists(filePath, (exists) => {
-    if (exists) {
-      res.setHeader('Content-Type', contentType);
-      res.sendFile(filePath);
+app.post('/process-payment', async (req, res) => {
+  console.log('Incoming request body:', req.body);
+
+  let {
+    nonce,
+    amount,
+    firstName,
+    lastName,
+    email,
+    phoneNumber,
+    selectedTickets,
+    discountCode,
+  } = req.body;
+
+  try {
+    // Check if selectedTickets is valid and contains data
+    if (!selectedTickets || selectedTickets.length === 0) {
+      logger.error('No selected tickets provided');
+      return res.status(400).json({ error: 'No selected tickets provided' });
+    }
+
+    logger.info('Starting payment process for customer:', { email, firstName, lastName, phoneNumber });
+    logger.info('Selected tickets:', selectedTickets); // Log selected tickets for debugging
+
+    let customerId;
+    let purchaseId = null;
+    let discountCodeId = null;
+
+    // Find or create customer
+    const existingCustomer = await findCustomerByEmail(email);
+    if (existingCustomer) {
+      customerId = existingCustomer.id;
+      logger.info(`Existing customer found for email: ${email}`);
     } else {
-      res.status(404).send('File not found');
-    }
-  });
-});
-
-// Metrics endpoint to serve metrics.json
-app.get('/api/metrics', (req, res) => {
-  const metricsFilePath = path.join(__dirname, 'metrics/metrics.json');
-
-  fs.readFile(metricsFilePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading metrics file:', err); // More detailed error logging
-      return res.status(500).json({ error: 'Failed to read metrics file' });
-    }
-
-    try {
-      const metrics = JSON.parse(data);
-      res.json({
-        totalPostsScraped: metrics.total_posts_scraped || 0,
-        totalVendorsScraped: metrics.total_vendors_scraped || 0,
-        lastScrapeTime: metrics.end_time || '',
-        averagePostsPerVendor: metrics.total_vendors_scraped 
-          ? (metrics.total_posts_scraped / metrics.total_vendors_scraped).toFixed(2) 
-          : 0,
-        errorsDuringScraping: metrics.errors_encountered || 0,
-        totalTimeToComplete: metrics.total_time_to_complete || 0,
-        numberOfPostsDownloaded: metrics.number_of_posts_downloaded || 0,
-        scrapingSuccessRate: metrics.scraping_success_rate || 0,
-        vendorWithMaxPosts: metrics.vendor_with_max_posts || { name: 'Unknown', total_posts: 0 },
-        lastScrapingError: metrics.last_scraping_error || 'None'
+      const createCustomerResponse = await client.customersApi.createCustomer({
+        emailAddress: email,
+        givenName: firstName,
+        familyName: lastName,
+        phoneNumber: phoneNumber,
       });
-    } catch (parseError) {
-      console.error('Error parsing metrics file:', parseError);
-      res.status(500).json({ error: 'Failed to parse metrics file' });
+      customerId = createCustomerResponse.result.customer.id;
+      logger.info(`New customer created with ID: ${customerId}`);
     }
-  });
+
+    // Handle discount code logic
+    let discountPercentage = 0;
+    if (discountCode) {
+      const discountQueryResult = await query('SELECT id, discount_percentage FROM discount_codes WHERE code = ?', [discountCode]);
+      if (discountQueryResult.length > 0) {
+        discountPercentage = discountQueryResult[0].discount_percentage;
+        discountCodeId = discountQueryResult[0].id; // Capture discount_code_id
+        logger.info(`Discount applied: ${discountPercentage}%`);
+      } else {
+        logger.warn(`Invalid discount code: ${discountCode}`);
+        return res.status(400).json({ error: 'Invalid discount code' });
+      }
+    }
+
+    // Loop through all selected tickets to validate and calculate the total amount
+    let totalAmount = 0;
+    const ticketDetails = [];
+
+    for (const event of selectedTickets) {
+      for (const ticket of event.eventTickets) {
+        // Fetch ticket price and ticket_type from event_ticket_types table for each selected ticket
+        const ticketTypeQueryResult = await query(
+          'SELECT ticket_type, price FROM event_ticket_types WHERE id = ?',
+          [ticket.ticketTypeId]
+        );
+        const ticketResult = ticketTypeQueryResult[0];
+
+        if (!ticketResult) {
+          logger.error(`Ticket type not found for ticketTypeId: ${ticket.ticketTypeId}`);
+          return res.status(404).json({ message: 'Ticket type not found' });
+        }
+
+        const ticketPrice = parseFloat(ticketResult.price);
+        if (isNaN(ticketPrice)) {
+          logger.error(`Invalid ticket price for ticketTypeId: ${ticket.ticketTypeId}`);
+          return res.status(500).json({ message: 'Invalid ticket price' });
+        }
+
+        const discountedPrice = ticketPrice * (1 - discountPercentage / 100);
+        totalAmount += discountedPrice * ticket.quantity;
+
+        ticketDetails.push({
+          ticketType: ticketResult.ticket_type,
+          price: discountedPrice.toFixed(2),
+          quantity: ticket.quantity,
+        });
+
+        // Update available tickets
+        const updateTicketQuantityQuery = `
+          UPDATE event_ticket_types 
+          SET available_tickets = available_tickets - ?
+          WHERE id = ?
+        `;
+        await query(updateTicketQuantityQuery, [ticket.quantity, ticket.ticketTypeId]);
+        logger.info(`Updated available tickets for ticketTypeId: ${ticket.ticketTypeId}, Quantity: ${ticket.quantity}`);
+      }
+    }
+
+    // Check if the total amounts match
+    if (totalAmount !== amount / 100) {
+      logger.warn(`Amount mismatch! Frontend amount: ${amount / 100}, Backend calculated amount: ${totalAmount}`);
+      return res.status(400).json({ message: 'Amount mismatch, please try again' });
+    }
+
+    // Process payment with Square
+    const idempotencyKey = uuidv4();
+    const paymentResponse = await client.paymentsApi.createPayment({
+      sourceId: nonce,
+      idempotencyKey,
+      amountMoney: {
+        amount: Math.round(totalAmount * 100),  // Ensure amount is in cents
+        currency: 'USD',
+      },
+      autocomplete: true,
+      customerId,
+    });
+
+    if (paymentResponse.result.payment.status === 'COMPLETED') {
+      const payment = paymentResponse.result.payment;
+      logger.info(`Payment successful for amount: ${totalAmount} USD`);
+
+      // Insert purchase record in the database
+      const insertPurchaseQuery = `
+        INSERT INTO shop_purchases
+        (first_name, last_name, email, phone_number, event_id, quantity, total_amount, confirmation_code, payment_id, success_email, discount_code)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const params = [
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        selectedTickets[0].event.id,
+        selectedTickets[0].eventTickets[0].quantity,
+        totalAmount,
+        idempotencyKey,
+        payment.id,
+        0,  // Set success_email to 0 (false) initially
+        discountCode || null,  // Store discount code if present
+      ];
+
+      const result = await query(insertPurchaseQuery, params);
+      purchaseId = result.insertId;
+      logger.info(`Purchase record inserted with ID: ${purchaseId}`);
+
+      // Track discount code usage
+      if (discountCodeId) {
+        const insertDiscountUsageQuery = `
+          INSERT INTO discount_code_usages (discount_code_id, ticket_purchase_id, user_email, used_at)
+          VALUES (?, ?, ?, NOW())
+        `;
+        await query(insertDiscountUsageQuery, [discountCodeId, purchaseId, email]);
+        logger.info(`Discount code usage tracked for discountCodeId: ${discountCodeId}`);
+      }
+
+      // Send confirmation email
+      const totalCostFormatted = totalAmount.toFixed(2);
+      let emailSent = false;
+
+      try {
+        await sendConfirmationEmail({
+          to: email,
+          subject: `Your tickets for ${selectedTickets[0].event.title}`,
+          text: `Hi ${firstName} ${lastName},\n\nThank you for purchasing tickets to ${selectedTickets[0].event.title}!\n\nYour confirmation code is: ${idempotencyKey}.\nTotal: $${totalCostFormatted}`,
+          html: generateTicketPurchaseEmail({
+            firstName,
+            lastName,
+            eventName: selectedTickets[0].event.title,
+            tickets: ticketDetails,
+            confirmationCode: idempotencyKey,
+            totalCost: totalAmount,
+          }).html,
+        });
+
+        logger.info(`Confirmation email sent to: ${email}`);
+        emailSent = true;
+      } catch (emailError) {
+        logger.error(`Error sending confirmation email: ${emailError.message}`);
+        emailSent = false;
+      }
+
+      // Update success_email to 1 (true) if the email was sent successfully
+      const updateEmailStatusQuery = `
+        UPDATE shop_purchases
+        SET success_email = ?
+        WHERE id = ?
+      `;
+      await query(updateEmailStatusQuery, [emailSent ? 1 : 0, purchaseId]);
+
+      // Redirect to the payment-complete page on success
+      return res.status(200).json({ message: 'Payment and email successful.', purchaseComplete: true });
+    } else {
+      logger.error('Payment failed:', paymentResponse.result.errors);
+      return res.status(400).json({ error: 'Payment failed.' });
+    }
+  } catch (error) {
+    logger.error(`Error processing payment: ${error.message}`);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-// Routes
 const ticketRoutes = require('./routes/ticketRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const eventRoutes = require('./routes/eventRoutes');
@@ -114,126 +298,35 @@ const statusRoutes = require('./routes/statusRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
 const instagramRoutes = require('./routes/instagramRoutes');
 const discountRoutes = require('./routes/discountRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
-// Route integrations
 app.use('/api', vendorRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', blogRoutes);
 app.use('/api', guestRoutes);
 app.use('/api', statusRoutes);
+app.use('/api', notificationRoutes);
 app.use('/api/instagram', instagramRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/discounts', discountRoutes);
 
-// Instagram Route (Ensure `fetchVendorInstagramPosts` is defined and imported)
-app.get('/api/vendors-instagram-posts', (req, res) => {
-  const { selectedVendors } = req.query;
-
-  if (!selectedVendors || selectedVendors.length === 0) {
-    return res.json([]);
-  }
-
-  const vendorIds = selectedVendors.split(',').map(id => parseInt(id, 10));
-
-  // Use callback-based query for consistency
-  db.query(
-    'SELECT id, name, instagram_username FROM vendorshops WHERE id IN (?) AND instagram_username IS NOT NULL AND instagram_username != ""',
-    [vendorIds],
-    (err, vendors) => {
-      if (err) {
-        console.error('Error fetching vendors:', err);
-        return res.status(500).json({ message: 'Error fetching vendors' });
-      }
-
-      const vendorPostsPromises = vendors.map((vendor) => {
-        return new Promise((resolve, reject) => {
-          fetchVendorInstagramPosts(vendor.instagram_username)
-            .then((posts) => {
-              resolve({
-                vendor: vendor.name,
-                posts: posts || [],
-              });
-            })
-            .catch((error) => {
-              console.error('Error fetching Instagram posts:', error);
-              reject({ vendor: vendor.name, posts: [] });
-            });
-        });
-      });
-
-      // Handle all promises
-      Promise.all(vendorPostsPromises)
-        .then((vendorPosts) => res.json(vendorPosts))
-        .catch((error) => {
-          console.error('Error in vendor posts promises:', error);
-          res.status(500).json({ message: 'Error fetching vendor Instagram posts' });
-        });
-    }
-  );
-});
-
-// Status route
-app.get('/api/status', (req, res) => {
-  const statusData = {
-    dbStatus: false,
-    dbSize: 'N/A',
-    uptime: 'N/A',
-    lastBackup: 'N/A',
-    backupSize: 'N/A',
-    backupSuccess: 'N/A',
-    largestTable: 'N/A',
-    mostRecentEntry: 'N/A',
-  };
-
-  db.ping((err) => {
-    if (err) {
-      return res.status(200).json(statusData);
-    }
-
-    statusData.dbStatus = true;
-
-    db.query('SELECT SUM(data_length + index_length) AS size FROM information_schema.tables WHERE table_schema = ?', [process.env.DB_NAME], (err, result) => {
-      if (err || !result[0]) {
-        return res.status(500).json({ error: 'Failed to retrieve database size' });
-      }
-      statusData.dbSize = `${(result[0].size / (1024 * 1024)).toFixed(2)} MB`;
-
-      db.query('SELECT table_name, data_length + index_length AS size FROM information_schema.tables WHERE table_schema = ? ORDER BY size DESC LIMIT 1', [process.env.DB_NAME], (err, largestTableResult) => {
-        if (err || !largestTableResult[0]) {
-          return res.status(500).json({ error: 'Failed to retrieve largest table' });
-        }
-        statusData.largestTable = `${largestTableResult[0].table_name} (${(largestTableResult[0].size / (1024 * 1024)).toFixed(2)} MB)`;
-
-        db.query('SELECT table_name, update_time FROM information_schema.tables WHERE table_schema = ? ORDER BY update_time DESC LIMIT 1', [process.env.DB_NAME], (err, recentEntryResult) => {
-          if (err || !recentEntryResult[0]) {
-            return res.status(500).json({ error: 'Failed to retrieve recent entry' });
-          }
-          statusData.mostRecentEntry = `${recentEntryResult[0].table_name} (Last updated: ${recentEntryResult[0].update_time})`;
-          res.json(statusData);
-        });
-      });
-    });
-  });
-});
-
-// Error handling middleware
+// Error handling middleware with logging
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error',
-  });
+  logger.error(`Error: ${err.message}`);
+  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
-// Serve the privacy policy file
+// Serve privacy policy
 app.get('/privacy-policy', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'privacy-policy.html'));
 });
 
-// Handle all other routes with the React app
+// Serve frontend
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  logger.info(`Server running on http://localhost:${PORT}`);
 });

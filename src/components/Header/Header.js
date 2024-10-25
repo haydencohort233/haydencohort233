@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import GuestStatus from '../GuestStatus/GuestStatus';
 import './Header.css';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for programmatic navigation
+import { addLocalNotification } from '../NotificationSystem/NotificationSystem'; // Import the notification function
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [guest, setGuest] = useState(null);
   const menuRef = useRef(null);
+  const navigate = useNavigate(); // Initialize navigate
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -17,7 +20,6 @@ const Header = () => {
     }
   };
 
-  // Close menu on viewport resize back to desktop
   const handleResize = () => {
     if (window.innerWidth > 768) {
       setIsMenuOpen(false);
@@ -33,9 +35,7 @@ const Header = () => {
           throw new Error('Failed to fetch guest data');
         }
         const data = await response.json();
-
         const availableGuests = data.filter((guest) => !guest.break);
-
         const latestGuest = availableGuests.length > 0 ? availableGuests[availableGuests.length - 1] : null;
         setGuest(latestGuest);
       } catch (error) {
@@ -55,6 +55,11 @@ const Header = () => {
     };
   }, []);
 
+  const navigateToShop = () => {
+    // Use navigate to pass state when navigating to the shop
+    navigate('/shop', { state: { fromHeader: true } });
+  };
+
   return (
     <header className="header">
       <div className="header-logo-title">
@@ -68,7 +73,8 @@ const Header = () => {
       <nav className={`nav ${isMenuOpen ? 'open' : ''}`} ref={menuRef}>
         <ul>
           <li><a href="/haydencohort233/#/">Home</a></li>
-          <li><a href="/haydencohort233/#/shop">Shop</a></li>
+          {/* Replace anchor tag with onClick event for shop */}
+          <li onClick={navigateToShop}>Shop</li>
           <li><a href="/haydencohort233/#/events">Events</a></li>
           <li><a href="/haydencohort233/#/vendors">Vendors</a></li>
           <li><a href="/haydencohort233/#/blogs">Blogs</a></li>

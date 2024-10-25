@@ -10,31 +10,28 @@ const Tickets = ({ eventId, eventName, eventDate }) => {
 
     // Fetch ticket types for the event
     useEffect(() => {
-        console.log('Fetching ticket types for eventId:', eventId); // Debugging statement
-
+        console.log('Fetching ticket types for eventId:', eventId); 
+    
         const fetchTicketTypes = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/tickets/ticket-types?eventId=${eventId}`);
+                const response = await fetch(`http://localhost:5000/api/tickets/events/${eventId}/tickets`);
                 const result = await response.json();
-
-                console.log('API response:', result); // Debugging statement to log the full response
-
+        
                 if (response.ok && result.tickets) {
-                    setTicketTypes(result.tickets); // Ensure this line uses the correct property name
+                    setTicketTypes(result.tickets);
                 } else {
                     setErrorMessage(result.message || 'Failed to fetch ticket types.');
                 }
-                
             } catch (error) {
                 setErrorMessage('Error fetching ticket types.');
-                console.error('Error fetching ticket types:', error); // Log the error message
+                console.error('Error fetching ticket types:', error);
             }
-        };
-
+        };        
+    
         if (eventId) {
             fetchTicketTypes();
         }
-    }, [eventId]);
+    }, [eventId]);    
 
     const handleTicketClick = (ticketType) => {
         setSelectedTicketType(ticketType);
@@ -58,20 +55,24 @@ const Tickets = ({ eventId, eventName, eventDate }) => {
             {errorMessage ? (
                 <p className="error-message">{errorMessage}</p>
             ) : (
-                <div className="ticket-list">
-                    {ticketTypes.length > 0 ? (
-                        ticketTypes.map((ticketType) => (
-                            (isPresaleAvailable(ticketType) || !ticketType.ticketType.toLowerCase().includes('presale')) && (
-                                <div key={ticketType.id} className="ticket-bubble" onClick={() => handleTicketClick(ticketType)}>
-                                    <p className="ticket-name">{ticketType.ticketType}</p>
-                                    <p className="ticket-price">${ticketType.price}</p>
-                                </div>
-                            )
-                        ))
-                    ) : (
-                        <p>No ticket types available for this event.</p>
-                    )}
-                </div>
+            // Inside your map function, make sure to add a unique key for each item.
+// Ensure that you're passing a unique identifier like `ticketType.id` or `index` as a key
+
+<div className="ticket-list">
+  {ticketTypes.length > 0 ? (
+    ticketTypes.map((ticketType, index) => (
+      (isPresaleAvailable(ticketType) || !ticketType.ticketType.toLowerCase().includes('presale')) && (
+        <div key={ticketType.id || index} className="ticket-bubble" onClick={() => handleTicketClick(ticketType)}>
+          <p className="ticket-name">{ticketType.ticketType}</p>
+          <p className="ticket-price">${ticketType.price}</p>
+        </div>
+      )
+    ))
+  ) : (
+    <p>No ticket types available for this event.</p>
+  )}
+</div>
+
             )}
 
             {showDetails && selectedTicketType && (

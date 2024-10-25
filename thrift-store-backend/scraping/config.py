@@ -13,7 +13,7 @@ DATABASE_CONFIG = {
 }
 
 SCRAPER_CONFIG = {
-    'max_posts_per_vendor': 1,              # Maximum posts to scrape per vendor
+    'max_posts_per_vendor': 3,              # Maximum posts to scrape per vendor
     'max_photos': 3,                        # Max photos to download from carousel posts
     'throttle_speed_kbps': 50,              # Limit download speed of posts
     'request_threshold': 100,               # Number of requests before cooldown

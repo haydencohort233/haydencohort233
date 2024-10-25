@@ -42,13 +42,13 @@ const Tools = () => {
   const [isEditBlogModalOpen, setIsEditBlogModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchActiveDiscounts(); // Fetch active discounts when the component mounts
+    fetchActiveDiscounts();
   }, []);
 
   const fetchActiveDiscounts = () => {
     axios.get('http://localhost:5000/api/discounts/active')
       .then(response => {
-        setActiveDiscounts(response.data); // Store the active discounts
+        setActiveDiscounts(response.data);
       })
       .catch(error => {
         console.error('Error fetching active discounts:', error);
@@ -57,10 +57,8 @@ const Tools = () => {
 
   const handleScrape = () => {
     const userConfirmed = window.confirm('Are you sure you wish to scrape the latest Instagram posts?');
-  
     if (userConfirmed) {
       setScrapeStatus('Scraping in progress...');
-  
       axios.get('http://localhost:5000/api/scrape')
         .then(() => {
           alert('Scraping successful!');
@@ -74,7 +72,6 @@ const Tools = () => {
 
   const performBackup = () => {
     const userConfirmed = window.confirm('Are you sure you wish to backup the MySQL Database?');
-    
     if (userConfirmed) {
       axios.get('http://localhost:5000/api/backup')
         .then(() => {
@@ -244,7 +241,6 @@ const Tools = () => {
         </div>
       </div>
         <hr className='tools-divider' />
-          {/* Utility Buttons Section */}
           <div className="utility-button-container">
             <button className="view-map-button" onClick={() => setMapOpen(true)}>View Vendor Map</button>
             <button className="add-survey-button" onClick={() => setIsSurveyOpen(true)}>Survey</button>
@@ -256,7 +252,6 @@ const Tools = () => {
         {backupStatus && <p className="backup-status">{backupStatus}</p>}
       </div>
 
-      {/* Vendor Map Modal */}
       {isMapOpen && (
         <VendorMap 
           onClose={handleCloseMap} 

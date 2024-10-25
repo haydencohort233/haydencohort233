@@ -1,174 +1,67 @@
-/* AdminPage Layout */
-.admin-page {
-  display: flex;
-  height: 110vh;
-  font-family: 'Courier New', Courier, monospace;
-  padding: 20px;
-}
-
-/* Admin Actions - Fixed at bottom right for home and logout */
-.admin-actions {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.logout-button, .back-to-home-button {
-  background: linear-gradient(145deg, #000080, #4682b4);
-  color: #fff;
-  border: 2px solid #000000;
-  padding: 10px;
-  margin-top: 10px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.logout-button:hover, .back-to-home-button:hover {
-  background: linear-gradient(145deg, #4682b4, #1e90ff);
-}
-
-/* Tools Sidebar Styles */
-.tools-sidebar {
-  position: fixed; /* Keeps the sidebar fixed on the viewport */
-  top: 50%; /* Centers vertically */
-  left: 0; /* Aligns to the left of the viewport */
-  transform: translateY(-50%); /* Ensures perfect vertical centering */
-  width: 300px; /* Fixed width for the sidebar */
-  background: rgba(245, 245, 245, 0.9); /* Slightly transparent background */
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3); /* Adds a shadow for visual separation */
-  border: 2px solid #000; /* Border to define the sidebar */
-  padding: 10px; /* Adds some spacing inside */
-  z-index: 1000; /* Ensures it stays on top of other content */
-  transition: transform 0.3s ease-in-out; /* Smooth animation when toggling */
-}
-
-.tools-sidebar.open {
-  transform: translateY(-50%) translateX(0); /* Moves sidebar into view */
-}
-
-.tools-sidebar.closed {
-  transform: translateY(-50%) translateX(-100%); /* Hides the sidebar off-screen */
-}
-
-/* Tools toggle button */
-.tools-toggle-button {
-  position: fixed;
-  top: 50%; /* Aligns with the middle of the viewport */
-  left: 315px; /* Adjusts to be just outside the sidebar */
-  transform: translateY(-50%); /* Centers vertically */
-  background: linear-gradient(145deg, #00008b, #1e90ff); /* Retro color gradient */
-  color: #fff; /* White text for contrast */
-  padding: 10px; /* Spacing around the button */
-  border: none; /* Removes default border */
-  cursor: pointer; /* Changes the cursor to indicate action */
-  z-index: 1001; /* Ensures it's above other elements */
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Adds subtle shadow */
-  transition: left 0.3s ease-in-out; /* Smooth animation when toggling */
-}
-
-.tools-sidebar.closed + .tools-toggle-button {
-  left: 10px; /* Moves button to the edge when sidebar is closed */
-}
-
-/* Admin Content */
-.admin-content {
-  display: flex;
-  flex-direction: column; /* Keep content stacked vertically */
-  align-items: center; /* Center-align content horizontally */
-  justify-content: center;
-  padding: 20px;
-  width: 100%; /* Allow full width without being pushed by the sidebar */
-  position: relative; /* Ensure that it stays within its space */
-  margin-left: 0; /* Remove any margin that assumes the sidebar affects layout */
-}
-
-/* Metrics and Status Container */
-.metrics-status-container {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  padding-left: 20px;
-}
-
-/* Status and Metrics styling */
-.status-container {
-  background: linear-gradient(to top left, purple 0%, green 100%);
-  padding: 10px;
-  color: #fff;
-  border: 3px solid #fff;
-  margin-bottom: 20px;
-}
-
-.metrics-container {
-  background: linear-gradient(to top left, purple 0%, green 100%);
-  padding: 10px;
-  color: #fff;
-  border: 3px solid #fff;
-}
-
-/* For the login page container */
+/* Updated Login Page Styling */
 .login-page {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(135deg, #ffebcd, #f0e68c, #bdb76b); /* retro gradient */
+  background: linear-gradient(135deg, #ffebcd, #f0e68c, #bdb76b);
   font-family: 'Verdana', sans-serif; /* 2000s font style */
 }
 
-/* Login form styling */
+/* Center form content */
 .login-form {
-  background: linear-gradient(145deg, #fffacd, #ffe4b5); /* slight gradient for the box */
+  background: linear-gradient(145deg, #fffacd, #ffe4b5);
   padding: 30px;
   border: 3px solid #000000;
-  box-shadow: 6px 6px 0px #8b4513; /* 2000s shadow effect */
+  box-shadow: 6px 6px 0px #8b4513;
   width: 350px;
   text-align: center;
-  border-radius: 10px; /* Adds rounded corners for a softer look */
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers elements inside the form */
 }
 
-/* Header for the form */
 .login-form h2 {
   margin-bottom: 20px;
   font-size: 24px;
-  color: #00008b; /* Dark blue */
+  color: #00008b;
   font-weight: bold;
   text-shadow: 1px 1px 0px #fff;
 }
 
-/* Labels for the input fields */
 .login-form label {
   display: block;
   margin: 15px 0 5px;
   color: #000080;
   font-size: 14px;
+  text-align: left;
+  width: 100%; /* Ensure label stretches across the full form width */
 }
 
-/* Input fields styling */
+/* Ensure inputs are centered properly within the form */
 .login-form input {
-  width: 100%;
+  width: 100%; /* Full width relative to parent */
   padding: 10px;
   border: 2px solid #696969;
   border-radius: 3px;
   background: linear-gradient(145deg, #f0e68c, #fffacd);
   color: #000;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  text-align: center; /* Centers text inside input */
 }
 
-/* Error message styling */
 .error-message {
   color: #ff4500;
   margin-top: 10px;
   font-size: 14px;
 }
 
-/* Action buttons styling */
 .login-actions {
   display: flex;
   flex-direction: column;
   margin-top: 20px;
+  width: 100%; /* Adjust width for consistent centering */
 }
 
 .back-to-home-button, .login-button {
@@ -180,11 +73,15 @@
   margin: 10px 0;
   cursor: pointer;
   text-align: center;
-  border-radius: 5px; /* Rounded buttons */
 }
 
 .back-to-home-button:hover, .login-button:hover {
   background: linear-gradient(145deg, #a0522d, #8b4513);
+}
+
+.admin-page-user-input,
+.admin-page-pass-input {
+  width: 100%; /* Removed fixed 300px width */
 }
 
 /* Responsive layout for Status and Metrics */
@@ -197,4 +94,3 @@
     width: 100%;
   }
 }
-
