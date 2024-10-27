@@ -1,6 +1,9 @@
 const mysql = require('mysql');
-const logger = require('../utils/logger');
+const { createTaggedLogger } = require('../utils/logger');
 require('dotenv').config();
+
+// Create a tagged logger for the database module
+const logger = createTaggedLogger('server'); 
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -20,15 +23,18 @@ db.connect((err) => {
   logger.info('Connected to the database.');
 });
 
+// Handle unexpected disconnections and errors
 db.on('error', function(err) {
   if (err.code === 'PROTOCOL_CONNECTION_LOST') {
     logger.warn('Database connection was closed. Reconnecting...');
     handleDisconnect();
   } else {
+    logger.error(`Database error: ${err.message}`);
     throw err;
   }
 });
 
+// Reconnect function in case of disconnection
 function handleDisconnect() {
   db.connect((err) => {
     if (err) {
@@ -40,6 +46,7 @@ function handleDisconnect() {
   });
 }
 
+// Query function to interact with the database
 function query(sql, params) {
   return new Promise((resolve, reject) => {
     db.query(sql, params, (err, results) => {

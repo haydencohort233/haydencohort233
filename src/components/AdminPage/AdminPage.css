@@ -1,14 +1,25 @@
-/* Updated Login Page Styling */
+/* Login Page Styling */
 .login-page {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   background: linear-gradient(135deg, #ffebcd, #f0e68c, #bdb76b);
-  font-family: 'Verdana', sans-serif; /* 2000s font style */
+  font-family: 'Verdana', sans-serif;
 }
 
-/* Center form content */
+.error-message {
+  color: #ff4500;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Admin Page Styling */
+.admin-page-user-input,
+.admin-page-pass-input {
+  width: 90%;
+}
+
 .login-form {
   background: linear-gradient(145deg, #fffacd, #ffe4b5);
   padding: 30px;
@@ -16,14 +27,12 @@
   box-shadow: 6px 6px 0px #8b4513;
   width: 350px;
   text-align: center;
-  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers elements inside the form */
+  align-items: center;
 }
 
 .login-form h2 {
-  margin-bottom: 20px;
   font-size: 24px;
   color: #00008b;
   font-weight: bold;
@@ -36,32 +45,24 @@
   color: #000080;
   font-size: 14px;
   text-align: left;
-  width: 100%; /* Ensure label stretches across the full form width */
+  width: 90%;
 }
 
-/* Ensure inputs are centered properly within the form */
 .login-form input {
-  width: 100%; /* Full width relative to parent */
+  width: 90%;
   padding: 10px;
   border: 2px solid #696969;
   border-radius: 3px;
   background: linear-gradient(145deg, #f0e68c, #fffacd);
   color: #000;
-  margin-bottom: 15px;
-  text-align: center; /* Centers text inside input */
-}
-
-.error-message {
-  color: #ff4500;
-  margin-top: 10px;
-  font-size: 14px;
+  text-align: center;
 }
 
 .login-actions {
   display: flex;
   flex-direction: column;
   margin-top: 20px;
-  width: 100%; /* Adjust width for consistent centering */
+  width: 100%;
 }
 
 .back-to-home-button, .login-button {
@@ -70,21 +71,18 @@
   border: 2px solid #000000;
   padding: 10px;
   font-size: 16px;
-  margin: 10px 0;
+  margin: auto;
+  margin-bottom: 5px;
   cursor: pointer;
   text-align: center;
+  width: 70%;
 }
 
 .back-to-home-button:hover, .login-button:hover {
   background: linear-gradient(145deg, #a0522d, #8b4513);
 }
 
-.admin-page-user-input,
-.admin-page-pass-input {
-  width: 100%; /* Removed fixed 300px width */
-}
-
-/* Responsive layout for Status and Metrics */
+/* Mobile Responsive Layout */
 @media (max-width: 768px) {
   .metrics-status-container {
     padding-left: 0;

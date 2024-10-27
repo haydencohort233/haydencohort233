@@ -12,6 +12,8 @@ import Shop from './components/Shop/Shop';
 import BuyTicket from './components/Shop/BuyTicket';
 import ViewTickets from './components/ViewTickets/ViewTickets';
 import ShopComplete from './components/Shop/ShopComplete';
+import Login from './components/AdminPage/Login';
+import Register from './components/AdminPage/Register';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -24,6 +26,8 @@ root.render(
         <Route path="/events" element={<Events />} />
         <Route path="/vendors" element={<VendorList />} />
         <Route path="/blogs" element={<Blog />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/scraped-posts" element={<ScrapedPosts />} />
         <Route path="/shop" element={<Shop />} />

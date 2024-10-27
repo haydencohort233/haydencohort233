@@ -1,43 +1,17 @@
-const fs = require('fs');
-const path = require('path');
+const { createTaggedLogger } = require('./logger');
 
-// Log file path
-const logFilePath = path.join(__dirname, '../logs/actions.log');
+// Generic function to log vendor actions to combined.log with tags
+const logVendorAction = (action, vendorName, vendorId) => {
+  try {
+    const logger = createTaggedLogger('vendor'); // Create a tagged logger for vendors
+    const logMessage = `${action} by vendor: ${vendorName} (ID: ${vendorId})`;
 
-// Helper function to format the timestamp
-const formatTimestamp = () => {
-  const now = new Date();
-
-  // Format the date as MM-DD-YYYY
-  const date = now.toLocaleDateString('en-US', {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric',
-  });
-
-  // Format the time as HH:MM:SS AM/PM
-  const time = now.toLocaleTimeString('en-US', {
-    hour12: true,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-
-  return `[${date}][${time}]`;
+    logger.info(logMessage);
+    console.log(`Log entry added: ${logMessage}`); // Confirm log entry addition for debugging
+  } catch (error) {
+    console.error(`Failed to log action: ${error.message}`); // Handle error if logger instantiation fails
+    throw new Error('Logging failed');
+  }
 };
 
-// Log action with formatted timestamp, action, guest name, guest ID, and admin username
-const logAction = (action, guestName, guestId, adminUsername = 'Unknown Admin') => {
-  const timestamp = formatTimestamp();
-  
-  // Format the log message to include both guest name and guest ID
-  const logMessage = `[${adminUsername}]${timestamp} - ${action}: ${guestName} (ID: ${guestId})\n`;
-
-  fs.appendFile(logFilePath, logMessage, (err) => {
-    if (err) {
-      console.error('Failed to write to log file:', err);
-    }
-  });
-};
-
-module.exports = { logAction };
+module.exports = { logVendorAction };

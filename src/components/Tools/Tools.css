@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px; /* Fixed width for consistent button sizing */
+  width: 100px;
   border-radius: 4px;
 }
 

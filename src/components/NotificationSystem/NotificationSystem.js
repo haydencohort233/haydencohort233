@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './NotificationSystem.css';
 import { v4 as uuidv4 } from 'uuid';
-import notificationMessages from './notificationMessages.json'; // Import standard messages
 import { useLocation } from 'react-router-dom';
 
 let addLocalNotification;
@@ -35,48 +34,47 @@ const NotificationSystem = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Current Path:", location.pathname);
-
     // Dismiss all notifications if on an excluded path
-    const excludedPaths = ['/buy-ticket'];
+    const excludedPaths = ['/buy-ticket', '/register', '/login'];
     if (excludedPaths.includes(location.pathname)) {
       console.log("Dismissing all notifications as path is excluded.");
       setNotifications([]);
       return;
     }
 
-    // Fetch persistent notifications from the backend only if not on excluded paths
     if (!excludedPaths.includes(location.pathname)) {
       const fetchPersistentNotifications = async () => {
         try {
-          console.log("Fetching persistent notifications...");
           const response = await fetch('http://localhost:5000/api/notifications');
-          console.log("Received response from /api/notifications:", response);
-
-          const data = await response.json();
-          console.log("Parsed JSON data:", data);
-
-          const currentDateTime = new Date();
-          const notificationsArray = Array.isArray(data) ? data : [data];
-
-          const validNotifications = notificationsArray.filter((notification) => {
-            const showOn = new Date(notification.show_on);
-            const expiresAt = new Date(notification.expires_at);
-            return currentDateTime >= showOn && currentDateTime <= expiresAt;
-          });
-
-          console.log("Valid notifications to display:", validNotifications);
-
-          // Add persistent notifications to state without duplicating
-          validNotifications.forEach(notification => {
-            if (!notifications.some(notif => notif.message === notification.message)) {
-              addNotification(notification.message, notification.type || 'info', notification.priority || 'normal');
+      
+          if (response.ok && response.headers.get("content-length") !== "0") {
+            const data = await response.json();
+            if (data.length === 0) {
+              console.log("No notifications to display");
+            } else {
+              const currentDateTime = new Date();
+              const validNotifications = data.filter((notification) => {
+                const showOn = new Date(notification.show_on);
+                const expiresAt = new Date(notification.expires_at);
+                return currentDateTime >= showOn && currentDateTime <= expiresAt;
+              });
+      
+              console.log("Valid notifications to display:", validNotifications);
+      
+              // Add notifications to state without duplicating
+              validNotifications.forEach(notification => {
+                if (!notifications.some(notif => notif.message === notification.message)) {
+                  addNotification(notification.message, notification.type || 'info', notification.priority || 'normal');
+                }
+              });
             }
-          });
+          } else {
+            console.log("No content in the response body.");
+          }
         } catch (error) {
           console.error("Error fetching persistent notifications:", error);
         }
-      };
+      };      
 
       fetchPersistentNotifications();
     } else {
@@ -87,14 +85,14 @@ const NotificationSystem = () => {
   useEffect(() => {
     // Restart countdowns for notifications on refresh
     notifications.forEach((notification) => {
-      startCountdown(notification.id, notification.countdown); // Restart with saved countdown time
+      startCountdown(notification.id, notification.countdown);
     });
   }, []);
 
   // Function to add local notifications
   addLocalNotification = (message, type = 'info', priority = 'normal') => {
     const id = uuidv4();
-    const countdownTime = priority === 'high' ? 30 : priority === 'low' ? 10 : 15; // High priority stays longer (30s), low priority (10s), normal (15s)
+    const countdownTime = priority === 'high' ? 30 : priority === 'low' ? 10 : 15;
     const expiresAt = new Date(Date.now() + countdownTime * 1000);
     setNotifications((prev) => [...prev, { id, message, type, countdown: countdownTime, expiresAt }]);
     startCountdown(id, countdownTime);
@@ -126,8 +124,8 @@ const NotificationSystem = () => {
 
   const removeNotification = (id) => {
     console.log("Removing notification with ID:", id);
-    clearTimeout(hoverTimeouts.current[id]); // Clear any timeout when manually removing
-    clearInterval(countdownIntervals.current[id]); // Clear countdown interval
+    clearTimeout(hoverTimeouts.current[id]);
+    clearInterval(countdownIntervals.current[id]);
     setNotifications((prev) => prev.filter((notification) => notification.id !== id));
     delete hoverTimeouts.current[id];
     delete countdownIntervals.current[id];

@@ -12,10 +12,19 @@ const { v4: uuidv4 } = require('uuid');
 const JSONbig = require('json-bigint');
 const { sendConfirmationEmail } = require('./utils/emailService');
 const { generateTicketPurchaseEmail } = require('./utils/emailTemplates');
-const logger = require('./utils/logger');
+const { createTaggedLogger } = require('./utils/logger');
+const logger = createTaggedLogger('server');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Rate Limiting Middleware
+const loginRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per windowMs
+  message: 'Too many login attempts from this IP, please try again after 15 minutes'
+});
 
 // Middleware
 app.use(cors({
@@ -57,6 +66,20 @@ app.get('/downloads/:filename', (req, res) => {
 const client = new Client({
   environment: Environment.Sandbox,
   accessToken: process.env.SQUARE_SANDBOX_ACCESS_TOKEN,
+});
+
+// Set cookie options with secure flags
+const cookieOptions = {
+  httpOnly: true,
+  secure: true, // Only send over HTTPS
+  sameSite: 'strict', // Helps mitigate CSRF attacks
+  maxAge: 24 * 60 * 60 * 1000 // 1 day
+};
+
+// Example route for setting a cookie securely
+app.post('/set-cookie', (req, res) => {
+  res.cookie('exampleCookie', 'exampleValue', cookieOptions);
+  res.status(200).send('Cookie set securely');
 });
 
 // Helper functions for customer lookup
@@ -210,7 +233,6 @@ app.post('/process-payment', async (req, res) => {
       const payment = paymentResponse.result.payment;
       logger.info(`Payment successful for amount: ${totalAmount} USD`);
 
-      // Insert purchase record in the database
       const insertPurchaseQuery = `
         INSERT INTO shop_purchases
         (first_name, last_name, email, phone_number, event_id, quantity, total_amount, confirmation_code, payment_id, success_email, discount_code)
@@ -226,15 +248,14 @@ app.post('/process-payment', async (req, res) => {
         totalAmount,
         idempotencyKey,
         payment.id,
-        0,  // Set success_email to 0 (false) initially
-        discountCode || null,  // Store discount code if present
+        0,
+        discountCode || null,
       ];
 
       const result = await query(insertPurchaseQuery, params);
       purchaseId = result.insertId;
       logger.info(`Purchase record inserted with ID: ${purchaseId}`);
 
-      // Track discount code usage
       if (discountCodeId) {
         const insertDiscountUsageQuery = `
           INSERT INTO discount_code_usages (discount_code_id, ticket_purchase_id, user_email, used_at)
@@ -290,12 +311,14 @@ app.post('/process-payment', async (req, res) => {
   }
 });
 
+const logRoutes = require('./routes/logRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const guestRoutes = require('./routes/guestRoutes');
 const statusRoutes = require('./routes/statusRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
+const loginRoutes = require('./routes/loginRoutes');
 const instagramRoutes = require('./routes/instagramRoutes');
 const discountRoutes = require('./routes/discountRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
@@ -306,6 +329,8 @@ app.use('/api', blogRoutes);
 app.use('/api', guestRoutes);
 app.use('/api', statusRoutes);
 app.use('/api', notificationRoutes);
+app.use('/api/logs', logRoutes);
+app.use('/api/auth', loginRoutes);
 app.use('/api/instagram', instagramRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/discounts', discountRoutes);
