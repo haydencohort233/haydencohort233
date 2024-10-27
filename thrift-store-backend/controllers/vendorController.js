@@ -201,8 +201,24 @@ const getTakenLocations = (req, res) => {
   });
 };
 
+// 9. Get all taken vendor IDs (new)
+const getTakenVendorIds = (req, res) => {
+  const query = 'SELECT vendor_id FROM login_vendors WHERE vendor_id IS NOT NULL';
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching taken vendor IDs:', err);
+      return res.status(500).json({ message: 'Error fetching taken vendor IDs' });
+    }
+
+    // Map the results to an array of vendor IDs
+    const takenVendorIds = results.map((row) => row.vendor_id);
+    res.json(takenVendorIds);
+  });
+};
+
 // Correctly export all functions
-module.exports = { 
+module.exports = {
   getAllVendors,
   getVendorById,
   getVendorsWithInstagram,
@@ -210,5 +226,6 @@ module.exports = {
   addVendor,
   deleteVendor,
   updateVendor,
-  getTakenLocations
+  getTakenLocations,
+  getTakenVendorIds
 };

@@ -42,6 +42,7 @@ router.get('/vendors/:id', vendorsController.getVendorById);
 router.get('/vendors-with-instagram', vendorsController.getVendorsWithInstagram);
 router.get('/featured', vendorsController.getFeaturedVendors);
 router.get('/taken-locations', vendorsController.getTakenLocations);
+router.get('/taken-vendor-ids', vendorsController.getTakenVendorIds);
 
 router.delete('/vendors/:id', vendorsController.deleteVendor);
 

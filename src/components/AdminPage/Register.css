@@ -1,48 +1,101 @@
+/* General Page Styling */
 .register-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #f0f8ff, #add8e6, #4682b4);
-    font-family: 'Verdana', sans-serif;
-  }
-  
-  .register-form {
-    background: linear-gradient(145deg, #fff, #ffe4e1);
-    padding: 30px;
-    border: 3px solid #000;
-    box-shadow: 6px 6px 0px #4682b4;
-    width: 400px;
-    text-align: center;
-  }
-  
-  .register-form input {
-    width: 90%;
-    padding: 10px;
-    border: 2px solid #696969;
-    margin-bottom: 10px;
-    border-radius: 3px;
-    background: #fff;
-  }
-  
-  .register-button {
-    background: linear-gradient(145deg, #4682b4, #4169e1);
-    color: #fff;
-    border: 2px solid #000;
-    padding: 10px;
-    font-size: 16px;
-    margin-top: 10px;
-    cursor: pointer;
-    width: 80%;
-  }
-  
-  .error-message {
-    color: #ff4500;
-    margin-top: 10px;
-  }
-  
-  .success-message {
-    color: #32cd32;
-    margin-top: 10px;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  background: linear-gradient(135deg, #f0f8ff, #add8e6, #4682b4);
+  font-family: 'Verdana', sans-serif;
+}
+
+/* Form Container */
+.register-form {
+  background: linear-gradient(145deg, #fff, #ffe4e1);
+  padding: 20px;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0px #4682b4;
+  width: 400px;
+  text-align: center;
+}
+
+/* Unified Styling for Inputs and Selects */
+.register-input {
+  width: 90%;
+  padding: 10px;
+  border: 2px solid #696969;
+  margin-bottom: 15px;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.register-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Specific Styling for Select Elements (Dropdowns) */
+.register-form select.register-input {
+  -webkit-appearance: none; /* Remove default dropdown styling in Webkit browsers */
+  -moz-appearance: none; /* Remove default dropdown styling in Firefox */
+  appearance: none; /* Remove default dropdown styling for other browsers */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23007bff" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
+  width: 96%; /* Match the width of other input fields */
+}
+
+/* Styling for the <optgroup> elements */
+.register-form optgroup {
+  font-style: italic;
+  font-weight: 600;
+  color: #555;
+  padding: 0.5rem 0;
+}
+
+/* Styling for Disabled <option> Items */
+.register-form option[disabled] {
+  color: #aaa;
+  background-color: #f5f5f5;
+}
+
+.register-button {
+  background: linear-gradient(145deg, #4682b4, #4169e1);
+  color: #fff;
+  border: 2px solid #000;
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+  width: 80%;
+}
+
+.error-message {
+  color: #ff4500;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.success-message {
+  color: #32cd32;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.login-link {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.login-link a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
