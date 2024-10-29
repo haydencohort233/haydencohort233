@@ -2,16 +2,16 @@ const express = require('express');
 const ticketController = require('../controllers/ticketController');
 const purchaseController = require('../controllers/purchaseController');
 const router = express.Router();
-const logger = require('../utils/logger');
+const { serverLogger } = require('../utils/logger');  // Correctly import serverLogger
 
 // Route to fetch events with available tickets (only those with tickets enabled)
 router.get('/events-with-tickets', async (req, res, next) => {
   try {
-    logger.info('Fetching events with available tickets...');
+    serverLogger.info('Fetching events with available tickets...');
     await ticketController.getEventsWithTickets(req, res, next);
-    logger.info('Successfully fetched events with available tickets.');
+    serverLogger.info('Successfully fetched events with available tickets.');
   } catch (error) {
-    logger.error(`Error fetching events with tickets: ${error.message}`);
+    serverLogger.error(`Error fetching events with tickets: ${error.message}`);
     next(error); // Pass error to error-handling middleware
   }
 });
@@ -19,11 +19,11 @@ router.get('/events-with-tickets', async (req, res, next) => {
 // Route to check the availability of tickets for specific events or ticket types
 router.get('/availability', async (req, res, next) => {
   try {
-    logger.info('Checking availability of tickets...');
+    serverLogger.info('Checking availability of tickets...');
     await ticketController.checkAvailability(req, res, next);
-    logger.info('Successfully checked ticket availability.');
+    serverLogger.info('Successfully checked ticket availability.');
   } catch (error) {
-    logger.error(`Error checking ticket availability: ${error.message}`);
+    serverLogger.error(`Error checking ticket availability: ${error.message}`);
     next(error); // Pass error to error-handling middleware
   }
 });
@@ -31,11 +31,11 @@ router.get('/availability', async (req, res, next) => {
 // Route to handle ticket purchases
 router.post('/buy', async (req, res, next) => {
   try {
-    logger.info('Processing ticket purchase...');
+    serverLogger.info('Processing ticket purchase...');
     await purchaseController.buyTicket(req, res, next);
-    logger.info('Ticket purchase successful.');
+    serverLogger.info('Ticket purchase successful.');
   } catch (error) {
-    logger.error(`Error processing ticket purchase: ${error.message}`);
+    serverLogger.error(`Error processing ticket purchase: ${error.message}`);
     next(error); // Pass error to error-handling middleware
   }
 });
@@ -43,11 +43,11 @@ router.post('/buy', async (req, res, next) => {
 // Route to fetch all tickets (admin or user interface purpose)
 router.get('/', async (req, res, next) => {
   try {
-    logger.info('Fetching all tickets...');
+    serverLogger.info('Fetching all tickets...');
     await ticketController.getAllTickets(req, res, next);
-    logger.info('Successfully fetched all tickets.');
+    serverLogger.info('Successfully fetched all tickets.');
   } catch (error) {
-    logger.error(`Error fetching all tickets: ${error.message}`);
+    serverLogger.error(`Error fetching all tickets: ${error.message}`);
     next(error); // Pass error to error-handling middleware
   }
 });
@@ -56,11 +56,11 @@ router.get('/', async (req, res, next) => {
 router.get('/events/:eventId/tickets', async (req, res, next) => {
   try {
     const { eventId } = req.params;
-    logger.info(`Fetching tickets for event ID: ${eventId}...`);
+    serverLogger.info(`Fetching tickets for event ID: ${eventId}...`);
     await ticketController.getTicketsByEventId(req, res, next);
-    logger.info(`Successfully fetched tickets for event ID: ${eventId}.`);
+    serverLogger.info(`Successfully fetched tickets for event ID: ${eventId}.`);
   } catch (error) {
-    logger.error(`Error fetching tickets for event ID ${req.params.eventId}: ${error.message}`);
+    serverLogger.error(`Error fetching tickets for event ID ${req.params.eventId}: ${error.message}`);
     next(error); // Pass error to error-handling middleware
   }
 });
@@ -69,11 +69,11 @@ router.get('/events/:eventId/tickets', async (req, res, next) => {
 router.get('/:ticketId', async (req, res, next) => {
   try {
     const { ticketId } = req.params;
-    logger.info(`Fetching ticket with ID: ${ticketId}...`);
+    serverLogger.info(`Fetching ticket with ID: ${ticketId}...`);
     await ticketController.getTicket(req, res, next);
-    logger.info(`Successfully fetched ticket with ID: ${ticketId}.`);
+    serverLogger.info(`Successfully fetched ticket with ID: ${ticketId}.`);
   } catch (error) {
-    logger.error(`Error fetching ticket with ID ${req.params.ticketId}: ${error.message}`);
+    serverLogger.error(`Error fetching ticket with ID ${req.params.ticketId}: ${error.message}`);
     next(error); // Pass error to error-handling middleware
   }
 });
@@ -82,11 +82,11 @@ router.get('/:ticketId', async (req, res, next) => {
 router.get('/events/:eventId/tickets/:ticketId', async (req, res, next) => {
   try {
     const { eventId, ticketId } = req.params;
-    logger.info(`Fetching ticket with ID: ${ticketId} for event ID: ${eventId}...`);
+    serverLogger.info(`Fetching ticket with ID: ${ticketId} for event ID: ${eventId}...`);
     await ticketController.getTicketByEventAndTicketId(req, res, next);
-    logger.info(`Successfully fetched ticket with ID: ${ticketId} for event ID: ${eventId}.`);
+    serverLogger.info(`Successfully fetched ticket with ID: ${ticketId} for event ID: ${eventId}.`);
   } catch (error) {
-    logger.error(`Error fetching ticket with ID ${req.params.ticketId} for event ID ${req.params.eventId}: ${error.message}`);
+    serverLogger.error(`Error fetching ticket with ID ${req.params.ticketId} for event ID ${req.params.eventId}: ${error.message}`);
     next(error); // Pass error to error-handling middleware
   }
 });

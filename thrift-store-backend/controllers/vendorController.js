@@ -1,7 +1,7 @@
 const db = require('../config/db');
 const axios = require('axios');
 const path = require('path');
-const { logAction } = require('../utils/logHelper');
+const { logAction } = require('../controllers/logsController');
 const { query } = require('../config/db');
 require('dotenv').config();
 

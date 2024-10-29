@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { logAction } = require('../utils/logHelper');
+const { logAction } = require('../controllers/logsController');
 
 // Fetch the next 3 upcoming events
 exports.getUpcomingEvents = (req, res) => {

@@ -1,0 +1,4 @@
+{
+    "validLogTypes": ["vendor", "server", "email", "error", "shop", "blog"]
+  }
+  

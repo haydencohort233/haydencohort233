@@ -1,6 +1,6 @@
 const db = require('../config/db');
 const path = require('path');
-const { logAction } = require('../utils/logHelper');
+const { logAction } = require('../controllers/logsController');
 
 exports.getAllGuests = (req, res) => {
   const query = `SELECT id, name, guestavatar, guestphoto, description, schedule, break FROM guestvendors ORDER BY name ASC`;

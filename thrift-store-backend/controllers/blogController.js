@@ -1,6 +1,5 @@
 const db = require('../config/db');
-const { logAction } = require('../utils/logHelper');
-const path = require('path');
+const { logAction } = require('../controllers/logsController');
 
 exports.getAllBlogs = (req, res) => {
   const limit = req.query.limit ? `LIMIT ${parseInt(req.query.limit)}` : '';
@@ -46,7 +45,8 @@ exports.createBlog = (req, res) => {
       }
 
       const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
-      logAction('Blog Added', title, results.insertId, adminUsername);
+      const logMessage = `Blog titled "${title}" was added by ${adminUsername} (ID: ${results.insertId})`;
+      logAction('blog', logMessage);
 
       res.status(201).json({
         message: 'Blog created successfully',
@@ -90,7 +90,8 @@ exports.updateBlog = (req, res) => {
       return res.status(404).json({ error: 'Blog not found' });
     }
 
-    logAction('Blog Modified', title, req.params.id, adminUsername);
+    const logMessage = `Blog with ID ${req.params.id} was updated by ${adminUsername} with title "${title}"`;
+    logAction('blog', logMessage);
 
     res.status(200).json({ message: 'Blog updated successfully' });
   });
@@ -109,7 +110,8 @@ exports.deleteBlog = (req, res) => {
       return res.status(404).json({ error: 'Blog not found' });
     }
 
-    logAction('Blog Deleted', req.params.id, req.params.id, adminUsername);
+    const logMessage = `Blog with ID ${req.params.id} was deleted by ${adminUsername}`;
+    logAction('blog', logMessage);
 
     res.status(200).json({ message: 'Blog deleted successfully' });
   });

@@ -1,13 +1,10 @@
-// logRoutes.js
 const express = require('express');
 const { createTaggedLogger } = require('../utils/logger');
+const validLogTypes = require('../utils/logTypesConfig.json').validLogTypes;
 const router = express.Router();
 
-// Endpoint to log actions
 router.post('/log-action', (req, res) => {
     const { logType, message } = req.body;
-
-    // Debugging the incoming request
     console.log('Received log action request:', { logType, message });
 
     // Validate required fields
@@ -17,7 +14,6 @@ router.post('/log-action', (req, res) => {
     }
 
     // Validate logType if provided
-    const validLogTypes = ['vendor', 'server', 'email-info', 'error'];
     if (!validLogTypes.includes(logType)) {
         console.error(`Invalid logType provided: ${logType}`);
         return res.status(400).json({ error: `Invalid logType provided. Valid options are: ${validLogTypes.join(', ')}` });

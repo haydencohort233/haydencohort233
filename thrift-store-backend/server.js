@@ -1,19 +1,18 @@
 require('dotenv').config();
+require('dotenv').config({ path: '.env.sensitive' });
 const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
-const morgan = require('morgan');
 const { db, query } = require('./config/db');
 const express = require('express');
 const fs = require('fs');
+const { vendorLogger, serverLogger, logRequest } = require('./utils/logger');
 const { promisify } = require('util');
 const { Client, Environment } = require('square');
 const { v4: uuidv4 } = require('uuid');
 const JSONbig = require('json-bigint');
 const { sendConfirmationEmail } = require('./utils/emailService');
 const { generateTicketPurchaseEmail } = require('./utils/emailTemplates');
-const { createTaggedLogger } = require('./utils/logger');
-const logger = createTaggedLogger('server');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -38,7 +37,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
-app.use(morgan('dev'));
 
 // Serve images and videos with correct MIME types
 app.get('/downloads/:filename', (req, res) => {
@@ -54,10 +52,10 @@ app.get('/downloads/:filename', (req, res) => {
     if (exists) {
       res.setHeader('Content-Type', contentType);
       res.sendFile(filePath);
-      logger.info(`File sent: ${req.params.filename}`);
+      serverLogger.info(`File sent: ${req.params.filename}`);
     } else {
       res.status(404).send('File not found');
-      logger.error(`File not found: ${req.params.filename}`);
+      serverLogger.error(`File not found: ${req.params.filename}`);
     }
   });
 });
@@ -96,14 +94,14 @@ async function findCustomerByEmail(email) {
     });
 
     if (searchResponse.result.customers && searchResponse.result.customers.length > 0) {
-      logger.info(`Customer found by email: ${email}`);
+      vendorLogger.info(`Customer found by email: ${email}`);
       return searchResponse.result.customers[0];
     } else {
-      logger.warn(`No customer found with email: ${email}, creating new customer...`);
+      vendorLogger.warn(`No customer found with email: ${email}, creating new customer...`);
       return null;
     }
   } catch (error) {
-    logger.error(`Error searching customer by email: ${email} - ${error.message}`);
+    vendorLogger.error(`Error searching customer by email: ${email} - ${error.message}`);
     return null;
   }
 }
@@ -125,12 +123,12 @@ app.post('/process-payment', async (req, res) => {
   try {
     // Check if selectedTickets is valid and contains data
     if (!selectedTickets || selectedTickets.length === 0) {
-      logger.error('No selected tickets provided');
+      serverLogger.error('No selected tickets provided');
       return res.status(400).json({ error: 'No selected tickets provided' });
     }
 
-    logger.info('Starting payment process for customer:', { email, firstName, lastName, phoneNumber });
-    logger.info('Selected tickets:', selectedTickets); // Log selected tickets for debugging
+    serverLogger.info('Starting payment process for customer:', { email, firstName, lastName, phoneNumber });
+    serverLogger.info('Selected tickets:', selectedTickets); // Log selected tickets for debugging
 
     let customerId;
     let purchaseId = null;
@@ -140,7 +138,7 @@ app.post('/process-payment', async (req, res) => {
     const existingCustomer = await findCustomerByEmail(email);
     if (existingCustomer) {
       customerId = existingCustomer.id;
-      logger.info(`Existing customer found for email: ${email}`);
+      vendorLogger.info(`Existing customer found for email: ${email}`);
     } else {
       const createCustomerResponse = await client.customersApi.createCustomer({
         emailAddress: email,
@@ -149,7 +147,7 @@ app.post('/process-payment', async (req, res) => {
         phoneNumber: phoneNumber,
       });
       customerId = createCustomerResponse.result.customer.id;
-      logger.info(`New customer created with ID: ${customerId}`);
+      vendorLogger.info(`New customer created with ID: ${customerId}`);
     }
 
     // Handle discount code logic
@@ -159,9 +157,9 @@ app.post('/process-payment', async (req, res) => {
       if (discountQueryResult.length > 0) {
         discountPercentage = discountQueryResult[0].discount_percentage;
         discountCodeId = discountQueryResult[0].id; // Capture discount_code_id
-        logger.info(`Discount applied: ${discountPercentage}%`);
+        serverLogger.info(`Discount applied: ${discountPercentage}%`);
       } else {
-        logger.warn(`Invalid discount code: ${discountCode}`);
+        serverLogger.warn(`Invalid discount code: ${discountCode}`);
         return res.status(400).json({ error: 'Invalid discount code' });
       }
     }
@@ -180,13 +178,13 @@ app.post('/process-payment', async (req, res) => {
         const ticketResult = ticketTypeQueryResult[0];
 
         if (!ticketResult) {
-          logger.error(`Ticket type not found for ticketTypeId: ${ticket.ticketTypeId}`);
+          serverLogger.error(`Ticket type not found for ticketTypeId: ${ticket.ticketTypeId}`);
           return res.status(404).json({ message: 'Ticket type not found' });
         }
 
         const ticketPrice = parseFloat(ticketResult.price);
         if (isNaN(ticketPrice)) {
-          logger.error(`Invalid ticket price for ticketTypeId: ${ticket.ticketTypeId}`);
+          serverLogger.error(`Invalid ticket price for ticketTypeId: ${ticket.ticketTypeId}`);
           return res.status(500).json({ message: 'Invalid ticket price' });
         }
 
@@ -206,13 +204,13 @@ app.post('/process-payment', async (req, res) => {
           WHERE id = ?
         `;
         await query(updateTicketQuantityQuery, [ticket.quantity, ticket.ticketTypeId]);
-        logger.info(`Updated available tickets for ticketTypeId: ${ticket.ticketTypeId}, Quantity: ${ticket.quantity}`);
+        serverLogger.info(`Updated available tickets for ticketTypeId: ${ticket.ticketTypeId}, Quantity: ${ticket.quantity}`);
       }
     }
 
     // Check if the total amounts match
     if (totalAmount !== amount / 100) {
-      logger.warn(`Amount mismatch! Frontend amount: ${amount / 100}, Backend calculated amount: ${totalAmount}`);
+      serverLogger.warn(`Amount mismatch! Frontend amount: ${amount / 100}, Backend calculated amount: ${totalAmount}`);
       return res.status(400).json({ message: 'Amount mismatch, please try again' });
     }
 
@@ -231,7 +229,7 @@ app.post('/process-payment', async (req, res) => {
 
     if (paymentResponse.result.payment.status === 'COMPLETED') {
       const payment = paymentResponse.result.payment;
-      logger.info(`Payment successful for amount: ${totalAmount} USD`);
+      serverLogger.info(`Payment successful for amount: ${totalAmount} USD`);
 
       const insertPurchaseQuery = `
         INSERT INTO shop_purchases
@@ -254,7 +252,7 @@ app.post('/process-payment', async (req, res) => {
 
       const result = await query(insertPurchaseQuery, params);
       purchaseId = result.insertId;
-      logger.info(`Purchase record inserted with ID: ${purchaseId}`);
+      serverLogger.info(`Purchase record inserted with ID: ${purchaseId}`);
 
       if (discountCodeId) {
         const insertDiscountUsageQuery = `
@@ -262,7 +260,7 @@ app.post('/process-payment', async (req, res) => {
           VALUES (?, ?, ?, NOW())
         `;
         await query(insertDiscountUsageQuery, [discountCodeId, purchaseId, email]);
-        logger.info(`Discount code usage tracked for discountCodeId: ${discountCodeId}`);
+        serverLogger.info(`Discount code usage tracked for discountCodeId: ${discountCodeId}`);
       }
 
       // Send confirmation email
@@ -284,10 +282,10 @@ app.post('/process-payment', async (req, res) => {
           }).html,
         });
 
-        logger.info(`Confirmation email sent to: ${email}`);
+        serverLogger.info(`Confirmation email sent to: ${email}`);
         emailSent = true;
       } catch (emailError) {
-        logger.error(`Error sending confirmation email: ${emailError.message}`);
+        serverLogger.error(`Error sending confirmation email: ${emailError.message}`);
         emailSent = false;
       }
 
@@ -302,14 +300,18 @@ app.post('/process-payment', async (req, res) => {
       // Redirect to the payment-complete page on success
       return res.status(200).json({ message: 'Payment and email successful.', purchaseComplete: true });
     } else {
-      logger.error('Payment failed:', paymentResponse.result.errors);
+      serverLogger.error('Payment failed:', paymentResponse.result.errors);
       return res.status(400).json({ error: 'Payment failed.' });
     }
   } catch (error) {
-    logger.error(`Error processing payment: ${error.message}`);
+    serverLogger.error(`Error processing payment: ${error.message}`);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+// Register the request logger middleware
+app.use(logRequest);
 
 const logRoutes = require('./routes/logRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
@@ -337,7 +339,7 @@ app.use('/api/discounts', discountRoutes);
 
 // Error handling middleware with logging
 app.use((err, req, res, next) => {
-  logger.error(`Error: ${err.message}`);
+  serverLogger.error(`Error: ${err.message}`);
   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
@@ -353,5 +355,5 @@ app.get('*', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT}`);
+  serverLogger.info(`Server running on http://localhost:${PORT}`);
 });

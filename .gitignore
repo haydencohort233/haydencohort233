@@ -1,5 +1,6 @@
 # dependencies
 /node_modules
+node_modules/
 /.pnp
 .pnp.js
 
@@ -9,8 +10,8 @@
 # production
 /build
 
-# Exclude environment variable files
-.env
+# Environment Files
+.env.sensitive
 
 # Ignore Python bytecode and cache
 __pycache__/
@@ -39,3 +40,6 @@ bfg-1.14.0.jar
 
 # Exclude log files
 /thrift-store-backend/logs/*
+
+# Exclude Winston audit logs
+/thrift-store-backend/logs/*.json
