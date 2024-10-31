@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './AddTicket.css';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
 const AddTicket = ({ isOpen, onClose }) => {
   const [events, setEvents] = useState([]);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [ticketType, setTicketType] = useState('');
+  const [ticketDescription, setTicketDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [availableTickets, setAvailableTickets] = useState(0);
   const [error, setError] = useState('');
@@ -32,52 +35,74 @@ const AddTicket = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Ensure an event is selected
     if (!selectedEventId) {
-      setError('Please select an event before adding a ticket.');
-      return;
+        setError('Please select an event before adding a ticket.');
+        return;
     }
+
+    const adminUsername = Cookies.get('adminUsername');
 
     // Create the new ticket object
     const newTicket = {
-      event_id: selectedEventId,
-      ticket_type: ticketType,
-      price: parseFloat(price),
-      available_tickets: parseInt(availableTickets, 10),
+        eventId: selectedEventId,
+        ticketType,
+        ticketDescription, // Include ticketDescription here
+        price: parseFloat(price),
+        availableTickets: parseInt(availableTickets, 10),
     };
 
+    // Debugging: Log newTicket to verify eventId value
+    console.log("Adding ticket with data: ", newTicket);
+
     // Submit the new ticket to your backend
-    fetch(`http://localhost:5000/api/tickets`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newTicket),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to add the new ticket. Please try again.');
+    try {
+        const response = await fetch(`http://localhost:5000/api/tickets`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Admin-Username': adminUsername,
+            },
+            body: JSON.stringify(newTicket),
+        });
+
+        console.log('Received response from adding new ticket:', response);
+        if (response.ok) {
+            console.log('New ticket added successfully:', newTicket);
+            // Reset form fields and close the modal
+            setTicketType('');
+            setTicketDescription(''); // Reset ticket description
+            setPrice(0);
+            setAvailableTickets(0);
+            setSelectedEventId(null);
+            setError('');
+            onClose();
+
+            // Log vendor action after adding a ticket
+            if (adminUsername) {
+                try {
+                    await axios.post('http://localhost:5000/api/logs/log-vendor-action', {
+                        username: adminUsername,
+                        action: `added new ticket type "${ticketType}" with description "${ticketDescription}" with price "${price}" and available tickets "${availableTickets}" for event ID: ${selectedEventId}`,
+                        logType: 'vendor',
+                    });
+                } catch (error) {
+                    console.error(`Error logging vendor action: ${error.message}`);
+                }
+            }
+        } else {
+            const errorData = await response.json();
+            console.error('Error adding new ticket:', errorData);
+            setError('Failed to add the new ticket. Please try again.');
         }
-        return response.json();
-      })
-      .then(() => {
-        console.log('New ticket added successfully:', newTicket);
-        // Reset form fields and close the modal
-        setTicketType('');
-        setPrice(0);
-        setAvailableTickets(0);
-        setSelectedEventId(null);
-        setError('');
-        onClose();
-      })
-      .catch(error => {
+    } catch (error) {
         console.error('Error adding new ticket:', error);
-        setError('Failed to add the new ticket. Please try again.');
-      });
-  };
+        setError('An error occurred while adding the ticket. Please try again.');
+    }
+};
 
   const handleClose = () => {
     setSelectedEventId(null);
@@ -125,11 +150,21 @@ const AddTicket = ({ isOpen, onClose }) => {
               </label>
 
               <label className="add-ticket-label">
+                Ticket Description:
+                <input 
+                  type="text" 
+                  value={ticketDescription} 
+                  onChange={(e) => setTicketDescription(e.target.value)} 
+                  required 
+                />
+              </label>
+
+              <label className="add-ticket-label">
                 Price:
                 <input 
                   type="number" 
                   min="0" 
-                  step="0.01"
+                  step="1"
                   value={price} 
                   onChange={(e) => setPrice(e.target.value)} 
                   required 

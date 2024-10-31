@@ -1,5 +1,6 @@
 const winston = require('winston');
 const { db, query } = require('../config/db');
+const { vendorLogger } = require('../utils/logger');
 
 const logger = winston.createLogger({
     level: 'info',
@@ -159,35 +160,96 @@ exports.getTicketByEventAndTicketId = async (req, res) => {
   };
 
   exports.deleteTicket = (req, res) => {
-    const ticketId = req.params.id;
+    const ticketId = req.params.ticketId;
     const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
   
     // Query to get the ticket information
     const getTicketQuery = 'SELECT ticket_type FROM event_ticket_types WHERE id = ?';
     db.query(getTicketQuery, [ticketId], (err, ticketResults) => {
       if (err || ticketResults.length === 0) {
+        vendorLogger.error(`Attempt to delete non-existent ticket (ID: ${ticketId}) by vendor: ${adminUsername}`);
         return res.status(404).json({ error: 'Ticket not found' });
       }
   
-      const ticketType = ticketResults[0].ticket_type;
+      const { ticket_type: ticketType, ticket_description: ticketDescription } = ticketResults[0];
+
       const deleteQuery = 'DELETE FROM event_ticket_types WHERE id = ?';
       db.query(deleteQuery, [ticketId], (err, deleteResults) => {
         if (err) {
-          logger.error('Error deleting ticket:', err);
-          return res.status(500).json({ error: 'Failed to delete ticket' });
+            vendorLogger.error(`Error deleting ticket (ID: ${ticketId}) by vendor: ${adminUsername}. Error: ${err.message}`);
+            return res.status(500).json({ error: 'Failed to delete ticket' });
         }
   
         if (deleteResults.affectedRows === 0) {
-          return res.status(404).json({ error: 'Ticket not found' });
+            vendorLogger.warn(`No ticket deleted, affected rows 0 for ticket (ID: ${ticketId}) by vendor: ${adminUsername}`);
+            return res.status(404).json({ error: 'Ticket not found' });
         }
   
-        logAction('Ticket Deleted', ticketType, ticketId, adminUsername);
+        // Successfully deleted the ticket
+        vendorLogger.info(`${adminUsername} deleted ticket type "${ticketType}" with description "${ticketDescription}" (ID: ${ticketId})`);
         res.json({ message: `Ticket ${ticketType} (ID: ${ticketId}) deleted successfully` });
       });
     });
   };
-  
+
+  exports.updateTicket = async (req, res) => {
+    const { ticketId } = req.params;
+    const { ticketType, price, availableTickets, ticketDescription } = req.body;
+    const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+
+    try {
+        // Check if the ticket exists
+        const ticket = await query('SELECT * FROM event_ticket_types WHERE id = ?', [ticketId]);
+
+        if (!ticket || ticket.length === 0) {
+            return res.status(404).json({ message: 'Ticket not found' });
+        }
+
+        // Update the ticket information
+        const updateQuery = `
+            UPDATE event_ticket_types
+            SET ticket_type = ?, price = ?, available_tickets = ?, ticket_description = ?
+            WHERE id = ?
+        `;
+        const params = [ticketType, price, availableTickets, ticketDescription, ticketId];
+
+        await query(updateQuery, params);
+
+        // Log the update action
+        logAction('Ticket Updated', ticketType, ticketId, adminUsername);
+
+        res.status(200).json({ message: 'Ticket updated successfully' });
+    } catch (error) {
+        console.error('Error updating ticket:', error.message);
+        res.status(500).json({ message: 'Error updating ticket', error: error.message });
+    }
+};
+
+exports.addTicket = async (req, res) => {
+    const { eventId, ticketType, ticketDescription, price, availableTickets } = req.body;
+    const adminUsername = req.headers['x-admin-username'] || 'Unknown Admin';
+
+    try {
+        // Insert the new ticket
+        const insertQuery = `
+            INSERT INTO event_ticket_types (event_id, ticket_type, ticket_description, price, available_tickets)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        const params = [eventId, ticketType, ticketDescription, price, availableTickets];
+
+        const result = await query(insertQuery, params);
+
+        // Log the addition action
+        vendorLogger.info(`${adminUsername} added ticket type "${ticketType}" with description "${ticketDescription}" (ID: ${result.insertId})`);
+
+        res.status(201).json({ message: 'Ticket added successfully', ticketId: result.insertId });
+    } catch (error) {
+        console.error('Error adding ticket:', error.message);
+        res.status(500).json({ message: 'Error adding ticket', error: error.message });
+    }
+};
+
   // Helper function to log actions (placeholder)
   const logAction = (action, itemType, itemId, adminUsername) => {
     logger.info(`${action} - ${itemType} (ID: ${itemId}) by ${adminUsername}`);
-  };  
+  };

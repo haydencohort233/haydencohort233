@@ -10,8 +10,8 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [vendorId, setVendorId] = useState(''); // To select the vendor ID for registration
-  const [availableVendors, setAvailableVendors] = useState([]); // List of vendors available for new registration
-  const [takenVendors, setTakenVendors] = useState([]); // List of vendors already registered
+  const [availableVendors, setAvailableVendors] = useState([]);
+  const [takenVendors, setTakenVendors] = useState([]);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();

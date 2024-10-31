@@ -52,6 +52,18 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+// Route to add a new ticket
+router.post('/', async (req, res, next) => {
+  try {
+    serverLogger.info('Adding a new ticket...');
+    await ticketController.addTicket(req, res, next);
+    serverLogger.info('Successfully added new ticket.');
+  } catch (error) {
+    serverLogger.error(`Error adding new ticket: ${error.message}`);
+    next(error); // Pass error to error-handling middleware
+  }
+});
+
 // Route to fetch tickets by event ID
 router.get('/events/:eventId/tickets', async (req, res, next) => {
   try {
@@ -78,6 +90,19 @@ router.get('/:ticketId', async (req, res, next) => {
   }
 });
 
+// Route to update a ticket by ID
+router.put('/:ticketId', async (req, res, next) => {
+  try {
+    const { ticketId } = req.params;
+    serverLogger.info(`Updating ticket with ID: ${ticketId}...`);
+    await ticketController.updateTicket(req, res, next);
+    serverLogger.info(`Successfully updated ticket with ID: ${ticketId}.`);
+  } catch (error) {
+    serverLogger.error(`Error updating ticket with ID ${ticketId}: ${error.message}`);
+    next(error); // Pass error to error-handling middleware
+  }
+});
+
 // Route to fetch a specific ticket of an event by event ID and ticket ID
 router.get('/events/:eventId/tickets/:ticketId', async (req, res, next) => {
   try {
@@ -90,5 +115,7 @@ router.get('/events/:eventId/tickets/:ticketId', async (req, res, next) => {
     next(error); // Pass error to error-handling middleware
   }
 });
+
+router.delete('/:ticketId', ticketController.deleteTicket);
 
 module.exports = router;

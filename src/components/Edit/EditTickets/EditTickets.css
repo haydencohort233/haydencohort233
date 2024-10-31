@@ -124,7 +124,7 @@ transition: background-color 0.3s ease;
 }
 
 .edit-ticket-type-input {
-height: 5px;
+height: 20px;
 font-size: 14px !important;
 }
 

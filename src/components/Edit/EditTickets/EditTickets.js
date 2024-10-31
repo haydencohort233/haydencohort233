@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './EditTickets.css';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 const EditTickets = ({ isOpen, onClose }) => {
   const [events, setEvents] = useState([]);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [ticketData, setTicketData] = useState({
     ticketType: '',
+    ticketDescription: '',
     price: 0,
     availableTickets: 0,
     ticketTypeId: null
@@ -114,6 +116,7 @@ const EditTickets = ({ isOpen, onClose }) => {
     console.log('Ticket selected:', ticket);
     setTicketData({
       ticketType: ticket.ticketType,
+      ticketDescription: ticket.ticketDescription,
       price: ticket.price,
       availableTickets: ticket.availableTickets,
       ticketTypeId: ticket.ticketTypeId,
@@ -124,13 +127,13 @@ const EditTickets = ({ isOpen, onClose }) => {
   const handleTicketUpdate = async (e) => {
     e.preventDefault();
     if (!ticketData) return;
-
+    
     if (!window.confirm("Are you sure you want to update this ticket?")) {
       return;
     }
-
+    
     const adminUsername = Cookies.get('adminUsername');
-
+    
     try {
       console.log('Updating ticket:', ticketData);
       const response = await fetch(`http://localhost:5000/api/tickets/${ticketData.ticketTypeId}`, {
@@ -141,11 +144,24 @@ const EditTickets = ({ isOpen, onClose }) => {
         },
         body: JSON.stringify(ticketData),
       });
-
+    
       console.log('Received response from updating ticket:', response);
       if (response.ok) {
         alert('Ticket updated successfully!');
         setError('');
+    
+    // Log vendor action after updating a ticket
+    if (adminUsername) {
+      try {
+        await axios.post('http://localhost:5000/api/logs/log-vendor-action', {
+          username: adminUsername,
+          action: `updated ticket type "${ticketData.ticketType}" with description "${ticketData.ticketDescription}" (ID: ${ticketData.ticketTypeId})`,
+        });
+      } catch (error) {
+        console.error(`Error logging vendor action: ${error.message}`);
+      }
+    }
+
       } else {
         const errorData = await response.json();
         console.error('Error updating ticket:', errorData);
@@ -155,18 +171,18 @@ const EditTickets = ({ isOpen, onClose }) => {
       console.error('Error updating ticket:', error);
       setError('An error occurred while updating the ticket. Please try again.');
     }
-  };
-
+  };  
+  
   const handleTicketDelete = async () => {
     if (!ticketData) return;
-
+  
     if (!window.confirm("Are you sure you want to delete this ticket? This action cannot be undone.")) {
       return;
     }
-
+  
     setIsDeleting(true);
     const adminUsername = Cookies.get('adminUsername');
-
+  
     try {
       console.log('Deleting ticket:', ticketData.ticketTypeId);
       const response = await fetch(`http://localhost:5000/api/tickets/${ticketData.ticketTypeId}`, {
@@ -175,13 +191,22 @@ const EditTickets = ({ isOpen, onClose }) => {
           'X-Admin-Username': adminUsername,
         },
       });
-
+  
       console.log('Received response from deleting ticket:', response);
       if (response.ok) {
         alert('Ticket deleted successfully!');
         setTickets(tickets.filter(ticket => ticket.ticketTypeId !== ticketData.ticketTypeId));
-        setTicketData({ ticketType: '', price: 0, availableTickets: 0, ticketTypeId: null });
+        setTicketData({ ticketType: '', ticketDescription: '', price: 0, availableTickets: 0, ticketTypeId: null });
         setError('');
+  
+        // Log vendor action
+        if (adminUsername) {
+          await axios.post('http://localhost:5000/api/logs/log-vendor-action', {
+            username: adminUsername,
+            action: `has deleted ${ticketData.ticketType} (Description: ${ticketData.ticketDescription}) (ID: ${ticketData.ticketTypeId})`,
+            logType: 'vendor',
+          });
+        }
       } else {
         setError('Failed to delete the ticket. Please try again.');
       }
@@ -191,7 +216,7 @@ const EditTickets = ({ isOpen, onClose }) => {
     } finally {
       setIsDeleting(false);
     }
-  };
+  };  
 
   if (!isOpen) return null;
 
@@ -243,10 +268,16 @@ const EditTickets = ({ isOpen, onClose }) => {
                 onChange={handleTicketInputChange}
                 required
               />
+              <label className="edit-ticket-label">Ticket Description:</label>
+              <input type="text" className="edit-ticket-type-description" name="ticketDescription"
+                value={ticketData.ticketDescription}
+                onChange={handleTicketInputChange}
+                required
+              />
               <label className="edit-ticket-label">Price:</label>
               <input type="number" className="edit-ticket-price-input" name="price"
                 min="0"
-                step="0.01"
+                step="1"
                 value={ticketData.price}
                 onChange={handleTicketInputChange}
                 required
